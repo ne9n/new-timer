@@ -10,10 +10,9 @@
 #define WAIT 0
 #define ARMED 1
 #define TAKEOFF 2
-#define ARMED 3
-#define FLY 4
-#define RAMPDWN 5
-#define LAND 6
+#define FLY 3
+#define RAMPDWN 4
+#define LAND 5
 
 Servo esc;
 
@@ -34,8 +33,6 @@ void debounce()
   static int buttonState = LOW;             // the current reading from the input pin
   static int lastButtonState = LOW;   // the previous reading from the input pin
 
-// the following variables are unsigned longs because the time, measured in
-// milliseconds, will quickly become a bigger number than can be stored in an int.
   static unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
   static unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
@@ -52,7 +49,6 @@ void debounce()
     // reset the debouncing timer
     lastDebounceTime = millis();
   }
-
   if ((millis() - lastDebounceTime) > debounceDelay) 
   {
     // whatever the reading is at, it's been there for longer than the debounce
@@ -65,8 +61,6 @@ void debounce()
 
     }
   }
-  
-
   // save the reading. Next time through the loop, it'll be the lastButtonState:
   lastButtonState = reading;
   return buttonState;
@@ -93,6 +87,7 @@ void loop()
  {
     case WAIT:
     {
+      // need to see a low to high transistion 
       if (debounce)
       {
         state_tmr = millis();
