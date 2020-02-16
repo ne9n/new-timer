@@ -7,6 +7,10 @@
 #define ArmTime 30000 // wait time in milisecnds 
 #define IncThrottle 3
 
+//for tesr
+#define FlyTime 9000 // air time in miliseconfs
+#define ArmTime 3000 // wait time in milisecnds 
+
 #define WAIT 0
 #define ARMED 1
 #define TAKEOFF 2
@@ -14,17 +18,27 @@
 #define RAMPDWN 4
 #define LAND 5
 
+// sub state for flyng
+#define FLYING 0
+#define BURP 1
+#define SETUP 2
+
+
+#define INCTIME 100
+
 Servo esc;
 
 // definations 
 int maxThrottle = MaxSpeed;
 int state_tmr;
 int curThrottle = 0; // current speed 
+int incTime = 0;
 
 
 const int buttonPin = 7;
 
 int fly_state = WAIT;
+int inFlight = FLYING;
 
 
 void debounce()
@@ -74,12 +88,34 @@ void setup() {
 	// attaches the servo on pin 9 to the servo object
 	esc.attach(9, 1000, 2000);
 	esc.write(curThrottle);
-  pinMode(buttonPin, INPUT);  
+  pinMode(buttonPin, INPUT); 
+  Serial.begin(9600);
+  Serial.print(" \n in setup \n");
 }
+void flyState()
+{
+unsigned long currentMillis1 = millis();
 
-
-
-void loop() 
+  switch (inFlight)
+  {
+  case FLYING:
+  {
+    if ( (currentMillis1 - state_tmr) > FlyTime)
+    {
+      fly_state = RAMPDWN;
+      state_tmr = millis();
+      Serial.print("\n rampdown \n");
+      Serial.print(curThrottle, DEC);
+    }
+    break;
+  }
+  case BURP:
+  {
+    break;
+  }
+  }
+}
+void speedState() 
 {
  unsigned long currentMillis = millis();
  
@@ -92,6 +128,9 @@ void loop()
       {
         state_tmr = millis();
         fly_state = ARMED;
+        Serial.print("\n wait to armed \n");
+        Serial.print(curThrottle,DEC);
+
       }
       break;
     }
@@ -101,37 +140,45 @@ void loop()
       {
         fly_state = TAKEOFF;
         state_tmr = millis();
+        Serial.print("\n armed to takeoff \n");        
+        Serial.print(curThrottle,DEC);
       }   
       break;
     }
     case TAKEOFF:
     {
-      if ((curThrottle =+ IncThrottle)  >= MaxSpeed)
+      if (curThrottle  >= MaxSpeed)
       {
         fly_state = FLY;
         state_tmr = millis();
         curThrottle = MaxSpeed;
+        Serial.print("\n fly \n");        
+        Serial.print(curThrottle, DEC);
+        incTime = currentMillis;
       }        
-      delay(100);  /* ick I hate this */
+      if (currentMillis- incTime >INCTIME)
+
+      curThrottle = curThrottle+ IncThrottle;
       break;
     }
     case FLY:
     {
-      if ( (currentMillis - state_tmr) > FlyTime)
-      {
-        fly_state = RAMPDWN;
-        state_tmr = millis();
-      }
+      flyState();
       break;
     }
     case RAMPDWN:
     {
-      if ((curThrottle-=IncThrottle)<=0 )
+      if ((curThrottle)<=0 )
       {
         fly_state = LAND;
         curThrottle = 0;  
+        Serial.print("\n land \n");
+        Serial.print(curThrottle ,DEC);
+        incTime = currentMillis;
+
       }
-      delay(100);
+      if (currentMillis- incTime >INCTIME)
+      curThrottle= curThrottle - IncThrottle;
       break;
     }
     case LAND:
@@ -142,4 +189,8 @@ void loop()
     }
  }
  esc.write(curThrottle);
+}
+void loop()
+{
+  speedState();
 }
