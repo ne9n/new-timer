@@ -5,8 +5,10 @@
 #define MaxSpeed 120 // 0 to 180 for degrees of rotation of a servo
 #define FlyTime 90000 // air time in miliseconfs
 #define ArmTime 30000 // wait time in milisecnds 
-#define IncThrottle 3
-
+#define IncThrottle 1
+#define BurpMax 180
+#define BURPTIME 500
+#define RDYTIME 5000
 //for tesr
 #define FlyTime 9000 // air time in miliseconfs
 #define ArmTime 3000 // wait time in milisecnds 
@@ -21,7 +23,8 @@
 // sub state for flyng
 #define FLYING 0
 #define BURP 1
-#define SETUP 2
+#define RDYLAND 2
+
 
 
 #define INCTIME 100
@@ -98,21 +101,35 @@ unsigned long currentMillis1 = millis();
 
   switch (inFlight)
   {
-  case FLYING:
-  {
-    if ( (currentMillis1 - state_tmr) > FlyTime)
+    case FLYING:
     {
-      fly_state = RAMPDWN;
-      state_tmr = millis();
-      Serial.print("\n rampdown \n");
-      Serial.print(curThrottle, DEC);
+     if ( (currentMillis1 - state_tmr) > FlyTime)
+      {
+        //fly_state = RAMPDWN;
+        state_tmr = millis();
+        inFlight= BURP;
+      }
+      break;
     }
-    break;
-  }
-  case BURP:
-  {
-    break;
-  }
+    case BURP:
+    {
+      curThrottle = BurpMax;
+      if (currentMillis1 - state_tmr > BURPTIME)
+      {
+        curThrottle = MaxSpeed;
+        state_tmr = 0;
+        inFlight = RDYLAND;
+      }
+      break;
+    }
+    case RDYLAND:
+    {
+      if((currentMillis1 - state_tmr) > RDYTIME)
+      {
+        state_tmr = 0;
+        fly_state = RAMPDWN; 
+      }
+    }
   }
 }
 void speedState() 
@@ -127,6 +144,7 @@ void speedState()
       if (debounce)
       {
         state_tmr = millis();
+        curThrottle = 0;
         fly_state = ARMED;
         Serial.print("\n wait to armed \n");
         Serial.print(curThrottle,DEC);
@@ -139,6 +157,8 @@ void speedState()
       if ( currentMillis- state_tmr > ArmTime)
       {
         fly_state = TAKEOFF;
+        curThrottle = 0;
+        incTime = currentMillis;
         state_tmr = millis();
         Serial.print("\n armed to takeoff \n");        
         Serial.print(curThrottle,DEC);
@@ -154,16 +174,19 @@ void speedState()
         curThrottle = MaxSpeed;
         Serial.print("\n fly \n");        
         Serial.print(curThrottle, DEC);
-        incTime = currentMillis;
+        
       }        
-      if (currentMillis- incTime >INCTIME)
-
-      curThrottle = curThrottle+ IncThrottle;
+      else if (currentMillis- incTime >INCTIME)
+      {
+        curThrottle = curThrottle+ IncThrottle;
+        Serial.print("accel");
+      }
       break;
     }
     case FLY:
     {
       flyState();
+      incTime = currentMillis;
       break;
     }
     case RAMPDWN:
@@ -175,10 +198,11 @@ void speedState()
         Serial.print("\n land \n");
         Serial.print(curThrottle ,DEC);
         incTime = currentMillis;
-
       }
-      if (currentMillis- incTime >INCTIME)
-      curThrottle= curThrottle - IncThrottle;
+      else if (currentMillis- incTime >INCTIME)
+      {
+        curThrottle= curThrottle - IncThrottle;
+      }
       break;
     }
     case LAND:
