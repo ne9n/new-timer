@@ -1,7 +1,15 @@
 #include <Servo.h>
 // create servo object to control a servo
-
 // state constants part of config values 
+
+// LIST OF THINGS TO DO
+// START BUTTON no debounce
+// Need LED support 
+// programming method
+// acclermotoer support
+// accel and decel ramps work but need a better method 
+ 
+
 #define MaxSpeed 120 // 0 to 180 for degrees of rotation of a servo
 #define FlyTime 90000 // air time in miliseconfs
 #define ArmTime 30000 // wait time in milisecnds 
@@ -12,6 +20,9 @@
 //for tesr
 #define FlyTime 9000 // air time in miliseconfs
 #define ArmTime 3000 // wait time in milisecnds 
+
+#define FLASHON 500
+#define FLASHOFF 500
 
 #define WAIT 0
 #define ARMED 1
@@ -27,7 +38,7 @@
 
 
 
-#define INCTIME 100
+#define INCTIME 50
 
 Servo esc;
 
@@ -36,7 +47,7 @@ int maxThrottle = MaxSpeed;
 int state_tmr;
 int curThrottle = 0; // current speed 
 int incTime = 0;
-
+int led_state =0;
 
 const int buttonPin = 7;
 
@@ -80,7 +91,7 @@ void debounce()
   }
   // save the reading. Next time through the loop, it'll be the lastButtonState:
   lastButtonState = reading;
-  return buttonState;
+  return !buttonState;
 }
 
 
@@ -92,8 +103,30 @@ void setup() {
 	esc.attach(9, 1000, 2000);
 	esc.write(curThrottle);
   pinMode(buttonPin, INPUT); 
+  pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
-  Serial.print(" \n in setup \n");
+}
+
+void ledUpdate()
+{
+  unsigned long currentMillis1 = millis();
+
+  switch (led_state)
+  {
+    case 1:
+    {
+      digitalWrite(LED_BUILTIN, HIGH);
+      led_state = 2;
+      break;  
+    }
+    case 2:
+    {
+      digitalWrite(LED_BUILTIN, LOW);
+      led_state = 1;
+      break;  
+     
+    }
+  }
 }
 void flyState()
 {
@@ -141,14 +174,11 @@ void speedState()
     case WAIT:
     {
       // need to see a low to high transistion 
-      if (debounce)
+      if (digitalRead(buttonPin))
       {
         state_tmr = millis();
         curThrottle = 0;
         fly_state = ARMED;
-        Serial.print("\n wait to armed \n");
-        Serial.print(curThrottle,DEC);
-
       }
       break;
     }
@@ -160,27 +190,26 @@ void speedState()
         curThrottle = 0;
         incTime = currentMillis;
         state_tmr = millis();
-        Serial.print("\n armed to takeoff \n");        
-        Serial.print(curThrottle,DEC);
       }   
       break;
     }
     case TAKEOFF:
     {
+      Serial.print(curThrottle, DEC);
+      Serial.print("\n");
       if (curThrottle  >= MaxSpeed)
       {
         fly_state = FLY;
         state_tmr = millis();
         curThrottle = MaxSpeed;
-        Serial.print("\n fly \n");        
-        Serial.print(curThrottle, DEC);
         
       }        
       else if (currentMillis- incTime >INCTIME)
       {
         curThrottle = curThrottle+ IncThrottle;
-        Serial.print("accel");
+        incTime = currentMillis;
       }
+
       break;
     }
     case FLY:
@@ -191,17 +220,17 @@ void speedState()
     }
     case RAMPDWN:
     {
-      if ((curThrottle)<=0 )
+
+      if ((curThrottle)<=10 )
       {
         fly_state = LAND;
         curThrottle = 0;  
-        Serial.print("\n land \n");
-        Serial.print(curThrottle ,DEC);
         incTime = currentMillis;
       }
       else if (currentMillis- incTime >INCTIME)
       {
-        curThrottle= curThrottle - IncThrottle;
+        curThrottle= curThrottle - IncThrottle; 
+        incTime = currentMillis;
       }
       break;
     }
@@ -212,9 +241,16 @@ void speedState()
       break;
     }
  }
+ if (fly_state < LAND)
+ {
+ } 
+ Serial.print(curThrottle, DEC);
+ Serial.print("\n");
+
  esc.write(curThrottle);
 }
 void loop()
 {
   speedState();
+  ledUpdate();
 }
