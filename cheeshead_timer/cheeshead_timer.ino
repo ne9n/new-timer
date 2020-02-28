@@ -9,20 +9,26 @@
 // START BUTTON no debounce
 // Need LED support
 // programming method
+//  works, saves data 
+//  add data to cheze structure 
+//  eeprom works
+
 // acclermotoer support
 // accel and decel ramps work but need a better method
 
+typedef struct{
+  unsigned int FlySpeed; // 0 to 180 for degrees of rotation of a servo
+  unsigned int FlyTime; // air time in miliseconfs
+  unsigned int ArmTime; // wait time in milisecnds
+  unsigned int aceelTime;
+}time_t;
 
-#define MaxSpeed 120 // 0 to 180 for degrees of rotation of a servo
-#define FlyTime 90000 // air time in miliseconfs
-#define ArmTime 30000 // wait time in milisecnds 
+time_t cheze;
+
 #define IncThrottle 1
 #define BurpMax 180
 #define BURPTIME 500
 #define RDYTIME 5000
-//for tesr
-#define FlyTime 9000 // air time in miliseconfs
-#define ArmTime 3000 // wait time in milisecnds 
 
 #define FLASHON 500
 #define FLASHOFF 500
@@ -39,14 +45,14 @@
 #define BURP 1
 #define RDYLAND 2
 
-
+extern void terminal();
 
 #define INCTIME 50
 
 Servo esc;
 
 // definations
-int maxThrottle = MaxSpeed;
+int maxThrottle = cheze.FlySpeed;
 int state_tmr;
 int curThrottle = 0; // current speed
 int incTime = 0;
@@ -60,13 +66,15 @@ int inFlight = FLYING;
 
 
 
-void setup() 
+void setup()
 {
   // attaches the servo on pin 9 to the servo object
   esc.attach(9, 1000, 2000);
   esc.write(curThrottle);
-//  pinMode(buttonPin, INPUT);
-//  pinMode(LED_BUILTIN, OUTPUT);
+  int eeAddress = 0;   
+  EEPROM.get(eeAddress, cheze );
+  pinMode(buttonPin, INPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
   terminal();
 }

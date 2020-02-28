@@ -7,7 +7,7 @@ void flyState()
   {
     case FLYING:
       {
-        if ( (currentMillis1 - state_tmr) > FlyTime)
+        if ( (currentMillis1 - state_tmr) > cheze.FlyTime)
         {
           //fly_state = RAMPDWN;
           state_tmr = millis();
@@ -20,7 +20,7 @@ void flyState()
         curThrottle = BurpMax;
         if (currentMillis1 - state_tmr > BURPTIME)
         {
-          curThrottle = MaxSpeed;
+          curThrottle = 180;
           state_tmr = 0;
           inFlight = RDYLAND;
         }
@@ -61,7 +61,7 @@ void speedState()
       }
     case ARMED:
       {
-        if ( currentMillis - state_tmr > ArmTime)
+        if ( currentMillis - state_tmr > cheze.ArmTime)
         {
           fly_state = TAKEOFF;
           curThrottle = 0;
@@ -72,13 +72,11 @@ void speedState()
       }
     case TAKEOFF:
       {
-        Serial.print(curThrottle, DEC);
-        Serial.print("\n");
-        if (curThrottle  >= MaxSpeed)
+        if (curThrottle  >= cheze.FlySpeed)
         {
           fly_state = FLY;
           state_tmr = millis();
-          curThrottle = MaxSpeed;
+          curThrottle = cheze.FlySpeed ;
 
         }
         else if (currentMillis - incTime > INCTIME)
@@ -121,7 +119,7 @@ void speedState()
   if (fly_state < LAND)
   {
   }
- 
+
 
   esc.write(curThrottle);
 }
