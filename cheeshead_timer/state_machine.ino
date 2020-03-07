@@ -7,9 +7,11 @@ void flyState()
   {
     case FLYING:
       {
+        curThrottle = cheze.FlySpeed + posTrim;
         if ( (currentMillis1 - state_tmr) > cheze.FlyTime)
         {
-          //fly_state = RAMPDWN;
+        
+           //fly_state = RAMPDWN;
           state_tmr = millis();
           inFlight = BURP;
         }
@@ -41,17 +43,26 @@ void flyState()
 void speedState()
 {
   unsigned long currentMillis = millis();
-
+  //Serial.println(fly_state);
+  //Serial.println(curThrottle);
+ 
   switch (fly_state)
   {
     case WAIT:
       {
+          digitalWrite(3,LOW);
+          digitalWrite(4,LOW);
+          digitalWrite(5,LOW);
+ 
         // need to see a low to high transistion
         if (digitalRead(buttonPin))
         {
           state_tmr = millis();
           curThrottle = 0;
           fly_state = ARMED;
+          digitalWrite(3,LOW);
+          digitalWrite(4,LOW);
+          digitalWrite(5, LOW);
         }
         else
         {
@@ -63,6 +74,10 @@ void speedState()
       {
         if ( currentMillis - state_tmr > cheze.ArmTime)
         {
+          digitalWrite(3, LOW);
+          digitalWrite(4,HIGH);
+          digitalWrite(5,LOW);
+
           fly_state = TAKEOFF;
           curThrottle = 0;
           incTime = currentMillis;
@@ -77,6 +92,9 @@ void speedState()
           fly_state = FLY;
           state_tmr = millis();
           curThrottle = cheze.FlySpeed ;
+          digitalWrite(3,HIGH);
+          digitalWrite(4,HIGH);
+          digitalWrite(5, LOW);
 
         }
         else if (currentMillis - incTime > INCTIME)
@@ -91,6 +109,10 @@ void speedState()
       {
         flyState();
         incTime = currentMillis;
+        digitalWrite(3, LOW);
+        digitalWrite(4, LOW);
+        digitalWrite(5 ,HIGH);
+
         break;
       }
     case RAMPDWN:
@@ -119,7 +141,13 @@ void speedState()
   if (fly_state < LAND)
   {
   }
-
-
+  constrain(curThrottle, 0,180);
+  Serial.print("throttle : ");
+  Serial.print(curThrottle);
+  Serial.print("\t trim : ");
+  Serial.print(posTrim);
+  Serial.println();
+  if(fly_state != LAND){
   esc.write(curThrottle);
+  }
 }

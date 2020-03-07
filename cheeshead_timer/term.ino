@@ -21,7 +21,7 @@ void saveData()
 }
 void get1Input()
 {
-  char menu = " ";
+  char menu;
   unsigned int x = 0;
   while (menu != 'q' )
   {
@@ -39,7 +39,7 @@ void get1Input()
       case 'a':
       case 'A':
         {
-          Serial.print( "Set fly speed %");
+          Serial.print( "Set fly speed ");
           cheze.FlySpeed = x;
           if (cheze.FlySpeed > 180) {
             cheze.FlySpeed = 180;
@@ -51,7 +51,7 @@ void get1Input()
       case 'B':
         {
           Serial.print( "Fly Time mseconds secs is ");
-          cheze.FlyTime = x 
+          cheze.FlyTime = x; 
           Serial.println(cheze.FlyTime );
           break;
         }
@@ -63,7 +63,14 @@ void get1Input()
           Serial.println(cheze.ArmTime );
           break;
         }
-
+      case 'D':
+      case 'd':
+        {
+          Serial.print( "Accel time in mseconds ");
+          cheze.accelTime = x ;
+          Serial.println(cheze.accelTime );
+          break;
+        }
       case 'q':
       case 'Q':
         {
@@ -83,6 +90,26 @@ void get1Input()
           menuValues();
           break;
         }
+              case 'o':
+        {
+          Serial.print( "LED off ");
+          digitalWrite(3,LOW);
+          digitalWrite(4,LOW);
+          digitalWrite(5,LOW);
+
+          break;
+        }
+                      case 'O':
+        {
+          Serial.print( "LED on ");
+          digitalWrite(3,HIGH);
+          digitalWrite(4,HIGH);
+          digitalWrite(5,HIGH);
+
+          break;
+        }
+
+
     }
   }
 }
@@ -98,7 +125,7 @@ void menuValues ()
   Serial.print(" c Arm Time msec     ");  
   Serial.println(cheze.ArmTime );
   Serial.print(" d accel Time msec   ");
-  Serial.println(cheze.acelTime );
+  Serial.println(cheze.accelTime );
 
   Serial.println(" *********************");
   Serial.println(" r refresh");

@@ -1,5 +1,4 @@
-
-void debounce()
+int debounce()
 {
   // Variables will change:
   static int buttonState = LOW;             // the current reading from the input pin
