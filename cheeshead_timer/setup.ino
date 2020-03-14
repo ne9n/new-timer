@@ -8,7 +8,7 @@ int debounce()
   static unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
   // read the state of the switch into a local variable:
-  int reading = digitalRead(buttonPin);
+  int reading = digitalRead(BUTTONPIN);
 
   // check to see if you just pressed the button
   // (i.e. the input went from LOW to HIGH), and you've waited long enough

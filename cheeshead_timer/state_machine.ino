@@ -1,18 +1,16 @@
 
 void flyState()
 {
-  unsigned long currentMillis1 = millis();
-
+ 
   switch (inFlight)
   {
     case FLYING:
       {
         curThrottle = cheze.FlySpeed + posTrim;
-        if ( (currentMillis1 - state_tmr) > cheze.FlyTime)
+        if ( (currentMillis- state_tmr) > cheze.FlyTime*1000 )
         {
-        
            //fly_state = RAMPDWN;
-          state_tmr = millis();
+          state_tmr = currentMillis;
           inFlight = BURP;
         }
         break;
@@ -20,7 +18,7 @@ void flyState()
     case BURP:
       {
         curThrottle = BurpMax;
-        if (currentMillis1 - state_tmr > BURPTIME)
+        if (currentMillis - state_tmr > BURPTIME)
         {
           curThrottle = 180;
           state_tmr = 0;
@@ -30,10 +28,11 @@ void flyState()
       }
     case RDYLAND:
       {
-        if ((currentMillis1 - state_tmr) > RDYTIME)
+        if ((currentMillis - state_tmr) > RDYTIME)
         {
           state_tmr = 0;
           fly_state = RAMPDWN;
+          inFlight = FLYING;
         }
       }
   }
@@ -42,46 +41,45 @@ void flyState()
 
 void speedState()
 {
-  unsigned long currentMillis = millis();
-  //Serial.println(fly_state);
-  //Serial.println(curThrottle);
- 
+  char m1;
+
+  currentMillis = millis();
   switch (fly_state)
   {
     case WAIT:
       {
-          digitalWrite(3,LOW);
+          digitalWrite(3,HIGH);
           digitalWrite(4,LOW);
           digitalWrite(5,LOW);
- 
-        // need to see a low to high transistion
-        if (digitalRead(buttonPin))
+          m1 =Serial.read();
+        if (m1 == '?')
         {
-          state_tmr = millis();
+           terminal(); 
+        }
+        // need to see a low to high transistion
+        if (!digitalRead(BUTTONPIN))
+        {
+          state_tmr = currentMillis;
           curThrottle = 0;
           fly_state = ARMED;
-          digitalWrite(3,LOW);
-          digitalWrite(4,LOW);
-          digitalWrite(5, LOW);
-        }
-        else
-        {
-
+          digitalWrite(3,HIGH);
+          digitalWrite(4,HIGH);
+          digitalWrite(5, HIGH);
         }
         break;
       }
     case ARMED:
       {
-        if ( currentMillis - state_tmr > cheze.ArmTime)
+        if ( (currentMillis - state_tmr) > cheze.ArmTime*1000)
         {
-          digitalWrite(3, LOW);
+          digitalWrite(3,LOW);
           digitalWrite(4,HIGH);
           digitalWrite(5,LOW);
 
           fly_state = TAKEOFF;
           curThrottle = 0;
-          incTime = currentMillis;
-          state_tmr = millis();
+          state_tmr = currentMillis;
+          
         }
         break;
       }
@@ -90,7 +88,7 @@ void speedState()
         if (curThrottle  >= cheze.FlySpeed)
         {
           fly_state = FLY;
-          state_tmr = millis();
+          state_tmr = currentMillis;
           curThrottle = cheze.FlySpeed ;
           digitalWrite(3,HIGH);
           digitalWrite(4,HIGH);
@@ -108,7 +106,6 @@ void speedState()
     case FLY:
       {
         flyState();
-        incTime = currentMillis;
         digitalWrite(3, LOW);
         digitalWrite(4, LOW);
         digitalWrite(5 ,HIGH);
@@ -123,6 +120,7 @@ void speedState()
           fly_state = LAND;
           curThrottle = 0;
           incTime = currentMillis;
+          state_tmr = currentMillis;
         }
         else if (currentMillis - incTime > INCTIME)
         {
@@ -134,19 +132,16 @@ void speedState()
     case LAND:
     default:
       {
+        if ( currentMillis - state_tmr > LANDTIME)
+        {
+          fly_state = WAIT;
+          state_tmr =currentMillis;
+        }
+       
         curThrottle = 0;
         break;
       }
   }
-  if (fly_state < LAND)
-  {
-  }
-  constrain(curThrottle, 0,180);
-  Serial.print("throttle : ");
-  Serial.print(curThrottle);
-  Serial.print("\t trim : ");
-  Serial.print(posTrim);
-  Serial.println();
   if(fly_state != LAND){
   esc.write(curThrottle);
   }
