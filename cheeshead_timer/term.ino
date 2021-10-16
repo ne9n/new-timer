@@ -1,4 +1,5 @@
 
+
 #include <EEPROM.h>
 
 void banner()
@@ -170,6 +171,7 @@ void get1Input()
 
 void menuValues ()
 {
+  read_giro();
   Serial.print(" a Fly Speed 0-180 ");
   Serial.println(cheze.FlySpeed );
   Serial.print(" b Fly Time sec ");
@@ -188,6 +190,12 @@ void menuValues ()
   Serial.println(cheze.calY );
   Serial.print(" Z gyro cal Z ");
   Serial.println(cheze.calZ );
+  Serial.print(" X gyro value ");
+  Serial.println(angleX );
+  Serial.print(" Y gyro val  ");
+  Serial.println(angleY );
+  Serial.print(" Z gyro val ");
+  Serial.println(angleZ );
   
   
   Serial.println(" **************************");
@@ -201,11 +209,19 @@ void menuValues ()
 }
 
 
+void read_giro()
+{
+  angleX = mpu6050.getAngleX();
+  angleY = mpu6050.getAngleY();
+  angleZ = mpu6050.getAngleZ();
+}
+
 
 void terminal()
 {
     
   banner();
+
   menuValues();
   get1Input();
 }
