@@ -50,7 +50,7 @@ Servo esc;
 #define RDYTIME 5000
 #define LANDTIME 0x1FF
 #define INCTIME 50
-
+#define SKIP 1000
 #define FLASHON 500
 #define FLASHOFF 500
 
@@ -129,16 +129,16 @@ void printDebug(void)
 {
     if (skip < 3)
   {
-    //      Serial.print("angleX : ");
-    //      Serial.print(angleX);
-    //      Serial.print("\tangleY : ");
-    //      Serial.print(angleY);
-    //      Serial.print("\tangleZ : ");
-    //      Serial.print(angleZ);
-          Serial.print("\t posTrim : ");
-          Serial.print(posTrim);
-          Serial.print("\t throttle : ");
-          Serial.print(curThrottle);
+          Serial.print("angleX : ");
+          Serial.print(angleX);
+          Serial.print("\tangleY : ");
+          Serial.print(angleY);
+       //   Serial.print("\tangleZ : ");
+      //    Serial.print(angleZ);
+    //      Serial.print("\t posTrim : ");
+    //      Serial.print(posTrim);
+    //      Serial.print("\t throttle : ");
+    //      Serial.print(curThrottle);
     
 //            Serial.print(" fly_state : ");
 //            Serial.print(fly_state);
@@ -149,9 +149,9 @@ void printDebug(void)
   }
   else
   {
-    if (skip > 500)
+    if (skip > SKIP)
     {
-      skip = 500;
+      skip = SKIP;
     }
     skip--;
   }
