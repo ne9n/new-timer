@@ -1,5 +1,4 @@
 
-
 void flyState()
 {
  
@@ -49,9 +48,9 @@ void speedState()
   {
     case WAIT:
       {
-          digitalWrite(3,HIGH);
-          digitalWrite(4,LOW);
-          digitalWrite(5,LOW);
+          digitalWrite(LED3,HIGH);
+          digitalWrite(LED4,LOW);
+          digitalWrite(LED5,digitalRead(BUTTONPIN));
           m1 =Serial.read();
         if (m1 == '?')
         {
@@ -63,9 +62,9 @@ void speedState()
           state_tmr = currentMillis;
           curThrottle = 0;
           fly_state = ARMED;
-          digitalWrite(3,HIGH);
-          digitalWrite(4,HIGH);
-          digitalWrite(5, HIGH);
+          digitalWrite(LED3,HIGH);
+          digitalWrite(LED4,HIGH);
+          digitalWrite(LED5, HIGH);
         }
         break;
       }
@@ -73,9 +72,9 @@ void speedState()
       {
         if ( (currentMillis - state_tmr) > cheze.ArmTime*1000)
         {
-          digitalWrite(3,LOW);
-          digitalWrite(4,HIGH);
-          digitalWrite(5,LOW);
+          digitalWrite(LED3,LOW);
+          digitalWrite(LED4,HIGH);
+          digitalWrite(LED5,LOW);
 
           fly_state = TAKEOFF;
           curThrottle = 0;
@@ -91,9 +90,9 @@ void speedState()
           fly_state = FLY;
           state_tmr = currentMillis;
           curThrottle = cheze.FlySpeed ;
-          digitalWrite(3,HIGH);
-          digitalWrite(4,HIGH);
-          digitalWrite(5, LOW);
+          digitalWrite(LED3,HIGH);
+          digitalWrite(LED4,HIGH);
+          digitalWrite(LED5, LOW);
 
         }
         else if (currentMillis - incTime > INCTIME)
@@ -107,9 +106,9 @@ void speedState()
     case FLY:
       {
         flyState();
-        digitalWrite(3, LOW);
-        digitalWrite(4, LOW);
-        digitalWrite(5 ,HIGH);
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5 ,HIGH);
 
         break;
       }

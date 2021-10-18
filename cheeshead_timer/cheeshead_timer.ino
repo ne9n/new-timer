@@ -40,6 +40,7 @@ typedef struct {
   byte k2;
 } time_t;
 
+int i;
 time_t cheze;
 MPU6050 mpu6050(Wire);
 Servo esc;
@@ -50,7 +51,7 @@ Servo esc;
 #define RDYTIME 5000
 #define LANDTIME 0x1FF
 #define INCTIME 50
-#define SKIP 1000
+#define SKIP 500
 #define FLASHON 500
 #define FLASHOFF 500
 
@@ -65,12 +66,14 @@ Servo esc;
 #define FLYING 0
 #define BURP 1
 #define RDYLAND 2
-#define BUTTONPIN 7
+
+// hardware pin def's
+#define BUTTONPIN 13
 #define SW1 8
 #define SERVO 9
-#define LED3 3
-#define LED4 4
-#define LED5 5
+#define LED3 10
+#define LED4 11
+#define LED5 12 //works
 
 
 extern void terminal();
@@ -117,6 +120,8 @@ void setup()
   pinMode(LED4, OUTPUT);
   pinMode(LED5, OUTPUT);
 
+
+
   Serial.begin(19200);
   Wire.begin();
   mpu6050.begin();
@@ -140,8 +145,8 @@ void printDebug(void)
     //      Serial.print("\t throttle : ");
     //      Serial.print(curThrottle);
     
-//            Serial.print(" fly_state : ");
-//            Serial.print(fly_state);
+            Serial.print(" fly_state : ");
+            Serial.print(fly_state);
 //            Serial.print(" currentMillis -state_tmr : ");
 //            Serial.print(currentMillis-state_tmr);
 
