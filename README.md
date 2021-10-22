@@ -7,3 +7,8 @@ The idea is to change the speed of the motor based on the ptich and roll of the 
 Target is an arduino and usees SPI connected giro to measure attitude.  
 it hsa on board storage of setup data, and serial termaina based menu.
 it usese the servo lib and task scheduler 
+
+#include <Servo.h>
+#include <EEPROM.h>
+#include <MPU6050_tockn.h>
+#include <Wire.h>
