@@ -20,7 +20,7 @@ the speed function works like this
 speed command =   speed set point + K1 * sin ( pitch angle) + K2 *abs (sine (roll angle))
 
 K1 and K2 are constands in save in the program.  
-the sensor is set up so that the pitch and roll nagles are zero when in level flight.  
+the sensor is set up so that the pitch and roll angles are zero when in level flight attitude.  
 
 the sine function will be implimeted as a lookup table 
 the system is controlled by a state machine and stated by a push button
