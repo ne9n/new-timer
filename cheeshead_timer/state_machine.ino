@@ -41,8 +41,6 @@ void flyState()
 
 void speedState()
 {
-  char m1;
-
   currentMillis = millis();
   switch (fly_state)
   {
@@ -50,12 +48,7 @@ void speedState()
       {
           digitalWrite(LED3,HIGH);
           digitalWrite(LED4,LOW);
-          digitalWrite(LED5,digitalRead(BUTTONPIN));
-          m1 =Serial.read();
-        if (m1 == '?')
-        {
-           terminal(); 
-        }
+          digitalWrite(LED5,LOW);
         // need to see a low to high transistion
         if (!digitalRead(BUTTONPIN))
         {
@@ -65,9 +58,10 @@ void speedState()
           digitalWrite(LED3,HIGH);
           digitalWrite(LED4,HIGH);
           digitalWrite(LED5, HIGH);
-        }
+        
         break;
       }
+     }
     case ARMED:
       {
         if ( (currentMillis - state_tmr) > cheze.ArmTime*1000)
