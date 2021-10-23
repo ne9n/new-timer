@@ -2,6 +2,7 @@
 #include <EEPROM.h>
 #include <MPU6050_tockn.h>
 #include <Wire.h>
+#include<NoDelay.h>
 
 // Dave Siegler ne9n.dave@gmail.com
 // This is a timer that steps through a seguence of speeds
@@ -80,6 +81,8 @@ extern void terminal();
 extern void speedState();
 extern void gyro();
 extern void printDebug();
+extern void led_slow();
+extern void led_fast();
 
 
 // definations
@@ -92,9 +95,10 @@ int gyro_flag = false;
 unsigned int skip;
 int angleX;
 int angleY;
-int angleZ;
+
 int posTrim;
 
+noDelay LEDtime(1000);//Creats a noDelay varible set to 1000ms
 
 
 // state variables 
@@ -102,7 +106,6 @@ int fly_state = WAIT;
 int inFlight = FLYING;
 
 unsigned long currentMillis = millis();
- 
 
 
 void setup()
@@ -121,7 +124,6 @@ void setup()
   pinMode(LED5, OUTPUT);
 
 
-
   Serial.begin(19200);
   Wire.begin();
   mpu6050.begin();
@@ -132,18 +134,18 @@ void setup()
 
 void plotDebug(void)
 {
-     
+  
           Serial.print("angleX : ");
           Serial.print(angleX);
           Serial.print("\tangleY : ");
           Serial.print(angleY);
+  
        //   Serial.print("\tangleZ : ");
       //    Serial.print(angleZ);
     //      Serial.print("\t posTrim : ");
     //      Serial.print(posTrim);
     //      Serial.print("\t throttle : ");
     //      Serial.print(curThrottle);
-    
             Serial.print(" fly_state : ");
             Serial.print(fly_state);
 //            Serial.print(" currentMillis -state_tmr : ");
@@ -152,13 +154,42 @@ void plotDebug(void)
     Serial.println();
   }
 
+void term_ctrl()
+{
+    char m1;
+    m1=Serial.read();
+    if (m1 == '?')
+    {
+       terminal(); 
+    }
+    // ctrlC exits 
+    else if (m1= 0x03)
+    {
+      fly_state = LAND;
+    }
+        ///ctrl p
+    else if (m1= 0x10)
+    {
+    }
+
+
+    
+    else
+    {}
+        
+
 }
 
 
 void loop()
 {
+  term_ctrl();
   speedState();
-  printDebug();
+  plotDebug();
   gyro();
-  // ledUpdate();
+  if(LEDtime.update())//Checks to see if set time has past
+  {
+    ledUpdate();
+  }
+  
 }
