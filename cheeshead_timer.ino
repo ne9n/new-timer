@@ -51,7 +51,7 @@ Servo esc;
 #define RDYTIME 5000
 #define LANDTIME 0x1FF
 #define INCTIME 50
-#define SKIP 1000
+#define SKIP 500
 #define FLASHON 500
 #define FLASHOFF 500
 
