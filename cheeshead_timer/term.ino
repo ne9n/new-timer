@@ -193,8 +193,6 @@ void menuValues ()
   Serial.println(angleX );
   Serial.print(" Y gyro val  ");
   Serial.println(angleY );
-  Serial.print(" Z gyro val ");
-  Serial.println(angleZ );
   
   
   Serial.println(" **************************");
@@ -212,7 +210,7 @@ void read_giro()
 {
   angleX = mpu6050.getAngleX();
   angleY = mpu6050.getAngleY();
-  angleZ = mpu6050.getAngleZ();
+
 }
 
 
