@@ -50,18 +50,18 @@ void speedState()
   {
     case WAIT:
       {
-          digitalWrite(LED3,HIGH);
-          digitalWrite(LED4,LOW);
-          digitalWrite(LED5,LOW);
         // need to see a low to high transistion
+        lights[0].skip = 1;
+        lights[0].invert = 1;
+
+        lights[1].skip = 1;
+        lights[2].skip = 1;
+        
         if (!digitalRead(BUTTONPIN))
         {
           state_tmr = currentMillis;
           curThrottle = 0;
           fly_state = ARMED;
-          digitalWrite(LED3,HIGH);
-          digitalWrite(LED4,HIGH);
-          digitalWrite(LED5, HIGH);
         
         break;
       }
@@ -70,10 +70,7 @@ void speedState()
       {
         if ( (currentMillis - state_tmr) > cheze.ArmTime*1000)
         {
-          digitalWrite(LED3,LOW);
-          digitalWrite(LED4,HIGH);
-          digitalWrite(LED5,LOW);
-
+ 
           fly_state = TAKEOFF;
           curThrottle = 0;
           state_tmr = currentMillis;
@@ -88,9 +85,6 @@ void speedState()
           fly_state = FLY;
           state_tmr = currentMillis;
           curThrottle = cheze.FlySpeed ;
-          digitalWrite(LED3,HIGH);
-          digitalWrite(LED4,HIGH);
-          digitalWrite(LED5, LOW);
 
         }
         else if (currentMillis - incTime > INCTIME)
@@ -104,9 +98,6 @@ void speedState()
     case FLY:
       {
         flyState();
-        digitalWrite(LED3, LOW);
-        digitalWrite(LED4, LOW);
-        digitalWrite(LED5 ,HIGH);
 
         break;
       }

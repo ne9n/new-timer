@@ -2,7 +2,7 @@
 #include <EEPROM.h>
 #include <MPU6050_tockn.h>
 #include <Wire.h>
-#include<NoDelay.h>
+
 
 // Dave Siegler ne9n.dave@gmail.com
 // This is a timer that steps through a seguence of speeds
@@ -40,6 +40,11 @@ typedef struct {
   byte k1;
   byte k2;
 } time_t;
+
+
+
+
+
 
 int i;
 time_t cheze;
@@ -84,8 +89,7 @@ extern void terminal();
 extern void speedState();
 extern void gyro();
 extern void printDebug();
-extern void led_slow();
-extern void led_fast();
+extern void led_init();
 
 
 // definations
@@ -93,7 +97,7 @@ int maxThrottle = cheze.FlySpeed;
 unsigned long state_tmr;
 int curThrottle = 0; // current speed
 int incTime = 0;
-int led_state = 0;
+
 int gyro_flag = false;
 unsigned int skip;
 int angleX;
@@ -101,7 +105,6 @@ int angleY;
 
 int posTrim;
 
-noDelay LEDtime(1000);//Creats a noDelay varible set to 1000ms
 
 
 // state variables 
@@ -122,10 +125,7 @@ void setup()
   pinMode(SW1, INPUT_PULLUP);
   pinMode(BUTTONPIN, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(LED3, OUTPUT);
-  pinMode(LED4, OUTPUT);
-  pinMode(LED5, OUTPUT);
-
+  led_init();
 
   Serial.begin(19200);
   Wire.begin();
@@ -190,9 +190,6 @@ void loop()
   speedState();
   plotDebug();
   gyro();
-  if(LEDtime.update())//Checks to see if set time has past
-  {
-    ledUpdate();
-  }
+  ledUpdate();
   
 }
