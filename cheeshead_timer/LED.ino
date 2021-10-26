@@ -18,13 +18,13 @@ struct light
 {
     byte pin;
     byte skip;
-    bool invert;
+    bool enable;
     bool toggle;
 };
 
 struct light lights[3];
 
-noDelay LEDtime(100);//Creats a noDelay varible set to 1000ms
+noDelay LEDtime(250);//Creats a noDelay varible set to 1000ms
 
 
 
@@ -34,9 +34,12 @@ void led_init()
   pinMode(LED4, OUTPUT);
   pinMode(LED5, OUTPUT);
   lights[0].pin = LED3;
-  lights[4].pin = LED4;
-  lights[5].pin = LED5;
+  lights[1].pin = LED4;
+  lights[2].pin = LED5;
  
+  lights[0].skip = 1;
+  lights[1].skip = 1;
+  lights[2].skip = 1;
   
 
 }
@@ -48,21 +51,26 @@ void led_init()
 void ledUpdate()
 {
   static byte ct;
-  byte i,j;
-  ct++;
+  byte i;
   if(LEDtime.update())//Checks to see if set time has past
   { 
- 
+    ct++;
+    if (ct>4)
+      ct = 0;
+
     for (i = 0; i<3; i++)
     {
-      j= ct & 1;
-      if (j=0 )
-          digitalWrite(lights[i].pin,lights[i].toggle);
-          if(lights[i].toggle == HIGH)
-              lights[i].toggle = LOW;
-          else
-              lights[i].toggle = HIGH;
-        
+    
+       {
+        if (ct & lights[i].skip )
+        {
+            digitalWrite(lights[i].pin,lights[i].toggle*lights[i].enable);
+            if(lights[i].toggle == HIGH)
+                lights[i].toggle = LOW;
+            else
+                lights[i].toggle = HIGH;
+        }
+      }  
     }
   }
 }
