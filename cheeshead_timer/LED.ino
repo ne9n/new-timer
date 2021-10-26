@@ -64,7 +64,7 @@ void ledUpdate()
        {
         if (ct & lights[i].skip )
         {
-            digitalWrite(lights[i].pin,lights[i].toggle*lights[i].enable);
+            digitalWrite(lights[i].pin,lights[i].toggle);
             if(lights[i].toggle == HIGH)
                 lights[i].toggle = LOW;
             else
