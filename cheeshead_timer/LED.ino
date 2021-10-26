@@ -33,9 +33,9 @@ noDelay LEDtime(250);//Creats a noDelay varible set to 1000ms
 void led_init()
 {
  
- Led led1(LED3);
- Led led2(LED4);
- Led led3(LED5);
+ Led led3(LED3);
+ Led led4(LED4);
+ Led led5(LED5);
  /* change this to external button*/
  Button button1(BUTTON_PIN); 
   
