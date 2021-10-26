@@ -50,11 +50,9 @@ void speedState()
   {
     case WAIT:
       {
-        lights[0].skip = 1;
-        lights[0].enable = HIGH;
-        lights[1].skip = 4;
-        lights[1].enable = HIGH;
-
+        led3.on();
+        led4.off();
+        led5.off();
        
         if (!digitalRead(BUTTONPIN))
         {
@@ -70,12 +68,9 @@ void speedState()
         if ( (currentMillis - state_tmr) > cheze.ArmTime*1000)
         {
 
-        lights[0].skip = 2;
-        lights[0].enable = HIGH;
-        lights[1].skip = 1;
-        lights[1].enable = HIGH;
-
-
+          led3.off();
+          led4.on();
+          led5.off();
           fly_state = TAKEOFF;
           curThrottle = 0;
           state_tmr = currentMillis;
@@ -85,10 +80,9 @@ void speedState()
       }
     case TAKEOFF:
       {
-        lights[0].skip = 2;
-        lights[0].enable = HIGH;
-        lights[1].skip = 2;
-        lights[1].enable = HIGH;
+         led3.on();
+         led4.on();
+         led5.off();
 
         if (curThrottle  >= cheze.FlySpeed)
         {
@@ -109,20 +103,18 @@ void speedState()
     case FLY:
       {
         flyState();
-        lights[0].skip = 2;
-        lights[0].enable = HIGH;
-        lights[1].skip = 1;
-        lights[1].enable = LOW;
+        led3.off();
+        led4.off();
+        led5.on();
 
 
         break;
       }
     case RAMPDWN:
       {
-        lights[0].skip = 2;
-        lights[0].enable = LOW;
-        lights[1].skip = 1;
-        lights[1].enable = HIGH;
+        led3.on();
+        led4.off();
+        led5.on();
 
 
         if ((curThrottle) <= 10 )
@@ -142,10 +134,9 @@ void speedState()
     case LAND:
     default:
       {
-        lights[0].skip = 4;
-        lights[0].enable = HIGH;
-        lights[1].skip = 4;
-        lights[1].enable = HIGH;
+        led3.off();
+        led4.on();
+        led5.on();
 
         if ( currentMillis - state_tmr > LANDTIME)
         {
