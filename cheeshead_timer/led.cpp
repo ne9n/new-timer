@@ -1,4 +1,5 @@
 #include "Led.h"
+
 Led::Led(byte pin) {
   // Use 'this->' to make the difference between the
   // 'pin' attribute of the class and the 
@@ -18,4 +19,11 @@ void Led::on() {
 }
 void Led::off() {
   digitalWrite(pin, LOW);
+}
+void Led::flash(){
+  if (digitalRead(pin)
+      digitalWrite(pin, LOW);
+  else
+      digitalWrite(pin,HIGH);
+  
 }
