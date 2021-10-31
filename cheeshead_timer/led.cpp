@@ -1,4 +1,8 @@
-#include "Led.h"
+#include "led.h"
+#include<NoDelay.h>
+
+noDelay LEDtime(1000);//Creats a noDelay varible set to 1000ms
+
 
 Led::Led(byte pin) {
   // Use 'this->' to make the difference between the
@@ -20,10 +24,13 @@ void Led::on() {
 void Led::off() {
   digitalWrite(pin, LOW);
 }
-void Led::flash(){
-  if (digitalRead(pin)
-      digitalWrite(pin, LOW);
-  else
-      digitalWrite(pin,HIGH);
-  
+void Led::flash()
+{
+  if(LEDtime.update())//Checks to see if set time has past
+  {
+    if (digitalRead(pin))
+        digitalWrite(pin, LOW);
+    else
+        digitalWrite(pin,HIGH);
+  }
 }

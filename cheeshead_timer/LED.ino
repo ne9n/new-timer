@@ -3,41 +3,32 @@
  * skip time but be a power of 2
  */
 
-#include<NoDelay.h>
-#include "Led.h"
-#include "Button.h"
 
+#include "led.h"
+#include "button.h"
+
+#define BUTTONPIN 13
+#define SW1 13
 #define LED3 10
 #define LED4 11
 #define LED5 12
 
 
 extern void ledTest();
- 
-int led_state = 0;
 
-struct light
-{
-    byte pin;
-    byte skip;
-    bool enable;
-    bool toggle;
-};
+ Led led3(LED3);
+ Led led4(LED4);
+ Led led5(LED5);
+ Button Sw1(SW1); 
 
-struct light lights[3];
-
-noDelay LEDtime(250);//Creats a noDelay varible set to 1000ms
 
 
 
 void led_init()
 {
  
- Led led3(LED3);
- Led led4(LED4);
- Led led5(LED5);
  /* change this to external button*/
- Button button1(BUTTON_PIN); 
+ 
   
 
 }
@@ -48,12 +39,6 @@ void led_init()
 
 void ledUpdate()
 {
-  static byte ct;
-  byte i;
-  if(LEDtime.update())//Checks to see if set time has past
-  {
-   /* this jsut has flashing updates from LED object */
-  }
  
 }
 

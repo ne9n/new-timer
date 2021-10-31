@@ -3,6 +3,10 @@
  *  
  */
 
+#include "led.h"
+
+
+
 void flyState()
 {
  
@@ -43,6 +47,7 @@ void flyState()
 }
 
 
+
 void speedState()
 {
   currentMillis = millis();
@@ -53,16 +58,16 @@ void speedState()
         led3.on();
         led4.off();
         led5.off();
-       
-        if (!digitalRead(BUTTONPIN))
-        {
+        if (/*Sw1.isPressed()*/ digitalRead(SW1)== 0)  // fix this later bitton method doesnt clear latch
+         {
           state_tmr = currentMillis;
           curThrottle = 0;
           fly_state = ARMED;
-        
+
+        }
         break;
       }
-     }
+     
     case ARMED:
       {
         if ( (currentMillis - state_tmr) > cheze.ArmTime*1000)
@@ -80,7 +85,7 @@ void speedState()
       }
     case TAKEOFF:
       {
-         led3.on();
+        led3.on();
          led4.on();
          led5.off();
 
@@ -102,7 +107,7 @@ void speedState()
       }
     case FLY:
       {
-        flyState();
+       flyState();
         led3.off();
         led4.off();
         led5.on();

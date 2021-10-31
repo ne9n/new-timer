@@ -1,11 +1,11 @@
-#include "Button.h"
+#include "button.h"
 Button::Button(byte pin) {
   this->pin = pin;
   lastReading = LOW;
   init();
 }
 void Button::init() {
-  pinMode(pin, INPUT);
+  pinMode(pin, INPUT_PULLUP); // need pull up! 
   update();
 }
 void Button::update() {
@@ -29,3 +29,4 @@ byte Button::getState() {
 }
 bool Button::isPressed() {
   return (getState() == HIGH);
+}
