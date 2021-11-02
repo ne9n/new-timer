@@ -51,7 +51,7 @@ time_t cheze;
 MPU6050 mpu6050(Wire);
 Servo esc;
 
-#define IncThrottle 1
+#define INCTHROTTLE 1
 #define BurpMax 180
 #define BURPTIME 500
 #define RDYTIME 5000
@@ -93,7 +93,7 @@ extern void led_init();
 int maxThrottle = cheze.FlySpeed;
 unsigned long state_tmr;
 int curThrottle = 0; // current speed
-int incTime = 0;
+int lastMillis = 0;
 
 int gyro_flag = false;
 unsigned int skip;
@@ -133,17 +133,17 @@ void setup()
 void plotDebug(void)
 {
   
-          Serial.print("angleX : ");
-          Serial.print(angleX);
-          Serial.print("\tangleY : ");
-          Serial.print(angleY);
+       // Serial.print("angleX : ");
+       // Serial.print(angleX);
+       // Serial.print("\tangleY : ");
+       // Serial.print(angleY);
   
        // Serial.print("\tangleZ : ");
        // Serial.print(angleZ);
-          Serial.print("\t posTrim : ");
-          Serial.print(posTrim);
-      //  Serial.print("\t throttle : ");
-      //  Serial.print(curThrottle);
+      //  Serial.print("\t posTrim : ");
+      //  Serial.print(posTrim);
+          Serial.print("\t throttle : ");
+          Serial.print(curThrottle);
           Serial.print(" fly_state : ");
           Serial.print(fly_state);
       //  Serial.print(" Start switch : ");

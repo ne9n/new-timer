@@ -1,7 +1,7 @@
 #include "led.h"
 #include<NoDelay.h>
 
-noDelay LEDtime(1000);//Creats a noDelay varible set to 1000ms
+noDelay LEDtime(500);//Creats a noDelay varible set to 1000ms
 
 
 Led::Led(byte pin) {

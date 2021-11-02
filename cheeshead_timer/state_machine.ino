@@ -5,7 +5,7 @@
 
 #include "led.h"
 
-
+noDelay StateTime(5000);//Creats a noDelay variable 
 
 void flyState()
 {
@@ -18,7 +18,7 @@ void flyState()
         if ( (currentMillis- state_tmr) > cheze.FlyTime*1000 )
         {
            //fly_state = RAMPDWN;
-          state_tmr = currentMillis;
+          lastMillis = currentMillis;
           inFlight = BURP;
         }
         break;
@@ -26,19 +26,19 @@ void flyState()
     case BURP:
       {
         curThrottle = BurpMax;
-        if (currentMillis - state_tmr > BURPTIME)
+        if (currentMillis - lastMillis > BURPTIME)
         {
           curThrottle = 180;
-          state_tmr = 0;
+          lastMillis = currentMillis;
           inFlight = RDYLAND;
         }
         break;
       }
     case RDYLAND:
       {
-        if ((currentMillis - state_tmr) > RDYTIME)
+        if ((currentMillis - lastMillis) > RDYTIME)
         {
-          state_tmr = 0;
+          lastMillis = currentMillis;
           fly_state = RAMPDWN;
           inFlight = FLYING;
         }
@@ -54,99 +54,118 @@ void speedState()
   switch (fly_state)
   {
     case WAIT:
+    /*
+    Waits here until the start button is pressed
+    Entrance -  Start up or land
+    Exit Armed state 
+    */
       {
-        led3.on();
-        led4.off();
-        led5.off();
+        led3.flash();
+        led4.flash();
+        led5.flash();
         if (/*Sw1.isPressed()*/ digitalRead(SW1)== 0)  // fix this later bitton method doesnt clear latch
-         {
-          state_tmr = currentMillis;
+        {
+          
           curThrottle = 0;
           fly_state = ARMED;
+          StateTime.setdelay(cheze.ArmTime*1000);
 
         }
         break;
       }
      
     case ARMED:
-      {
-        if ( (currentMillis - state_tmr) > cheze.ArmTime*1000)
+      {     
+        /* wits here to walk out to the model
+          Entry from wait state 
+          Exit timer expired and on to take off */     
+        led3.off();
+        led4.flash();
+        led5.off();
+
+        if ( StateTime.update())
         {
 
-          led3.off();
-          led4.on();
-          led5.off();
           fly_state = TAKEOFF;
           curThrottle = 0;
-          state_tmr = currentMillis;
+          incThrottle = 
+          
           
         }
         break;
       }
     case TAKEOFF:
       {
-        led3.on();
-         led4.on();
+        /*This is a complicated state
+        this will ramp up speed to the base trottle position based on acclertion time 
+        Doe to the low resoultions, I may be off by one tick */
+         led3.flash();
+         led4.flash();
          led5.off();
 
         if (curThrottle  >= cheze.FlySpeed)
         {
           fly_state = FLY;
-          state_tmr = currentMillis;
+          lastMillis = currentMillis;
           curThrottle = cheze.FlySpeed ;
  
 
         }
-        else if (currentMillis - incTime > INCTIME)
+        else if (currentMillis - lastMillis > INCTIME)
         {
-          curThrottle = curThrottle + IncThrottle;
-          incTime = currentMillis;
+          curThrottle = curThrottle + INCTHROTTLE;
+          lastMillis = currentMillis;
         }
 
         break;
       }
     case FLY:
       {
-       flyState();
+        /* this has it own substates
+          Flying-- can refualte speed based on state vector
+          Burp-  step speed up as a warning to end of flight time 
+          rdyland wait some delay before landing */
+          /* entry-- takeoff state
+          Exit substate rdy land */
+        flyState();
         led3.off();
         led4.off();
-        led5.on();
+        led5.flash();
 
 
         break;
       }
     case RAMPDWN:
       {
-        led3.on();
+        led3.flash();
         led4.off();
-        led5.on();
+        led5.flash();
 
 
         if ((curThrottle) <= 10 )
         {
           fly_state = LAND;
           curThrottle = 0;
-          incTime = currentMillis;
-          state_tmr = currentMillis;
-        }
-        else if (currentMillis - incTime > INCTIME)
+          lastMillis = currentMillis;
+         }
+        else if (currentMillis - lastMillis > INCTIME)
         {
-          curThrottle = curThrottle - IncThrottle;
-          incTime = currentMillis;
+          curThrottle = curThrottle - INCTHROTTLE;
+          lastMillis = currentMillis;
         }
         break;
       }
     case LAND:
     default:
       {
-        led3.off();
+        led3.on();
         led4.on();
         led5.on();
 
-        if ( currentMillis - state_tmr > LANDTIME)
+        if ( currentMillis - lastMillis > LANDTIME)
         {
           fly_state = WAIT;
-          state_tmr =currentMillis;
+          lastMillis =currentMillis;
         }
        
         curThrottle = 0;

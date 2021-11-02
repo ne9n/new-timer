@@ -177,7 +177,7 @@ void menuValues ()
   Serial.println(cheze.FlyTime );
   Serial.print(" c Arm Time sec ");  
   Serial.println(cheze.ArmTime );
-  Serial.print(" d accel Time msec ");
+  Serial.print(" d accel Time msec 1000= 1 ");
   Serial.println(cheze.accelTime );
   Serial.print(" E  Pitch gain 0- 180 ");
   Serial.println(cheze.k1 );
