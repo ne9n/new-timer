@@ -69,6 +69,7 @@ void speedState()
           curThrottle = 0;
           fly_state = ARMED;
           StateTime.setdelay(cheze.ArmTime*1000);
+          
 
         }
         break;
@@ -76,7 +77,7 @@ void speedState()
      
     case ARMED:
       {     
-        /* wits here to walk out to the model
+        /* waits here to walk out to the model
           Entry from wait state 
           Exit timer expired and on to take off */     
         led3.off();
@@ -99,6 +100,10 @@ void speedState()
         /*This is a complicated state
         this will ramp up speed to the base trottle position based on acclertion time 
         Doe to the low resoultions, I may be off by one tick */
+       /* inc or dec each time by Max speed (180)/acell time 
+       but that is less than so it wont work so one speed tic = accel time *1000/180
+       so wait that long and add a tic each time though */
+       
          led3.flash();
          led4.flash();
          led5.off();
