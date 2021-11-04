@@ -36,7 +36,6 @@ typedef struct {
   unsigned int accelTime; // in msec
   int calX;
   int calY;
-  int calZ;
   byte k1;
   byte k2;
 } time_t;
@@ -69,10 +68,7 @@ Servo esc;
 #define LAND 5
 
 
-// sub state for flyng
-#define FLYING 0
-#define BURP 1
-#define RDYLAND 2
+
 
 // hardware pin def's
 
@@ -90,25 +86,20 @@ extern void led_init();
 
 
 // definations
-int maxThrottle = cheze.FlySpeed;
-unsigned long state_tmr;
 int curThrottle = 0; // current speed
-int lastMillis = 0;
 
 int gyro_flag = false;
 unsigned int skip;
 int angleX;
 int angleY;
-
+int tTime;
 int posTrim;
 
 
 
 // state variables 
 int fly_state = WAIT;
-int inFlight = FLYING;
 
-unsigned long currentMillis = millis();
 
 
 void setup()
@@ -126,7 +117,7 @@ void setup()
   Wire.begin();
   mpu6050.begin();
  // mpu6050.calcGyroOffsets(true);
- mpu6050.setGyroOffsets(cheze.calX/100.0, cheze.calY/100.0, cheze.calZ/100.0);
+ mpu6050.setGyroOffsets(cheze.calX/100.0, cheze.calY/100.0, 0);
 }
 
 
@@ -146,6 +137,8 @@ void plotDebug(void)
           Serial.print(curThrottle);
           Serial.print(" fly_state : ");
           Serial.print(fly_state);
+          Serial.print(" nodelay : ");
+          Serial.print(tTime);
       //  Serial.print(" Start switch : ");
       //  Serial.print(digitalRead(SW1));
       //  Serial.print(" currentMillis -state_tmr : ");
@@ -172,7 +165,7 @@ void term_ctrl()
       }
       default:
       {
-         plotDebug();
+   //      plotDebug();
          break;
       }   
     }

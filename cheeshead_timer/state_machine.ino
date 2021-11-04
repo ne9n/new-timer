@@ -1,141 +1,101 @@
 /*
- *  added comments
- *  
- */
+    added comments
+
+*/
 
 #include "led.h"
+#include <Ramp.h>
+#include <NoDelay.h>
 
-noDelay StateTime(5000);//Creats a noDelay variable 
+ramp accelramp;
+noDelay StateTime(5000);//Creats a noDelay variable
 
-void flyState()
-{
- 
-  switch (inFlight)
-  {
-    case FLYING:
-      {
-        curThrottle = cheze.FlySpeed + posTrim;
-        if ( (currentMillis- state_tmr) > cheze.FlyTime*1000 )
-        {
-           //fly_state = RAMPDWN;
-          lastMillis = currentMillis;
-          inFlight = BURP;
-        }
-        break;
-      }
-    case BURP:
-      {
-        curThrottle = BurpMax;
-        if (currentMillis - lastMillis > BURPTIME)
-        {
-          curThrottle = 180;
-          lastMillis = currentMillis;
-          inFlight = RDYLAND;
-        }
-        break;
-      }
-    case RDYLAND:
-      {
-        if ((currentMillis - lastMillis) > RDYTIME)
-        {
-          lastMillis = currentMillis;
-          fly_state = RAMPDWN;
-          inFlight = FLYING;
-        }
-      }
-  }
-}
 
 
 
 void speedState()
 {
-  currentMillis = millis();
+  tTime = StateTime.update();
   switch (fly_state)
   {
     case WAIT:
-    /*
-    Waits here until the start button is pressed
-    Entrance -  Start up or land
-    Exit Armed state 
-    */
+      /*
+        Waits here until the start button is pressed
+        Entrance -  Start up or land
+        Exit Armed state
+      */
       {
         led3.flash();
         led4.flash();
         led5.flash();
-        if (/*Sw1.isPressed()*/ digitalRead(SW1)== 0)  // fix this later bitton method doesnt clear latch
+        if (/*Sw1.isPressed()*/ digitalRead(SW1) == 0) // fix this later bitton method doesnt clear latch
         {
-          
+
           curThrottle = 0;
           fly_state = ARMED;
-          StateTime.setdelay(cheze.ArmTime*1000);
-          
+          StateTime.setdelay(cheze.ArmTime * 1000);
+
+
 
         }
         break;
       }
-     
+
     case ARMED:
-      {     
+      {
         /* waits here to walk out to the model
-          Entry from wait state 
-          Exit timer expired and on to take off */     
+          Entry from wait state
+          Exit timer expired and on to take off */
         led3.off();
         led4.flash();
         led5.off();
-
+    
         if ( StateTime.update())
         {
 
           fly_state = TAKEOFF;
           curThrottle = 0;
-          incThrottle = 
-          
-          
+          accelramp.go(curThrottle);
+          accelramp.go(cheze.FlySpeed, cheze.accelTime);
+
         }
-        break;
       }
     case TAKEOFF:
       {
         /*This is a complicated state
-        this will ramp up speed to the base trottle position based on acclertion time 
-        Doe to the low resoultions, I may be off by one tick */
-       /* inc or dec each time by Max speed (180)/acell time 
-       but that is less than so it wont work so one speed tic = accel time *1000/180
-       so wait that long and add a tic each time though */
-       
-         led3.flash();
-         led4.flash();
-         led5.off();
-
-        if (curThrottle  >= cheze.FlySpeed)
+          this will ramp up speed to the base trottle position based on acclertion time
+          Doe to the low resoultions, I may be off by one tick */
+        /* inc or dec each time by Max speed (180)/acell time
+          but that is less than so it wont work so one speed tic = accel time *1000/180
+          so wait that long and add a tic each time though */
+        led3.flash();
+        led4.flash();
+        led5.off();
+        curThrottle = accelramp.update();
+        if (accelramp.isFinished())
         {
           fly_state = FLY;
-          lastMillis = currentMillis;
-          curThrottle = cheze.FlySpeed ;
- 
-
+          StateTime.setdelay(cheze.FlyTime * 1000);
         }
-        else if (currentMillis - lastMillis > INCTIME)
-        {
-          curThrottle = curThrottle + INCTHROTTLE;
-          lastMillis = currentMillis;
-        }
-
         break;
       }
     case FLY:
       {
         /* this has it own substates
           Flying-- can refualte speed based on state vector
-          Burp-  step speed up as a warning to end of flight time 
+          Burp-  step speed up as a warning to end of flight time
           rdyland wait some delay before landing */
-          /* entry-- takeoff state
+        /* entry-- takeoff state
           Exit substate rdy land */
-        flyState();
         led3.off();
         led4.off();
         led5.flash();
+        curThrottle = cheze.FlySpeed + posTrim;
+        if ( StateTime.update())
+        {
+          accelramp.go(curThrottle);
+          accelramp.go(0, cheze.accelTime);
+        }
 
 
         break;
@@ -146,38 +106,14 @@ void speedState()
         led4.off();
         led5.flash();
 
-
-        if ((curThrottle) <= 10 )
-        {
-          fly_state = LAND;
-          curThrottle = 0;
-          lastMillis = currentMillis;
-         }
-        else if (currentMillis - lastMillis > INCTIME)
-        {
-          curThrottle = curThrottle - INCTHROTTLE;
-          lastMillis = currentMillis;
-        }
-        break;
-      }
-    case LAND:
-    default:
-      {
-        led3.on();
-        led4.on();
-        led5.on();
-
-        if ( currentMillis - lastMillis > LANDTIME)
+        curThrottle = accelramp.update();
+        if (accelramp.isFinished())
         {
           fly_state = WAIT;
-          lastMillis =currentMillis;
+          curThrottle = 0;
         }
-       
-        curThrottle = 0;
         break;
       }
   }
-  if(fly_state != LAND){
   esc.write(curThrottle);
-  }
 }

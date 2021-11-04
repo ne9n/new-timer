@@ -106,7 +106,7 @@ void get1Input()
       case 'r':
         {
           Serial.println("Refresh");
-          mpu6050.setGyroOffsets(cheze.calX/100.0, cheze.calY/100.0, cheze.calZ/100.0); 
+          mpu6050.setGyroOffsets(cheze.calX/100.0, cheze.calY/100.0, 0); 
           menuValues();
           break;
         }
@@ -131,11 +131,7 @@ void get1Input()
                      case 'z':
                       case 'Z':
         {
-          cheze.calZ = x;
-          Serial.println("cal z ");
-          Serial.println(cheze.calZ );
-          break;
-        }
+         }
 
 
               case 'o':
@@ -187,8 +183,6 @@ void menuValues ()
   Serial.println(cheze.calX );
   Serial.print(" Y gyro cal Y ");
   Serial.println(cheze.calY );
-  Serial.print(" Z gyro cal Z ");
-  Serial.println(cheze.calZ );
   Serial.print(" X gyro value ");
   Serial.println(angleX );
   Serial.print(" Y gyro val  ");
