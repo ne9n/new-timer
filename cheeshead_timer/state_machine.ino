@@ -4,39 +4,36 @@
 */
 
 #include "led.h"
-#include <Ramp.h>
-#include <NoDelay.h>
-
-ramp accelramp;
-noDelay StateTime(5000);//Creats a noDelay variable
+#include <Ramp.h> 
+rampInt upRamp; 
 
 
 
+
+int startTime =0 ;
+int deltaTime = 0;
 
 void speedState()
 {
-  tTime = StateTime.update();
+  deltaTime = millis() - startTime;
   switch (fly_state)
   {
     case WAIT:
       /*
         Waits here until the start button is pressed
-        Entrance -  Start up or land
+         Entrance -  Start up or land
         Exit Armed state
       */
       {
         led3.flash();
-        led4.flash();
-        led5.flash();
+        led4.off();
+        led5.off();
         if (/*Sw1.isPressed()*/ digitalRead(SW1) == 0) // fix this later bitton method doesnt clear latch
         {
-
           curThrottle = 0;
-          fly_state = ARMED;
-          StateTime.setdelay(cheze.ArmTime * 1000);
-
-
-
+          fly_state = ARMED;  
+          startTime = millis();
+          
         }
         break;
       }
@@ -50,15 +47,17 @@ void speedState()
         led4.flash();
         led5.off();
     
-        if ( StateTime.update())
+        if (deltaTime > (cheze.ArmTime*1000) )
         {
-
+         
+          Serial.print ("\t armed \t");
           fly_state = TAKEOFF;
           curThrottle = 0;
-          accelramp.go(curThrottle);
-          accelramp.go(cheze.FlySpeed, cheze.accelTime);
-
+          upRamp.go(0);   // set value to directly to 5000
+          upRamp.go(cheze.FlySpeed,cheze.accelTime);
+        
         }
+        break;
       }
     case TAKEOFF:
       {
@@ -68,14 +67,14 @@ void speedState()
         /* inc or dec each time by Max speed (180)/acell time
           but that is less than so it wont work so one speed tic = accel time *1000/180
           so wait that long and add a tic each time though */
-        led3.flash();
-        led4.flash();
+        led3.on();
+        led4.on();
         led5.off();
-        curThrottle = accelramp.update();
-        if (accelramp.isFinished())
+        curThrottle= upRamp.update();
+        if (curThrottle >= cheze.FlySpeed)
         {
           fly_state = FLY;
-          StateTime.setdelay(cheze.FlyTime * 1000);
+          startTime = millis();
         }
         break;
       }
@@ -91,23 +90,43 @@ void speedState()
         led4.off();
         led5.flash();
         curThrottle = cheze.FlySpeed + posTrim;
-        if ( StateTime.update())
+        if (deltaTime > (cheze.FlyTime*1000) )
         {
-          accelramp.go(curThrottle);
-          accelramp.go(0, cheze.accelTime);
+          startTime= millis();
+          fly_state = BURP;
         }
-
-
         break;
       }
+    case BURP:
+    {
+      curThrottle = MAXT;
+      if (deltaTime > BURP_TIME )
+      {
+         startTime= millis();
+         fly_state = BURP_DELAY;
+         curThrottle = cheze.FlySpeed;
+      }
+      break;
+    }
+    case BURP_DELAY:
+    {
+      if (deltaTime > BURP_WAIT)
+      {
+      upRamp.go(curThrottle);    
+      upRamp.go(0,cheze.accelTime);
+         
+          fly_state = RAMPDWN;
+      }
+      break;
+    }
     case RAMPDWN:
       {
-        led3.flash();
+        led3.on();
         led4.off();
-        led5.flash();
+        led5.on();
 
-        curThrottle = accelramp.update();
-        if (accelramp.isFinished())
+        curThrottle= upRamp.update();
+        if (curThrottle == 0)
         {
           fly_state = WAIT;
           curThrottle = 0;

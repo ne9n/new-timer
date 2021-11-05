@@ -64,10 +64,14 @@ Servo esc;
 #define ARMED 1
 #define TAKEOFF 2
 #define FLY 3
-#define RAMPDWN 4
-#define LAND 5
+#define BURP 4
+#define BURP_DELAY 5
+#define RAMPDWN 6
+#define LAND 7
 
-
+#define MAXT  180
+#define BURP_TIME  200
+#define BURP_WAIT  5000
 
 
 // hardware pin def's
@@ -113,7 +117,7 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT);
   led_init();
 
-  Serial.begin(19200);
+  Serial.begin(115200);
   Wire.begin();
   mpu6050.begin();
  // mpu6050.calcGyroOffsets(true);
@@ -131,14 +135,15 @@ void plotDebug(void)
   
        // Serial.print("\tangleZ : ");
        // Serial.print(angleZ);
-      //  Serial.print("\t posTrim : ");
-      //  Serial.print(posTrim);
+          Serial.print("\t posTrim : ");
+          Serial.print(posTrim);
+          Serial.print("\t set speed : ");
+          Serial.print(cheze.FlySpeed);
+
           Serial.print("\t throttle : ");
           Serial.print(curThrottle);
           Serial.print(" fly_state : ");
           Serial.print(fly_state);
-          Serial.print(" nodelay : ");
-          Serial.print(tTime);
       //  Serial.print(" Start switch : ");
       //  Serial.print(digitalRead(SW1));
       //  Serial.print(" currentMillis -state_tmr : ");
@@ -165,7 +170,7 @@ void term_ctrl()
       }
       default:
       {
-   //      plotDebug();
+         plotDebug();
          break;
       }   
     }
