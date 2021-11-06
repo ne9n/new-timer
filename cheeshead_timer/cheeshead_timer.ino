@@ -74,11 +74,16 @@ Servo esc;
 #define BURP_WAIT  5000
 
 
-// hardware pin def's
+// hardware pin def'snana
 
-#define SERVO 9
+#define BUTTONPIN 13
+#define SW1 13
+#define LED3 10
+#define LED4 11
+#define LED5 12
 
-#define SW1 13  /*for debug watch out!*/
+#define SERVO 6
+
 
 
 

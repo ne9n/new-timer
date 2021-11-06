@@ -120,8 +120,8 @@ void speedState()
         led5.flashF();
       if (deltaTime > BURP_WAIT)
       {
-      upRamp.go(curThrottle);    
-      upRamp.go(0,cheze.accelTimeMs);
+        upRamp.go(curThrottle);    
+        upRamp.go(0,cheze.accelTimeMs);
          
           fly_state = RAMPDWN;
       }
