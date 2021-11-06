@@ -33,7 +33,7 @@ typedef struct {
   unsigned int FlySpeed; // 0 to 180 for degrees of rotation of a servo
   unsigned int FlyTime; // air time in seconds
   unsigned int ArmTime; // wait time in seconds
-  unsigned int accelTime; // in msec
+  unsigned int accelTimeMs; // in msec
   int calX;
   int calY;
   byte k1;
@@ -96,7 +96,6 @@ int gyro_flag = false;
 unsigned int skip;
 int angleX;
 int angleY;
-int tTime;
 int posTrim;
 
 
@@ -170,7 +169,7 @@ void term_ctrl()
       }
       default:
       {
-         plotDebug();
+      //   plotDebug();
          break;
       }   
     }

@@ -16,6 +16,7 @@ int deltaTime = 0;
 void speedState()
 {
   deltaTime = millis() - startTime;
+  esc.write(curThrottle);
   switch (fly_state)
   {
     case WAIT:
@@ -25,7 +26,7 @@ void speedState()
         Exit Armed state
       */
       {
-        led3.flash();
+        led3.flashS();
         led4.off();
         led5.off();
         if (/*Sw1.isPressed()*/ digitalRead(SW1) == 0) // fix this later bitton method doesnt clear latch
@@ -43,8 +44,8 @@ void speedState()
         /* waits here to walk out to the model
           Entry from wait state
           Exit timer expired and on to take off */
-        led3.off();
-        led4.flash();
+        led3.flashF();
+        led4.flashF();
         led5.off();
     
         if (deltaTime > (cheze.ArmTime*1000) )
@@ -54,7 +55,7 @@ void speedState()
           fly_state = TAKEOFF;
           curThrottle = 0;
           upRamp.go(0);   // set value to directly to 5000
-          upRamp.go(cheze.FlySpeed,cheze.accelTime);
+          upRamp.go(cheze.FlySpeed,cheze.accelTimeMs);
         
         }
         break;
@@ -67,8 +68,8 @@ void speedState()
         /* inc or dec each time by Max speed (180)/acell time
           but that is less than so it wont work so one speed tic = accel time *1000/180
           so wait that long and add a tic each time though */
-        led3.on();
-        led4.on();
+        led3.off();
+        led4.flashF();
         led5.off();
         curThrottle= upRamp.update();
         if (curThrottle >= cheze.FlySpeed)
@@ -87,8 +88,8 @@ void speedState()
         /* entry-- takeoff state
           Exit substate rdy land */
         led3.off();
-        led4.off();
-        led5.flash();
+        led4.flashS();
+        led5.flashS();
         curThrottle = cheze.FlySpeed + posTrim;
         if (deltaTime > (cheze.FlyTime*1000) )
         {
@@ -100,6 +101,10 @@ void speedState()
     case BURP:
     {
       curThrottle = MAXT;
+        led3.off();
+        led4.flashF();
+        led5.flashF();
+
       if (deltaTime > BURP_TIME )
       {
          startTime= millis();
@@ -110,10 +115,13 @@ void speedState()
     }
     case BURP_DELAY:
     {
+        led3.flashF();
+        led4.flashF();
+        led5.flashF();
       if (deltaTime > BURP_WAIT)
       {
       upRamp.go(curThrottle);    
-      upRamp.go(0,cheze.accelTime);
+      upRamp.go(0,cheze.accelTimeMs);
          
           fly_state = RAMPDWN;
       }
@@ -123,7 +131,7 @@ void speedState()
       {
         led3.on();
         led4.off();
-        led5.on();
+        led5.flashF();
 
         curThrottle= upRamp.update();
         if (curThrottle == 0)
@@ -134,5 +142,5 @@ void speedState()
         break;
       }
   }
-  esc.write(curThrottle);
+
 }

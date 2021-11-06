@@ -70,8 +70,8 @@ void get1Input()
       case 'd':
         {
           Serial.print( "Accel time in mseconds ");
-          cheze.accelTime = x ;
-          Serial.println(cheze.accelTime );
+          cheze.accelTimeMs = x ;
+          Serial.println(cheze.accelTimeMs );
           break;
         }
       case 'E':
@@ -174,7 +174,7 @@ void menuValues ()
   Serial.print(" c Arm Time sec ");  
   Serial.println(cheze.ArmTime );
   Serial.print(" d accel Time msec 1000= 1 ");
-  Serial.println(cheze.accelTime );
+  Serial.println(cheze.accelTimeMs );
   Serial.print(" E  Pitch gain 0- 180 ");
   Serial.println(cheze.k1 );
   Serial.print(" F  Roll gain 0 -180 ");
