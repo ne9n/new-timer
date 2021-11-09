@@ -33,10 +33,9 @@ typedef struct {
   unsigned int FlySpeed; // 0 to 180 for degrees of rotation of a servo
   unsigned int FlyTime; // air time in seconds
   unsigned int ArmTime; // wait time in seconds
-  unsigned int accelTime; // in msec
+  unsigned int accelTimeMs; // in msec
   int calX;
   int calY;
-  int calZ;
   byte k1;
   byte k2;
 } time_t;
@@ -65,14 +64,15 @@ Servo esc;
 #define ARMED 1
 #define TAKEOFF 2
 #define FLY 3
-#define RAMPDWN 4
-#define LAND 5
+#define BURP 4
+#define BURP_DELAY 5
+#define RAMPDWN 6
+#define LAND 7
 
+#define MAXT  180
+#define BURP_TIME  200
+#define BURP_WAIT  5000
 
-// sub state for flyng
-#define FLYING 0
-#define BURP 1
-#define RDYLAND 2
 
 // hardware pin def's
 
@@ -90,25 +90,19 @@ extern void led_init();
 
 
 // definations
-int maxThrottle = cheze.FlySpeed;
-unsigned long state_tmr;
 int curThrottle = 0; // current speed
-int lastMillis = 0;
 
 int gyro_flag = false;
 unsigned int skip;
 int angleX;
 int angleY;
-
 int posTrim;
 
 
 
 // state variables 
 int fly_state = WAIT;
-int inFlight = FLYING;
 
-unsigned long currentMillis = millis();
 
 
 void setup()
@@ -122,11 +116,11 @@ void setup()
   pinMode(LED_BUILTIN, OUTPUT);
   led_init();
 
-  Serial.begin(19200);
+  Serial.begin(115200);
   Wire.begin();
   mpu6050.begin();
  // mpu6050.calcGyroOffsets(true);
- mpu6050.setGyroOffsets(cheze.calX/100.0, cheze.calY/100.0, cheze.calZ/100.0);
+ mpu6050.setGyroOffsets(cheze.calX/100.0, cheze.calY/100.0, 0);
 }
 
 
@@ -140,8 +134,11 @@ void plotDebug(void)
   
        // Serial.print("\tangleZ : ");
        // Serial.print(angleZ);
-      //  Serial.print("\t posTrim : ");
-      //  Serial.print(posTrim);
+          Serial.print("\t posTrim : ");
+          Serial.print(posTrim);
+          Serial.print("\t set speed : ");
+          Serial.print(cheze.FlySpeed);
+
           Serial.print("\t throttle : ");
           Serial.print(curThrottle);
           Serial.print(" fly_state : ");
@@ -172,7 +169,7 @@ void term_ctrl()
       }
       default:
       {
-         plotDebug();
+      //   plotDebug();
          break;
       }   
     }
