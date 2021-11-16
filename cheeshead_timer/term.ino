@@ -1,5 +1,30 @@
 
 #include <EEPROM.h>
+#include <VT100.H>
+
+
+
+void termSetup(void)
+{
+  VT100.setBackgroundColor(VT_RED);
+  VT100.setTextColor(VT_YELLOW);
+}
+
+void Vt_100_term(void)
+{
+  VT100.setCursor(1, 10);
+  VT100.formatText(VT_BRIGHT);
+  Serial.println ("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+  Serial.println (" Cheesehead Timer");
+  Serial.println (" A control line time and speed regulator");
+  Serial.println (" https://github.com/ne9n");
+  Serial.println (" Dave Siegler ne9n.dave@gmail.com");
+  Serial.println ("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+  VT100.clearLineAfter();
+
+}
+
+  
 
 void banner()
 {
