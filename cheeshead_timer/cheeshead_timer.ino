@@ -29,27 +29,7 @@
 // 2) Add acceleration boost to control function
 // 3) table based lookup for control to replace sin()
 
-typedef struct {
-  unsigned int FlySpeed; // 0 to 180 for degrees of rotation of a servo
-  unsigned int FlyTime; // air time in seconds
-  unsigned int ArmTime; // wait time in seconds
-  unsigned int accelTimeMs; // in msec
-  int calX;
-  int calY;
-  byte k1;
-  byte k2;
-} time_t;
-
-
-
-
-
-
-int i;
-time_t cheze;
-MPU6050 mpu6050(Wire);
-Servo esc;
-
+//constants
 #define INCTHROTTLE 1
 #define BurpMax 180
 #define BURPTIME 500
@@ -82,6 +62,45 @@ Servo esc;
 
 
 
+
+
+
+
+// global data structure stored in eeprom
+typedef struct {
+  unsigned int FlySpeed; // 0 to 180 for degrees of rotation of a servo
+  unsigned int FlyTime; // air time in seconds
+  unsigned int ArmTime; // wait time in seconds
+  unsigned int accelTimeMs; // in msec
+  int calX;
+  int calY;
+  byte px;
+  byte py;
+  byte rx;
+  byte ry;
+} time_t;
+
+
+
+
+
+
+time_t cheze;
+MPU6050 mpu6050(Wire);
+Servo esc;
+int curThrottle = 0; // current speed
+
+int angleX;
+int angleY;
+int posTrim;
+
+// state variables 
+int fly_state = WAIT;
+
+
+
+
+
 extern void terminal();
 extern void speedState();
 extern void gyro();
@@ -90,18 +109,6 @@ extern void led_init();
 
 
 // definations
-int curThrottle = 0; // current speed
-
-int gyro_flag = false;
-unsigned int skip;
-int angleX;
-int angleY;
-int posTrim;
-
-
-
-// state variables 
-int fly_state = WAIT;
 
 
 
@@ -113,14 +120,16 @@ void setup()
   int eeAddress = 0;
   EEPROM.get(eeAddress, cheze );
 //  mpu6050.setGyroOffsets(calX, calY, calZ);
-  pinMode(LED_BUILTIN, OUTPUT);
-  led_init();
+//  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(SW1, INPUT);
 
   Serial.begin(115200);
+  
   Wire.begin();
   mpu6050.begin();
- // mpu6050.calcGyroOffsets(true);
- mpu6050.setGyroOffsets(cheze.calX/100.0, cheze.calY/100.0, 0);
+  mpu6050.calcGyroOffsets(true);
+  //mpu6050.setGyroOffsets(cheze.calX/100.0, cheze.calY/100.0, 0);
+ Serial.print("init complete");
 }
 
 
@@ -134,17 +143,17 @@ void plotDebug(void)
   
        // Serial.print("\tangleZ : ");
        // Serial.print(angleZ);
-          Serial.print("\t posTrim : ");
-          Serial.print(posTrim);
-          Serial.print("\t set speed : ");
-          Serial.print(cheze.FlySpeed);
+       //   Serial.print("\t posTrim : ");
+       //   Serial.print(posTrim);
+       //   Serial.print("\t set speed : ");
+       //   Serial.print(cheze.FlySpeed);
 
-          Serial.print("\t throttle : ");
-          Serial.print(curThrottle);
+       //   Serial.print("\t throttle : ");
+       //   Serial.print(curThrottle);
           Serial.print(" fly_state : ");
           Serial.print(fly_state);
-      //  Serial.print(" Start switch : ");
-      //  Serial.print(digitalRead(SW1));
+          Serial.print(" Start switch : ");
+          Serial.print(digitalRead(SW1));
       //  Serial.print(" currentMillis -state_tmr : ");
       //  Serial.print(currentMillis-state_tmr);
 
@@ -167,9 +176,15 @@ void term_ctrl()
        fly_state = LAND;
        break;
       }
+     
+      case 'P':
+      {
+        plotDebug();
+        break;
+      }
       default:
       {
-      //   plotDebug();
+         plotDebug();
          break;
       }   
     }

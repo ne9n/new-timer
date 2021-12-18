@@ -1,39 +1,20 @@
 
 #include <EEPROM.h>
-#include <VT100.H>
 
 
 
 void termSetup(void)
 {
-  VT100.setBackgroundColor(VT_RED);
-  VT100.setTextColor(VT_YELLOW);
 }
 
-void Vt_100_term(void)
-{
-  VT100.setCursor(1, 10);
-  VT100.formatText(VT_BRIGHT);
-  Serial.println ("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-  Serial.println (" Cheesehead Timer");
-  Serial.println (" A control line time and speed regulator");
-  Serial.println (" https://github.com/ne9n");
-  Serial.println (" Dave Siegler ne9n.dave@gmail.com");
-  Serial.println ("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-  VT100.clearLineAfter();
-
-}
 
   
 
 void banner()
 {
   Serial.flush();
-  Serial.println ("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-  Serial.println (" Cheesehead Timer");
-  Serial.println (" A control line time and speed regulator");
-  Serial.println (" https://github.com/ne9n");
-  Serial.println (" Dave Siegler ne9n.dave@gmail.com");
+  Serial.println (" https://github.com/ne9n               ");
+  Serial.println (" Dave Siegler ne9n.dave@gmail.com      ");
   Serial.println ("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 
 }
@@ -102,19 +83,36 @@ void get1Input()
       case 'E':
       case 'e':
         {
-          Serial.print( "pitch gain 0 180 ");
-          cheze.k1 = x ;
-          Serial.println(cheze.k1 );
+          Serial.print( "pitch gain x 0 180 ");
+          cheze.px = x ;
+          Serial.println(cheze.px );
           break;
         }
       case 'f':
       case 'F':
         {
-          Serial.print( "roll gain 0 180 ");
-          cheze.k2 = x ;
-          Serial.println(cheze.k2 );
+          Serial.print( "roll gain 0 x 180 ");
+          cheze.rx = x ;
+          Serial.println(cheze.rx );
           break;
         }
+      case 'H':
+      case 'h':
+        {
+          Serial.print( "pitch gain y 0 180 ");
+          cheze.py = x ;
+          Serial.println(cheze.py );
+          break;
+        }
+      case 'i':
+      case 'I':
+        {
+          Serial.print( "roll gain 0 y 180 ");
+          cheze.ry = x ;
+          Serial.println(cheze.ry );
+          break;
+        }
+
       case 'q':
       case 'Q':
         {
@@ -162,18 +160,17 @@ void get1Input()
               case 'o':
         {
           Serial.print( "LED off ");
-          digitalWrite(3,LOW);
-          digitalWrite(4,LOW);
-          digitalWrite(5,LOW);
-
+          led3.off();
+          led4.off();
+          led5.off();
           break;
         }
         case 'O':
         {
           Serial.print( "LED on ");
-          digitalWrite(3,HIGH);
-          digitalWrite(4,HIGH);
-          digitalWrite(5,HIGH);
+          led3.on();
+          led4.on();
+          led5.on();
 
           break;
         }
@@ -192,36 +189,29 @@ void get1Input()
 void menuValues ()
 {
   read_giro();
-  Serial.print(" a Fly Speed 0-180 ");
-  Serial.println(cheze.FlySpeed );
-  Serial.print(" b Fly Time sec ");
-  Serial.println(cheze.FlyTime );
-  Serial.print(" c Arm Time sec ");  
-  Serial.println(cheze.ArmTime );
-  Serial.print(" d accel Time msec 1000= 1 ");
-  Serial.println(cheze.accelTimeMs );
-  Serial.print(" E  Pitch gain 0- 180 ");
-  Serial.println(cheze.k1 );
-  Serial.print(" F  Roll gain 0 -180 ");
-  Serial.println(cheze.k2 );
-  Serial.print(" X gyro cal X ");
-  Serial.println(cheze.calX );
-  Serial.print(" Y gyro cal Y ");
-  Serial.println(cheze.calY );
-  Serial.print(" X gyro value ");
-  Serial.println(angleX );
-  Serial.print(" Y gyro val  ");
-  Serial.println(angleY );
+  Serial.print(" a Fly Speed 0-180 "); Serial.println(cheze.FlySpeed );
+  Serial.print(" b Fly Time sec    "); Serial.println(cheze.FlyTime );
+  Serial.print(" c Arm Time sec    "); Serial.println(cheze.ArmTime );
+  Serial.print(" d accel Time msec "); Serial.println(cheze.accelTimeMs );
+  Serial.print(" E xaxis Pitch gain"); Serial.println(cheze.px );
+  Serial.print(" F xaxis Roll gain "); Serial.println(cheze.rx );
+  
+  Serial.print(" H yaxis Pitch gain"); Serial.println(cheze.px );
+  Serial.print(" I yaxis Roll gain "); Serial.println(cheze.rx );
+  Serial.print(" X gyro cal X      "); Serial.println(cheze.calX );
+  Serial.print(" Y gyro cal Y      "); Serial.println(cheze.calY );
+  Serial.print(" X gyro value      "); Serial.println(angleX );
+  Serial.print(" Y gyro val        "); Serial.println(angleY );
   
   
   Serial.println(" **************************");
   Serial.println(" r refresh");
-  Serial.println(" s save");
-  Serial.println(" O or o to tesr LED's" );
-  Serial.println(" G run calibration of Gyro ");
+  Serial.print(" s save");
+  Serial.print(" O or o  LED's" );
+  Serial.print(" G Gyro Cal");
   Serial.println(" q exit withiout saving");
   
-  Serial.println(" command value no spaces");
+  Serial.println(" Type command value no spaces");
 }
 
 
@@ -237,7 +227,7 @@ void terminal()
 {
     
   banner();
-
+  //Vt_100_term();
   menuValues();
   get1Input();
 }

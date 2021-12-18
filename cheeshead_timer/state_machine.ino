@@ -29,7 +29,7 @@ void speedState()
         led3.flashS();
         led4.off();
         led5.off();
-        if (/*Sw1.isPressed()*/ digitalRead(SW1) == 0) // fix this later bitton method doesnt clear latch
+        if (digitalRead(SW1) == 1) // clear latch
         {
           curThrottle = 0;
           fly_state = ARMED;  
