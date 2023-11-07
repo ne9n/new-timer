@@ -1,146 +1,149 @@
 /*
-    added comments
+ * Flystate() state machine only maanges the flying segment of the 
+ *  ptofile  state variable is inflight
+ *  
+ *  speedState  manages idele, ramp up and landing phases.   
+ *  could be combined into a single state machine.   
+ *  state variable is speed_state
+ */
 
-*/
-
-#include "led.h"
-#include <Ramp.h> 
-rampInt upRamp; 
-
-
-
-
-int startTime =0 ;
-int deltaTime = 0;
-
-void speedState()
+void flyState()
 {
-  deltaTime = millis() - startTime;
-  esc.write(curThrottle);
-  switch (fly_state)
+  switch (inFlight)
   {
-    case WAIT:
-      /*
-        Waits here until the start button is pressed
-         Entrance -  Start up or land
-        Exit Armed state
-      */
+    case FLYING:
       {
-        led3.flashS();
-        led4.off();
-        led5.off();
-        if (digitalRead(SW1) == 1) // clear latch
+        curThrottle = TimerSetup.FlySpeed + posTrim;
+        if ( (currentMillis- state_tmr) > TimerSetup.FlyTime*1000 )
         {
-          curThrottle = 0;
-          fly_state = ARMED;  
-          startTime = millis();
-          
+           //speed_state = RAMPDWN;
+          state_tmr = currentMillis;
+          inFlight = BURP;
         }
         break;
       }
+    case BURP:
+      {
+        curThrottle = BurpMax;
+        if (currentMillis - state_tmr > BURPTIME)
+        {
+          curThrottle = 180;
+          state_tmr = 0;
+          inFlight = RDYLAND;
+        }
+        break;
+      }
+    case RDYLAND:
+      {
+        if ((currentMillis - state_tmr) > RDYTIME)
+        {
+          state_tmr = 0;
+          speed_state = RAMPDWN;
+          inFlight = FLYING;
+        }
+      }
+  }
+}
 
+
+void speedState()
+{
+  currentMillis = millis();
+  switch (speed_state)
+  {
+    case WAIT:
+      {
+          digitalWrite(LED3,HIGH);
+          digitalWrite(LED4,LOW);
+          digitalWrite(LED5,LOW);
+        // need to see a low to high transistion
+        if (!digitalRead(BUTTONPIN))
+        {
+          state_tmr = currentMillis;
+          curThrottle = 0;
+          speed_state = ARMED;
+          digitalWrite(LED3,HIGH);
+          digitalWrite(LED4,HIGH);
+          digitalWrite(LED5, HIGH);
+        
+        break;
+      }
+     }
     case ARMED:
       {
-        /* waits here to walk out to the model
-          Entry from wait state
-          Exit timer expired and on to take off */
-        led3.flashF();
-        led4.flashF();
-        led5.off();
-    
-        if (deltaTime > (cheze.ArmTime*1000) )
+        if ( (currentMillis - state_tmr) > TimerSetup.ArmTime*1000)
         {
-         
-          Serial.print ("\t armed \t");
-          fly_state = TAKEOFF;
+          digitalWrite(LED3,LOW);
+          digitalWrite(LED4,HIGH);
+          digitalWrite(LED5,LOW);
+
+          speed_state = TAKEOFF;
           curThrottle = 0;
-          upRamp.go(0);   // set value to directly to 5000
-          upRamp.go(cheze.FlySpeed,cheze.accelTimeMs);
-        
+          state_tmr = currentMillis;
+          
         }
         break;
       }
     case TAKEOFF:
       {
-        /*This is a complicated state
-          this will ramp up speed to the base trottle position based on acclertion time
-          Doe to the low resoultions, I may be off by one tick */
-        /* inc or dec each time by Max speed (180)/acell time
-          but that is less than so it wont work so one speed tic = accel time *1000/180
-          so wait that long and add a tic each time though */
-        led3.off();
-        led4.flashF();
-        led5.off();
-        curThrottle= upRamp.update();
-        if (curThrottle >= cheze.FlySpeed)
+        if (curThrottle  >= TimerSetup.FlySpeed)
         {
-          fly_state = FLY;
-          startTime = millis();
+          speed_state = FLY;
+          state_tmr = currentMillis;
+          curThrottle = TimerSetup.FlySpeed ;
+          digitalWrite(LED3,HIGH);
+          digitalWrite(LED4,HIGH);
+          digitalWrite(LED5, LOW);
+
         }
+        else if (currentMillis - incTime > INCTIME)
+        {
+          curThrottle = curThrottle + IncThrottle;
+          incTime = currentMillis;
+        }
+
         break;
       }
     case FLY:
       {
-        /* this has it own substates
-          Flying-- can refualte speed based on state vector
-          Burp-  step speed up as a warning to end of flight time
-          rdyland wait some delay before landing */
-        /* entry-- takeoff state
-          Exit substate rdy land */
-        led3.off();
-        led4.flashS();
-        led5.flashS();
-        curThrottle = cheze.FlySpeed + posTrim;
-        if (deltaTime > (cheze.FlyTime*1000) )
+        flyState();
+        digitalWrite(LED3, LOW);
+        digitalWrite(LED4, LOW);
+        digitalWrite(LED5 ,HIGH);
+
+        break;
+      }
+    case RAMPDWN:
+      {
+
+        if ((curThrottle) <= 10 )
         {
-          startTime= millis();
-          fly_state = BURP;
+          speed_state = LAND;
+          curThrottle = 0;
+          incTime = currentMillis;
+          state_tmr = currentMillis;
+        }
+        else if (currentMillis - incTime > INCTIME)
+        {
+          curThrottle = curThrottle - IncThrottle;
+          incTime = currentMillis;
         }
         break;
       }
-    case BURP:
-    {
-      curThrottle = MAXT;
-        led3.off();
-        led4.flashF();
-        led5.flashF();
-
-      if (deltaTime > BURP_TIME )
+    case LAND:
+    default:
       {
-         startTime= millis();
-         fly_state = BURP_DELAY;
-         curThrottle = cheze.FlySpeed;
-      }
-      break;
-    }
-    case BURP_DELAY:
-    {
-        led3.flashF();
-        led4.flashF();
-        led5.flashF();
-      if (deltaTime > BURP_WAIT)
-      {
-      upRamp.go(curThrottle);    
-      upRamp.go(0,cheze.accelTimeMs);
-         
-          fly_state = RAMPDWN;
-      }
-      break;
-    }
-    case RAMPDWN:
-      {
-        led3.on();
-        led4.off();
-        led5.flashF();
-
-        curThrottle= upRamp.update();
-        if (curThrottle == 0)
+        if ( currentMillis - state_tmr > LANDTIME)
         {
-          fly_state = WAIT;
-          curThrottle = 0;
+          speed_state = WAIT;
+          state_tmr =currentMillis;
         }
+       
+        curThrottle = 0;
         break;
       }
   }
-
+  if(speed_state != LAND){
+  esc.write(curThrottle);
+  }
 }

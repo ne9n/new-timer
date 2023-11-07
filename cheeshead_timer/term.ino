@@ -1,20 +1,14 @@
 
 #include <EEPROM.h>
 
-
-
-void termSetup(void)
-{
-}
-
-
-  
-
 void banner()
 {
   Serial.flush();
-  Serial.println (" https://github.com/ne9n               ");
-  Serial.println (" Dave Siegler ne9n.dave@gmail.com      ");
+  Serial.println ("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+  Serial.println (" Cheesehead Timer");
+  Serial.println (" A control line time and speed regulator");
+  Serial.println (" https://github.com/ne9n");
+  Serial.println (" Dave Siegler ne9n.dave@gmail.com");
   Serial.println ("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 
 }
@@ -23,12 +17,12 @@ void saveData()
 {
 
   int eeAddress = 0;   
-  EEPROM.put(eeAddress, cheze );
+  EEPROM.put(eeAddress, TimerSetup );
 }
 void get1Input()
 {
   char menu = ' ';
-  unsigned int x = 0;
+  unsigned int val = 0;
   while (menu != 'q' )
   {
     while (Serial.available() > 0)
@@ -39,9 +33,9 @@ void get1Input()
     {
     } //wait a for key
     menu = Serial.read();             // get slection
-    x = Serial.parseInt();
+    val = Serial.parseInt();
     Serial.print(menu);
-    Serial.println(x);
+    Serial.println(val);
     
     switch (menu)
     {
@@ -49,70 +43,53 @@ void get1Input()
       case 'A':
         {
           Serial.print( "Set fly speed ");
-          cheze.FlySpeed = x;
-          if (cheze.FlySpeed > 180) {
-            cheze.FlySpeed = 180;
+          TimerSetup.FlySpeed = val;
+          if (TimerSetup.FlySpeed > 180) {
+            TimerSetup.FlySpeed = 180;
           }
-          Serial.println(cheze.FlySpeed);
+          Serial.println(TimerSetup.FlySpeed);
           break;
         }
       case 'b':
       case 'B':
         {
           Serial.print( "Fly Time  secs is ");
-          cheze.FlyTime = x; 
-          Serial.println(cheze.FlyTime );
+          TimerSetup.FlyTime = val; 
+          Serial.println(TimerSetup.FlyTime );
           break;
         }
       case 'c':
       case 'C':
         {
           Serial.print( "arm time in seconds is ");
-          cheze.ArmTime = x ;
-          Serial.println(cheze.ArmTime );
+          TimerSetup.ArmTime = val ;
+          Serial.println(TimerSetup.ArmTime );
           break;
         }
       case 'D':
       case 'd':
         {
           Serial.print( "Accel time in mseconds ");
-          cheze.accelTimeMs = x ;
-          Serial.println(cheze.accelTimeMs );
+          TimerSetup.accelTime = val ;
+          Serial.println(TimerSetup.accelTime );
           break;
         }
       case 'E':
       case 'e':
         {
-          Serial.print( "pitch gain x 0 180 ");
-          cheze.px = x ;
-          Serial.println(cheze.px );
+          Serial.print( "pitch gain 0 180 ");
+          TimerSetup.px = val ;
+          Serial.println(TimerSetup.px );
           break;
         }
       case 'f':
       case 'F':
         {
-          Serial.print( "roll gain 0 x 180 ");
-          cheze.rx = x ;
-          Serial.println(cheze.rx );
+          Serial.print( "roll gain 0 180 ");
+          TimerSetup.py = val ;
+          Serial.println(TimerSetup.py );
           break;
         }
-      case 'H':
-      case 'h':
-        {
-          Serial.print( "pitch gain y 0 180 ");
-          cheze.py = x ;
-          Serial.println(cheze.py );
-          break;
-        }
-      case 'i':
-      case 'I':
-        {
-          Serial.print( "roll gain 0 y 180 ");
-          cheze.ry = x ;
-          Serial.println(cheze.ry );
-          break;
-        }
-
       case 'q':
       case 'Q':
         {
@@ -129,48 +106,53 @@ void get1Input()
       case 'r':
         {
           Serial.println("Refresh");
-          mpu6050.setGyroOffsets(cheze.calX/100.0, cheze.calY/100.0, 0); 
+          mpu6050.setGyroOffsets(TimerSetup.calX/100.0, TimerSetup.calY/100.0, TimerSetup.calZ/100.0); 
           menuValues();
           break;
         }
               case 'x':
               case 'X':
         {
-          cheze.calX = x;
+          TimerSetup.calX = val;
           Serial.println("cal x ");
-          Serial.println(cheze.calX );
+          Serial.println(TimerSetup.calX );
 
           break;
         }
                       case 'y':
                       case 'Y':
         {
-          cheze.calY = x;
+          TimerSetup.calY = val;
           Serial.println("cal y ");
-          Serial.println(cheze.calY );
+          Serial.println(TimerSetup.calY );
 
           break; 
         }
                      case 'z':
                       case 'Z':
         {
-         }
+          TimerSetup.calZ = val;
+          Serial.println("cal z ");
+          Serial.println(TimerSetup.calZ );
+          break;
+        }
 
 
               case 'o':
         {
           Serial.print( "LED off ");
-          led3.off();
-          led4.off();
-          led5.off();
+          digitalWrite(3,LOW);
+          digitalWrite(4,LOW);
+          digitalWrite(5,LOW);
+
           break;
         }
         case 'O':
         {
           Serial.print( "LED on ");
-          led3.on();
-          led4.on();
-          led5.on();
+          digitalWrite(3,HIGH);
+          digitalWrite(4,HIGH);
+          digitalWrite(5,HIGH);
 
           break;
         }
@@ -189,29 +171,38 @@ void get1Input()
 void menuValues ()
 {
   read_giro();
-  Serial.print(" a Fly Speed 0-180 "); Serial.println(cheze.FlySpeed );
-  Serial.print(" b Fly Time sec    "); Serial.println(cheze.FlyTime );
-  Serial.print(" c Arm Time sec    "); Serial.println(cheze.ArmTime );
-  Serial.print(" d accel Time msec "); Serial.println(cheze.accelTimeMs );
-  Serial.print(" E xaxis Pitch gain"); Serial.println(cheze.px );
-  Serial.print(" F xaxis Roll gain "); Serial.println(cheze.rx );
-  
-  Serial.print(" H yaxis Pitch gain"); Serial.println(cheze.px );
-  Serial.print(" I yaxis Roll gain "); Serial.println(cheze.rx );
-  Serial.print(" X gyro cal X      "); Serial.println(cheze.calX );
-  Serial.print(" Y gyro cal Y      "); Serial.println(cheze.calY );
-  Serial.print(" X gyro value      "); Serial.println(angleX );
-  Serial.print(" Y gyro val        "); Serial.println(angleY );
+  Serial.print(" a Fly Speed 0-180 ");
+  Serial.println(TimerSetup.FlySpeed );
+  Serial.print(" b Fly Time sec ");
+  Serial.println(TimerSetup.FlyTime );
+  Serial.print(" c Arm Time sec ");  
+  Serial.println(TimerSetup.ArmTime );
+  Serial.print(" d accel Time msec ");
+  Serial.println(TimerSetup.accelTime );
+  Serial.print(" E  Pitch gain 0- 180 ");
+  Serial.println(TimerSetup.px );
+  Serial.print(" F  Roll gain 0 -180 ");
+  Serial.println(TimerSetup.py );
+  Serial.print(" X gyro cal X ");
+  Serial.println(TimerSetup.calX );
+  Serial.print(" Y gyro cal Y ");
+  Serial.println(TimerSetup.calY );
+  Serial.print(" Z gyro cal Z ");
+  Serial.println(TimerSetup.calZ );
+  Serial.print(" X gyro value ");
+  Serial.println(angleX );
+  Serial.print(" Y gyro val  ");
+  Serial.println(angleY );
   
   
   Serial.println(" **************************");
   Serial.println(" r refresh");
-  Serial.print(" s save");
-  Serial.print(" O or o  LED's" );
-  Serial.print(" G Gyro Cal");
+  Serial.println(" s save");
+  Serial.println(" O or o to tesr LED's" );
+  Serial.println(" G run calibration of Gyro ");
   Serial.println(" q exit withiout saving");
   
-  Serial.println(" Type command value no spaces");
+  Serial.println(" command value no spaces");
 }
 
 
@@ -227,7 +218,6 @@ void terminal()
 {
     
   banner();
-  //Vt_100_term();
   menuValues();
   get1Input();
 }
