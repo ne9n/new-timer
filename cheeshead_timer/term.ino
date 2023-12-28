@@ -141,18 +141,18 @@ void get1Input()
               case 'o':
         {
           Serial.print( "LED off ");
-          digitalWrite(3,LOW);
-          digitalWrite(4,LOW);
-          digitalWrite(5,LOW);
+          digitalWrite(LED3,LOW);
+          digitalWrite(LED4,LOW);
+          digitalWrite(LED5,LOW);
 
           break;
         }
         case 'O':
         {
           Serial.print( "LED on ");
-          digitalWrite(3,HIGH);
-          digitalWrite(4,HIGH);
-          digitalWrite(5,HIGH);
+          digitalWrite(LED3,HIGH);
+          digitalWrite(LED4,HIGH);
+          digitalWrite(LED5,HIGH);
 
           break;
         }
@@ -198,7 +198,7 @@ void menuValues ()
   Serial.println(" **************************");
   Serial.println(" r refresh");
   Serial.println(" s save");
-  Serial.println(" O or o to tesr LED's" );
+  Serial.println(" (O)n or (o)ff to test LEDs" );
   Serial.println(" G run calibration of Gyro ");
   Serial.println(" q exit withiout saving");
   

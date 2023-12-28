@@ -2,7 +2,7 @@
  * Flystate() state machine only maanges the flying segment of the 
  *  ptofile  state variable is inflight
  *  
- *  speedState  manages idele, ramp up and landing phases.   
+ *  speedState  manages idle, ramp up and landing phases.   
  *  could be combined into a single state machine.   
  *  state variable is speed_state
  */
@@ -50,24 +50,28 @@ void speedState()
 {
   currentMillis = millis();
   switch (speed_state)
+  
   {
     case WAIT:
       {
           digitalWrite(LED3,HIGH);
           digitalWrite(LED4,LOW);
           digitalWrite(LED5,LOW);
+       
+  
         // need to see a low to high transistion
         if (!digitalRead(BUTTONPIN))
         {
+          
           state_tmr = currentMillis;
-          curThrottle = 0;
+          curThrottle = 25; /* a quick burp */  
           speed_state = ARMED;
           digitalWrite(LED3,HIGH);
           digitalWrite(LED4,HIGH);
           digitalWrite(LED5, HIGH);
-        
+        }
         break;
-      }
+      
      }
     case ARMED:
       {
@@ -78,7 +82,14 @@ void speedState()
           digitalWrite(LED5,LOW);
 
           speed_state = TAKEOFF;
-          curThrottle = 0;
+          if (curThrottle > 0)
+          {
+            curThrottle --; 
+          }
+          else 
+          {
+            curThrottle = 0;
+          }
           state_tmr = currentMillis;
           
         }

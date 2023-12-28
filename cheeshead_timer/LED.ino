@@ -28,6 +28,7 @@ void ledUpdate()
 
 void ledTest()
 {
+  int i;
   for (i = 0; i < 500; i++)
   {
 

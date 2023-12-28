@@ -17,17 +17,16 @@
 
 // acclermotoer support using MPU6050 tockn laibrat
 
-// SHROT TERM
-// 1) improve LED , mathe the flashine
+// SHORT TERM
+// 1) improve LED ,
 // 2) clean up menu
 // 3) range checl control functions
-// 4) better burp
+// 4) better burp, on startup 
 // 5) Draw it up and write docs
 
 // LONG TERM
 // 1) RC transmitter interface
 // 2) Add acceleration boost to control function
-// 3) table based lookup for control to replace sin()
 
 typedef struct {
   unsigned int FlySpeed; // 0 to 180 for degrees of rotation of a servo
@@ -43,7 +42,7 @@ typedef struct {
   byte ry;
 } param;
 
-int i;
+//int i;
 param TimerSetup;
 MPU6050 mpu6050(Wire);
 Servo esc;
@@ -122,10 +121,13 @@ void setup()
   // attaches the servo on pin 9 to the servo object
   esc.attach(SERVO, 1000, 2000);
   esc.write(curThrottle);
+  // read in all the set up variales 
   int eeAddress = 0;
   EEPROM.get(eeAddress, TimerSetup );
+
   //  mpu6050.setGyroOffsets(calX, calY, calZ);
-  pinMode(SW1, INPUT_PULLUP);
+  // set up teh I/O pins
+ 
   pinMode(BUTTONPIN, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(LED3, OUTPUT);
@@ -144,24 +146,19 @@ void setup()
 void plotDebug(void)
 {
 
-  Serial.print("angleX : ");
-  Serial.print(angleX);
-  Serial.print("\tangleY : ");
-  Serial.print(angleY);
+  Serial.print( (digitalRead(BUTTONPIN))  ? "\t button up": "\t button down" );
 
-  //   Serial.print("\tangleZ : ");
-  //   Serial.print(angleZ);
-  //   Serial.print("\t posTrim : ");
-  //   Serial.print(posTrim);
-  //   Serial.print("\t throttle : ");
-  //   Serial.print(curThrottle);
-  //   Serial.print(" speed_state : ");
-  //   Serial.print(speed_state);
-  //   Serial.print(" currentMillis -state_tmr : ");
-  //   Serial.print(currentMillis-state_tmr);
-  //   Serial.println();
+  Serial.print("angleX : ");      Serial.print(angleX);
+  Serial.print("\tangleY : ");    Serial.println(angleY );
+
+ 
+  Serial.print("\t posTrim : ");  Serial.print(posTrim);
+  Serial.print("\t throttle : "); Serial.print(curThrottle);
+  Serial.print(" speed_st : ");   Serial.print(speed_state);
+  Serial.print(" currentMillis -state_tmr : "); Serial.print(currentMillis-state_tmr);
+   
+   //Serial.println();
 }
-
 void term_ctrl()
 {
   char keypress;
@@ -170,21 +167,12 @@ void term_ctrl()
   {
     terminal();
   }
-  // ctrlC exits
-  else if (keypress = 0x03)
-  {
-    speed_state = LAND;
-  }
-  ///ctrl p
-  //else if (keypress = 0x10)
-  //{
-  //}
 }
 
 
 void loop()
 {
-  term_ctrl();  // this is can breale out of the loops and run menu
+  term_ctrl();
   speedState(); // this manages the state machunes for takeoff flyingand landing
   plotDebug();  // this prints a serial stream for the Arduino debugger.  un comment the intems to plot.  
   speedGyro();       // this reads the gyro and trims the speed 
