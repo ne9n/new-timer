@@ -17,5 +17,6 @@ K1 and K2 are constants in save in the program.
 the sensor is set up so that the pitch and roll angles are zero when in level flight attitude.
 
 the sine function will be implemented as a lookup table the system is controlled by a state machine and stated by a push button
+sine function replaced by a small 36-row lookup table.  
 
 Waiting--> ramp up--> flying--> ranp down --> landing --> back to waiting
