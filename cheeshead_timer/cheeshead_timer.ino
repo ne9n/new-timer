@@ -73,7 +73,7 @@ Servo esc;
 // hardware pin def's
 #define BUTTONPIN 13
 #define SW1 8
-#define SERVO 9
+#define SERVO 6
 #define LED3 10
 #define LED4 11
 #define LED5 12 //works
@@ -173,8 +173,8 @@ void term_ctrl()
 void loop()
 {
   term_ctrl();
-  speedState(); // this manages the state machunes for takeoff flyingand landing
-  plotDebug();  // this prints a serial stream for the Arduino debugger.  un comment the intems to plot.  
+  speedState(); // this manages the state machines for takeoff flying and landing
+  plotDebug();  //This prints a serial stream for the Arduino debugger.  uncomment the items to plot.  
   speedGyro();       // this reads the gyro and trims the speed 
   ledUpdate();  // updates the LED's 
 }
