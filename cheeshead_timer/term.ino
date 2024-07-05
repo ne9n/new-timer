@@ -4,12 +4,12 @@
 void banner()
 {
   Serial.flush();
-  Serial.println ("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-  Serial.println (" Cheesehead Timer");
-  Serial.println (" A control line time and speed regulator");
-  Serial.println (" https://github.com/ne9n");
-  Serial.println (" Dave Siegler ne9n.dave@gmail.com");
-  Serial.println ("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+  Serial.println (F("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"));
+  Serial.println (F(" Cheesehead Timer"));
+  Serial.println (F(" A control line time and speed regulator"));
+  Serial.println (F(" https://github.com/ne9n"));
+  Serial.println (F(" Dave Siegler ne9n.dave@gmail.com"));
+  Serial.println (F("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"));
 
 }
 
@@ -42,10 +42,11 @@ void get1Input()
       case 'a':
       case 'A':
         {
-          Serial.print( "Set fly speed ");
+          Serial.print(F( "Set fly speed "));
           TimerSetup.FlySpeed = val;
-          if (TimerSetup.FlySpeed > 180) {
-            TimerSetup.FlySpeed = 180;
+          if (TimerSetup.FlySpeed > MAX_SPEED) 
+          {
+            TimerSetup.FlySpeed = MAX_SPEED;
           }
           Serial.println(TimerSetup.FlySpeed);
           break;
@@ -53,31 +54,34 @@ void get1Input()
       case 'b':
       case 'B':
         {
-          Serial.print( "Fly Time  secs is ");
-          TimerSetup.FlyTime = val; 
+          Serial.print(F( "Fly Time  secs is "));
+          TimerSetup.FlyTime = val;
+          state_timer[FLY] = TimerSetup.FlyTime; 
           Serial.println(TimerSetup.FlyTime );
           break;
         }
       case 'c':
       case 'C':
         {
-          Serial.print( "arm time in seconds is ");
+          Serial.print(F( "arm time in seconds is "));
           TimerSetup.ArmTime = val ;
+       //   speed_s[ARMED] = TimerSetup.ArmTime; 
           Serial.println(TimerSetup.ArmTime );
           break;
         }
       case 'D':
       case 'd':
         {
-          Serial.print( "Accel time in mseconds ");
+          Serial.print(F( "Accel time in mseconds "));
           TimerSetup.accelTime = val ;
+          state_timer[TAKEOFF_RAMP] = TimerSetup.accelTime; 
           Serial.println(TimerSetup.accelTime );
           break;
         }
       case 'E':
       case 'e':
         {
-          Serial.print( "pitch gain 0 180 ");
+          Serial.print(F( "pitch gain 0 180 "));
           TimerSetup.px = val ;
           Serial.println(TimerSetup.px );
           break;
@@ -85,7 +89,7 @@ void get1Input()
       case 'f':
       case 'F':
         {
-          Serial.print( "roll gain 0 180 ");
+          Serial.print(F( "roll gain 0 180 "));
           TimerSetup.py = val ;
           Serial.println(TimerSetup.py );
           break;
@@ -93,14 +97,14 @@ void get1Input()
       case 'q':
       case 'Q':
         {
-          Serial.println("exit wihtout saving");
+          Serial.println(F("exit wihtout saving"));
           break;
         }
       case 's':
         {
-          Serial.println("saving data wait");
+          Serial.println(F("saving data wait"));
           saveData();
-          Serial.println("saving data done");
+          Serial.println(F("saving data done"));
           break;
         }
       case 'r':
@@ -114,7 +118,7 @@ void get1Input()
               case 'X':
         {
           TimerSetup.calX = val;
-          Serial.println("cal x ");
+          Serial.println(F("cal x "));
           Serial.println(TimerSetup.calX );
 
           break;
@@ -123,7 +127,7 @@ void get1Input()
                       case 'Y':
         {
           TimerSetup.calY = val;
-          Serial.println("cal y ");
+          Serial.println(F("cal y "));
           Serial.println(TimerSetup.calY );
 
           break; 
@@ -132,7 +136,7 @@ void get1Input()
                       case 'Z':
         {
           TimerSetup.calZ = val;
-          Serial.println("cal z ");
+          Serial.println(F("cal z "));
           Serial.println(TimerSetup.calZ );
           break;
         }
@@ -140,7 +144,7 @@ void get1Input()
 
               case 'o':
         {
-          Serial.print( "LED off ");
+          Serial.print(F( "LED off "));
           digitalWrite(LED3,LOW);
           digitalWrite(LED4,LOW);
           digitalWrite(LED5,LOW);
@@ -149,7 +153,7 @@ void get1Input()
         }
         case 'O':
         {
-          Serial.print( "LED on ");
+          Serial.print(F( "LED on "));
           digitalWrite(LED3,HIGH);
           digitalWrite(LED4,HIGH);
           digitalWrite(LED5,HIGH);
@@ -171,38 +175,38 @@ void get1Input()
 void menuValues ()
 {
   read_giro();
-  Serial.print(" a Fly Speed 0-180 ");
+  Serial.print(F(" a Fly Speed 0-180 "));
   Serial.println(TimerSetup.FlySpeed );
-  Serial.print(" b Fly Time sec ");
+  Serial.print(F(" b Fly Time sec "));
   Serial.println(TimerSetup.FlyTime );
-  Serial.print(" c Arm Time sec ");  
+  Serial.print(F(" c Arm Time sec "));  
   Serial.println(TimerSetup.ArmTime );
-  Serial.print(" d accel Time msec ");
+  Serial.print(F(" d accel Time msec "));
   Serial.println(TimerSetup.accelTime );
-  Serial.print(" E  Pitch gain 0- 180 ");
+  Serial.print(F(" E  Pitch gain 0- 180 "));
   Serial.println(TimerSetup.px );
-  Serial.print(" F  Roll gain 0 -180 ");
+  Serial.print(F(" F  Roll gain 0 -180 "));
   Serial.println(TimerSetup.py );
-  Serial.print(" X gyro cal X ");
+  Serial.print(F(" X gyro cal X "));
   Serial.println(TimerSetup.calX );
-  Serial.print(" Y gyro cal Y ");
+  Serial.print(F(" Y gyro cal Y "));
   Serial.println(TimerSetup.calY );
-  Serial.print(" Z gyro cal Z ");
+  Serial.print(F(" Z gyro cal Z "));
   Serial.println(TimerSetup.calZ );
-  Serial.print(" X gyro value ");
+  Serial.print(F(" X gyro value "));
   Serial.println(angleX );
-  Serial.print(" Y gyro val  ");
+  Serial.print(F(" Y gyro val  "));
   Serial.println(angleY );
   
   
-  Serial.println(" **************************");
-  Serial.println(" r refresh");
-  Serial.println(" s save");
-  Serial.println(" (O)n or (o)ff to test LEDs" );
-  Serial.println(" G run calibration of Gyro ");
-  Serial.println(" q exit withiout saving");
+  Serial.println(F(" **************************"));
+  Serial.println(F(" r refresh"));
+  Serial.println(F(" s save"));
+  Serial.println(F(" (O)n or (o)ff to test LEDs" ));
+  Serial.println(F(" G run calibration of Gyro "));
+  Serial.println(F(" q exit withiout saving"));
   
-  Serial.println(" command value no spaces");
+  Serial.println(F(" command value no spaces"));
 }
 
 

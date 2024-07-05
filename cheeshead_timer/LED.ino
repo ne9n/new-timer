@@ -1,64 +1,77 @@
-void ledUpdate()
-{
 
-  unsigned long currentMillis1 = millis();
-  if (LEDtime.update())
+void set_led()
+{
+  switch (speed_state)
   {
-    switch (led_state)
+    case WAIT:
     {
-      case 1:
-        {
-          digitalWrite(LED3, LOW);
-          digitalWrite(LED4, LOW);
-          digitalWrite(LED5, LOW);
-          led_state = 2;
-          break;
-        }
-      case 2:
-        {
-          digitalWrite(LED3, HIGH);
-          digitalWrite(LED4, LOW);
-          digitalWrite(LED5, LOW);
-          led_state = 1;
-          break;
-        }
+          rled.blink(250,1000);
+          yled.turnOFF();
+          gled.turnOFF();
+
     }
-  }
-}
+        break;
+    case ARMED:
+    {
+          rled.turnOFF();
+          yled.blink(250,1000);
+          gled.turnOFF();
+    }
+    break;
+    case TAKEOFF_RAMP:
+    {
+          rled.turnOFF();
+          yled.turnON();
+          gled.blink(250,100);
 
-void ledTest()
-{
-  int i;
-  for (i = 0; i < 500; i++)
+        
+    }
+    break;
+    case TAKEOFF:
+    {
+        rled.turnOFF();
+        yled.turnOFF();
+        gled.turnON();
+    }
+    break;
+    case FLY:
+    {
+        rled.turnOFF();
+        yled.blink(500,500);
+        gled.blink(500,500);
+    }
+    break;
+    case BURP:
   {
+        rled.turnON();
+        yled.turnON();
+        gled.turnON();
 
-    digitalWrite(LED_BUILTIN, HIGH);
-    digitalWrite(LED3, HIGH);
-    digitalWrite(LED4, HIGH);
-    digitalWrite(LED5, HIGH);
+    }
+    break;
 
-    delay(5000);
-    digitalWrite(LED_BUILTIN, LOW);
-    digitalWrite(LED3, LOW);
-    digitalWrite(LED4, LOW);
-    digitalWrite(LED5, LOW);
+    case RDYLAND:
+    {
 
-    delay(5000);
+    }
+    break;
+    case RAMPDWN:
+    {
+
+        rled.blink(250,1000);
+          yled.turnOFF();
+          gled.turnOFF();
+       
+    }
+    break;
+    default:
+    {
+        rled.turnON();
+        yled.turnOFF();
+        gled.turnOFF();
+       
+      
+    }
+    break;
   }
-}
-
-void led_fast()
-{
-  digitalWrite(LED3, LOW);
-  delay (1000);
-  digitalWrite(LED3, HIGH);
-  delay (1000);
-}
-
-void led_SLOW()
-{
-  digitalWrite(LED3, LOW);
-  delay (5000);
-  digitalWrite(LED3, HIGH);
-  delay (5000);
 }

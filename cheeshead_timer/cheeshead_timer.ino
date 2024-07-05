@@ -2,7 +2,10 @@
 #include <EEPROM.h>
 #include <MPU6050_tockn.h>
 #include <Wire.h>
-#include<NoDelay.h>
+#include <ezLED.h>
+#include "ADebouncer.h"
+
+
 
 // Dave Siegler ne9n.dave@gmail.com
 // This is a timer that steps through a seguence of speeds
@@ -46,37 +49,50 @@ typedef struct {
 param TimerSetup;
 MPU6050 mpu6050(Wire);
 Servo esc;
+ADebouncer debouncer; 
 
+#define MAX_SPEED  180
 #define IncThrottle 1
 #define BurpMax 180
-#define BURPTIME 500
-#define RDYTIME 5000
-#define LANDTIME 0x1FF
-#define INCTIME 50
-#define SKIP 500
-#define FLASHON 500
-#define FLASHOFF 500
-
-#define WAIT 0
-#define ARMED 1
-#define TAKEOFF 2
-#define FLY 3
-#define RAMPDWN 4
-#define LAND 5
 
 
-// sub state for flyng
-#define FLYING 0
-#define BURP 1
-#define RDYLAND 2
+
+enum  speed_s
+{
+  WAIT,
+  ARMED,
+  TAKEOFF_RAMP,
+  TAKEOFF,
+  FLY,
+  BURP,
+  RDYLAND,
+  RAMPDWN
+ };
+ enum speed_s speed_state = WAIT;
+ /*defaultvalues for states up above */
+ unsigned long state_timer[] = {
+  1000, /* 0 wait*/
+  3000, /* 1 armed*/
+  5000, /*2  spin up */
+  5000, /* 3 full speed */
+  20000, /*4 fly*/
+  1000, /*5 Burp*/
+  5000, /*6 ready land */
+  1500  /* 7 land*/
+ };
+
+
+
+
 
 // hardware pin def's
-#define BUTTONPIN 13
+#define BUTTONPIN 10
 #define SW1 8
-#define SERVO 6
-#define LED3 10
-#define LED4 11
-#define LED5 12 //works
+#define SERVO 3
+#define LED3 7
+#define LED4 8
+#define LED5 9 //works
+
 
 
 
@@ -85,15 +101,17 @@ extern void terminal();
 extern void speedState();
 extern void gyro();
 extern void printDebug();
-extern void led_slow();
-extern void led_fast();
+
 
 
 
 // Gyro related
 bool gyro_flag = false;
+bool go_fly = false;
+
 int angleX;
 int angleY;
+int angleZ;
 
 // speed variables
 int maxThrottle = TimerSetup.FlySpeed;
@@ -102,62 +120,72 @@ int posTrim;
 
 
 // time variables 
-noDelay LEDtime(1000);//Creats a noDelay varible set to 1000ms
 unsigned long currentMillis = millis();
-unsigned long state_tmr;
+unsigned long previousMillis;
 int incTime = 0;
-
+  ezLED rled(LED5);
+  ezLED yled(LED4);
+  ezLED gled(LED3);
 
 // state variables
-int speed_state = WAIT;
-int inFlight = FLYING;
-int led_state = 0;
+
 
 
 
 
 void setup()
 {
+  Serial.begin(19200);
+
+  Serial.print(" init start");
+  
   // attaches the servo on pin 9 to the servo object
   esc.attach(SERVO, 1000, 2000);
   esc.write(curThrottle);
   // read in all the set up variales 
   int eeAddress = 0;
   EEPROM.get(eeAddress, TimerSetup );
-
-  //  mpu6050.setGyroOffsets(calX, calY, calZ);
-  // set up teh I/O pins
- 
+  state_timer[FLY] = TimerSetup.FlyTime; 
+  state_timer[ARMED] = TimerSetup.ArmTime; 
+  state_timer[TAKEOFF_RAMP] = TimerSetup.accelTime; 
+  //mpu6050.setGyroOffsets(calX, calY, calZ);
+  // set up the I/O pins
+      
   pinMode(BUTTONPIN, INPUT_PULLUP);
+  debouncer.mode(DELAYED, 100 , HIGH);
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(LED3, OUTPUT);
-  pinMode(LED4, OUTPUT);
-  pinMode(LED5, OUTPUT);
 
-
-  Serial.begin(19200);
   Wire.begin();
   mpu6050.begin();
-  // mpu6050.calcGyroOffsets(true);
+  //mpu6050.calcGyroOffsets(true);
   mpu6050.setGyroOffsets(TimerSetup.calX / 100.0, TimerSetup.calY / 100.0, TimerSetup.calZ / 100.0);
+  rled.blink(500,500);
+  Serial.print(" init complte");
+ 
+
 }
 
 
 void plotDebug(void)
 {
-
-  Serial.print( (digitalRead(BUTTONPIN))  ? "\t button up": "\t button down" );
-
-  Serial.print("angleX : ");      Serial.print(angleX);
-  Serial.print("\tangleY : ");    Serial.println(angleY );
-
- 
-  Serial.print("\t posTrim : ");  Serial.print(posTrim);
-  Serial.print("\t throttle : "); Serial.print(curThrottle);
-  Serial.print(" speed_st : ");   Serial.print(speed_state);
-  Serial.print(" currentMillis -state_tmr : "); Serial.print(currentMillis-state_tmr);
    
-   //Serial.println();
+  
+  //Serial.print( (digitalRead(BUTTONPIN))  ? "\t button up": "\t button down" );
+ 
+  //Serial.print(F("angleX:"));      Serial.print(angleX); Serial.print(F(","));
+  //Serial.print(F("angleY:"));    Serial.print(angleY );Serial.print(F(","));
+  //Serial.print(F("angleZ:"));    Serial.print(angleZ );Serial.print(F(","));
+  //Serial.print(F("\angleZ:"));    Serial.print(angleZ );Serial.print(F(","));
+  //Serial.print(F("!button:"));    Serial.print(!digitalRead(BUTTONPIN) ); Serial.print(F(","));
+  //Serial.print(F("posTrim:"));  Serial.print(posTrim);Serial.print(F(","));
+  //Serial.print(F("throttle:")); Serial.print(curThrottle);Serial.print(F(","));
+  Serial.print(F(" speed_st:"));   Serial.print(speed_state);Serial.print(F(","));
+  Serial.print(F(" go_fly:"));   Serial.print(go_fly);Serial.print(F(","));
+ // Serial.print(F("currentMillis -state_tmr:")); Serial.print(currentMillis-state_tmr);
+  Serial.print(F("time left: ")); Serial.print(state_timer[speed_state] - (currentMillis - previousMillis) );
+  Serial.print(F("\n"));
+   
+  //Serial.println();
 }
 void term_ctrl()
 {
@@ -169,12 +197,83 @@ void term_ctrl()
   }
 }
 
+bool check_state()
+{
+  currentMillis = millis();
+  if  (currentMillis - previousMillis  > state_timer[speed_state])
+  {
+    //previousMillis = currentMillis;
+    /* inc the state and make it wrap 8 states */
+    speed_state = static_cast <speed_s>((speed_state+1)%8);
+    previousMillis = currentMillis;
+    set_led();
+    return true;
+  
+   }
+   else
+    return false;
+}
+
+int i;
 
 void loop()
 {
+  rled.loop();
+  yled.loop();
+  gled.loop();
+       
+  // need to see a low to high transistion
+
+  bool buttonState = debouncer.debounce(digitalRead(BUTTONPIN));
+  bool falling = debouncer.falling();
+  if (falling)
+  {
+    
+    if (go_fly)
+    {
+       previousMillis = currentMillis;
+       speed_state = WAIT;
+       set_led();
+       curThrottle = 0;  
+       go_fly = false;
+       Serial.println("dont");
+    }
+    else
+    { 
+      go_fly = true;
+      previousMillis = currentMillis;
+      speed_state = WAIT;
+      curThrottle = 0;  
+      Serial.println("do");
+
+    }
+  previousMillis = currentMillis;
+  speed_state = WAIT;
+
+  
+  }
   term_ctrl();
-  speedState(); // this manages the state machines for takeoff flying and landing
-  plotDebug();  //This prints a serial stream for the Arduino debugger.  uncomment the items to plot.  
-  speedGyro();       // this reads the gyro and trims the speed 
-  ledUpdate();  // updates the LED's 
+  if (go_fly)
+  {
+    speedState();
+    if (check_state())
+    {
+       // this manages the state machunes for takeoff flyingand landing
+      set_led();
+      //Serial.print(F("state:")); Serial.println(speed_state);
+      //Serial.println(F(" timer:")); Serial.println (state_timer[speed_state]);
+     // Serial.print(F("throttle :"));Serial.println(curThrottle );
+      
+      
+    
+    }
+  }
+
+  if (i++ >500)
+  {
+    plotDebug();  // this prints a serial stream for the Arduino debugger.  un comment the intems to plot. 
+     i = 0;
+  }
+  //speedGyro();       // this reads the gyro and trims the speed 
+
 }
