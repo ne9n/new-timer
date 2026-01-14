@@ -2,6 +2,7 @@
 #include "cheesehead_timer.h"
 #include <Servo.h>
 #include "state_machine.h"
+#include <limits.h>
 //#include <Arduino.h>
 #define rLIMIT 150
 extern unsigned long currentMillis;
@@ -159,8 +160,6 @@ void read_giro()
   last_y = iangleY;
   last_z = iangleZ;
   last_mils = currentMillis;
-}
-
 }
 
 // Refactored function to evaluate high pitch and yaw events

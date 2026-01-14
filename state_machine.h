@@ -1,7 +1,7 @@
 #ifndef STATE_MACHINE_H
 #define STATE_MACHINE_H
-//#include <ARDUINO.H>
-//#include "cheesehead_timer.h"
+#include <Arduino.h>
+#include "cheesehead_timer.h"
 
 
 
