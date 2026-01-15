@@ -22,6 +22,22 @@ void mpu_setup();
 // Evaluate high pitch and yaw events (refactored from read_giro)
 void evaluateHighPitchYaw(int dx, int dy, int dz);
 
+// Test/mocking helpers
+void setMockMPU(bool v);
+void setMockAngles(int x, int y, int z);
+int getAngleX_read();
+int getAngleY_read();
+int getAngleZ_read();
+void processSerialMPU();
+
+// Test/mocking hooks (serial-driven)
+void setMockMPU(bool v);
+void setMockAngles(int x, int y, int z);
+void processSerialMPU();
+int getAngleX_read();
+int getAngleY_read();
+int getAngleZ_read();
+
 
 
 #endif

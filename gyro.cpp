@@ -8,6 +8,43 @@
 extern unsigned long currentMillis;
 MPU6050 mpu6050(Wire);
 
+// Mocking support for tests: when `useMockMPU` is true the getAngle*_read
+// helpers return mocked values instead of reading the real MPU.
+static bool useMockMPU = false;
+static volatile int mockX = 0;
+static volatile int mockY = 0;
+static volatile int mockZ = 0;
+
+void setMockMPU(bool v) { useMockMPU = v; }
+void setMockAngles(int x, int y, int z) { mockX = x; mockY = y; mockZ = z; }
+
+int getAngleX_read() { return useMockMPU ? mockX : mpu6050.getAngleX(); }
+int getAngleY_read() { return useMockMPU ? mockY : mpu6050.getAngleY(); }
+int getAngleZ_read() { return useMockMPU ? mockZ : mpu6050.getAngleZ(); }
+
+// Simple serial command processor to accept test commands over Serial:
+//  - "TESTMODE ON" / "TESTMODE OFF"
+//  - "MPU X Y Z" to set angles (integers)
+void processSerialMPU()
+{
+  while (Serial.available())
+  {
+    String line = Serial.readStringUntil('\n');
+    line.trim();
+    if (line.length() == 0) continue;
+    if (line.equalsIgnoreCase("TESTMODE ON")) { setMockMPU(true); Serial.println("ACK TEST ON"); continue; }
+    if (line.equalsIgnoreCase("TESTMODE OFF")) { setMockMPU(false); Serial.println("ACK TEST OFF"); continue; }
+
+    if (line.startsWith("MPU"))
+    {
+      int x=0,y=0,z=0;
+      int n = sscanf(line.c_str(), "MPU %d %d %d", &x, &y, &z);
+      if (n == 3) { setMockAngles(x,y,z); Serial.println("ACK MPU"); }
+      else { Serial.println("ERR PARSE"); }
+    }
+  }
+}
+
 // servo declared in main sketch
 extern Servo esc;
 
@@ -82,9 +119,9 @@ void setUpMPU(void)
 void read_giro()
 {
   // read raw angles
-  iangleX = mpu6050.getAngleX();
-  iangleY = mpu6050.getAngleY();
-  iangleZ = mpu6050.getAngleZ();
+  iangleX = getAngleX_read();
+  iangleY = getAngleY_read();
+  iangleZ = getAngleZ_read();
 
   // initialize on first call
   if (last_mils == 0)
@@ -252,9 +289,9 @@ void speedGyro()
   mpu6050.update();
 
   // update raw angles
-  iangleX = mpu6050.getAngleX();
-  iangleY = mpu6050.getAngleY();
-  iangleZ = mpu6050.getAngleZ();
+  iangleX = getAngleX_read();
+  iangleY = getAngleY_read();
+  iangleZ = getAngleZ_read();
   // compute pitch trim from pitch angle (`iangleX`) using sin-table for smooth curve
   // - Uses `TimerSetup.px` as max magnitude (0..180)
   // - Signed sin table: READ_SIN gives ~0..1000, subtract 500 -> -500..+500
