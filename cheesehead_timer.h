@@ -25,7 +25,7 @@ extern void terminal();
 extern void speedState();
 extern void gyro();
 extern void printDebug();
-extern int set_led(int);
+extern void set_led(int);
 extern void speedGyro();
 extern void updateLED();
 extern void initLED();

@@ -41,6 +41,9 @@ void handleTap() {
       case STOPPED:
        currentState = STARTING;       
         break;
+      case STARTING:
+       currentState = RUN;
+        break;
       case RUN:
          currentState = STOPPED;   
         break;

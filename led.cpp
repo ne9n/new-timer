@@ -37,7 +37,7 @@ void updateLED()
 }
 
 
-int  set_led(int is)
+void set_led(int is)
 {
 
   delay(1000);
@@ -118,4 +118,5 @@ int  set_led(int is)
     }
     break;
   }
+  return; 
 }

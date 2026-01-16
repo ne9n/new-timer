@@ -45,7 +45,7 @@ Servo esc;
 extern unsigned long state_timer[];
 
 // speed variables
-int maxThrottle = TimerSetup.FlySpeed;
+int maxThrottle = TimerSetup.FlySpeed[0];
 
 
 
@@ -123,6 +123,8 @@ void getDips()
   // allow 3 speed prfiles and on swich for enable disable the gyro
   sindex = (!digitalRead(DS2)<< 1) + (!digitalRead(DS1))  ;
   gyroEn = digitalRead(DS3);
+  // install board cores (commented stray text removed)
+  
 /*
   Serial.print(sindex); 
   Serial.print(" = speed dips  ");

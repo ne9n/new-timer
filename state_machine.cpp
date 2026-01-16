@@ -18,7 +18,7 @@ extern Servo esc;
 extern bool run_state;
 extern speed_state ispeed_state;
 extern int iangleZ;
-extern int set_led();
+extern void set_led(int);
 unsigned long currentMillis;
 unsigned long previousMillis;
 int lastZ = 0;

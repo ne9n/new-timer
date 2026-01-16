@@ -202,6 +202,7 @@ void read_giro()
 // Refactored function to evaluate high pitch and yaw events
 void evaluateHighPitchYaw(int dx, int dy, int dz)
 {
+  (void)dy; // dy intentionally unused in current algorithm; silence compiler warning
   // Simplified, clearer handling split into pitch and yaw sections.
 
   // --- PITCH (hysteresis) ---
