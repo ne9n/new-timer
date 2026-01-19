@@ -52,6 +52,61 @@ void term_ctrl()
   {
     terminal();
   }
+  else if (keypress == '!')
+  {
+    serialMonitor();
+  }
+}
+
+// Live serial monitor: start by pressing '!' on the serial console.
+// Press 'q' to exit the monitor and return to normal operation.
+void serialMonitor()
+{
+  extern int curThrottle;
+  extern int iangleX;
+  extern int iangleY;
+  extern int iangleZ;
+  extern int maneuverBoost;
+  extern speed_state ispeed_state;
+
+  Serial.println(F("! Starting live telemetry monitor (press 'q' to quit)"));
+  while (true)
+  {
+    // exit if user pressed 'q'
+    if (Serial.available() > 0)
+    {
+      char c = Serial.read();
+      if (c == 'q')
+      {
+        Serial.println(F("! Exiting telemetry monitor"));
+        break;
+      }
+    }
+
+    // Read values and print a single-line status
+    int speed = curThrottle;
+    int pitch = iangleX;
+    int roll = iangleY;
+    int yaw = iangleZ;
+    int boost = maneuverBoost;
+    int led3 = digitalRead(LED3);
+    int led4 = digitalRead(LED4);
+    int led5 = digitalRead(LED5);
+    int btn = !digitalRead(BUTTONPIN); // active low -> pressed = 1
+
+    Serial.print(F("! speed:")); Serial.print(speed);
+    Serial.print(F(" pitch:")); Serial.print(pitch);
+    Serial.print(F(" roll:")); Serial.print(roll);
+    Serial.print(F(" yaw:")); Serial.print(yaw);
+    Serial.print(F(" boost:")); Serial.print(boost);
+    Serial.print(F(" leds:R")); Serial.print(led5);
+    Serial.print(F(" Y")); Serial.print(led4);
+    Serial.print(F(" G")); Serial.print(led3);
+    Serial.print(F(" btn:")); Serial.print(btn);
+    Serial.print(F(" state:")); Serial.println((int)ispeed_state);
+
+    delay(200); // update ~5 times/sec
+  }
 }
 
 
@@ -274,6 +329,42 @@ void getInput()
 
       
         }
+        case 'v':
+        case 'V':
+          {
+            Serial.println(F("Factory reset EEPROM requested. Send 'Y' to confirm."));
+            // clear any pending input
+            while (Serial.available() > 0) Serial.read();
+            while (Serial.available() == 0) { }
+            char c = Serial.read();
+            if (c == 'Y' || c == 'y')
+            {
+              int eeAddress = 0;
+              TimerSetup.calX = 1;
+              TimerSetup.calY = 1;
+              TimerSetup.calZ = 1;
+              TimerSetup.px = 1;
+              TimerSetup.py = 1;
+              TimerSetup.rx = 1;
+              TimerSetup.ry = 1;
+              TimerSetup.PitchExThresh = 40;
+              TimerSetup.YawRateExThresh = 20;
+              TimerSetup.LapCount = 0;
+              TimerSetup.LapLimit = 0;
+              TimerSetup.FlySpeed[0] = 120; TimerSetup.FlySpeed[1] = 140; TimerSetup.FlySpeed[2] = 180;
+              TimerSetup.FlyTime[0] = 40000; TimerSetup.FlyTime[1] = 40000; TimerSetup.FlyTime[2] = 40000;
+              TimerSetup.ArmTime[0] = 500; TimerSetup.ArmTime[1] = 500; TimerSetup.ArmTime[2] = 500;
+              TimerSetup.accelTime[0] = 5000; TimerSetup.accelTime[1] = 5000; TimerSetup.accelTime[2] = 5000;
+              EEPROM.put(eeAddress, TimerSetup);
+              Serial.println(F("Factory reset complete — defaults written to EEPROM."));
+              Serial.println(F("Run 'G' from the menu to recalibrate the MPU if needed."));
+            }
+            else
+            {
+              Serial.println(F("Factory reset cancelled."));
+            }
+            break;
+          }
       }
     }
   }
@@ -335,6 +426,7 @@ void menuValues()
   Serial.println(F(" (O)n or (o)ff to test LEDs" ));
   Serial.println(F(" G run calibration of Gyro "));
   Serial.println(F(" q exit withiout saving"));
+  Serial.println(F(" V Factory reset EEPROM (requires confirmation)"));
   
   Serial.println(F(" letter profile and value with a space between" ));
 }

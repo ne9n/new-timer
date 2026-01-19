@@ -64,11 +64,11 @@ void setup()
   esc.write(0);
   // EEprom read in all the set up variales 
   int eeAddress = 0;
+  bool firstRun = false;
   EEPROM.get(eeAddress, TimerSetup );
   if (TimerSetup.FlySpeed[2] > 500)
   {
-    /* must br a new board set defaukts */
-    
+    /* must be a new board - set defaults */
       TimerSetup.calX= 1;
       TimerSetup.calY = 1;
       TimerSetup.calZ= 1;
@@ -86,8 +86,8 @@ void setup()
       TimerSetup.accelTime[0] = 5000;TimerSetup.accelTime[1] = 5000;TimerSetup.accelTime[2] = 5000; // in mse
       EEPROM.put(eeAddress, TimerSetup);
       Serial.print(" set default values \n");
-      
-      }
+      firstRun = true;
+  }
   state_timer[int (speed_state::FLY)] = TimerSetup.FlyTime[0]; 
   state_timer[int (speed_state::ARMED)] = TimerSetup.ArmTime[0]; 
   state_timer[int (speed_state::TAKEOFF_RAMP)] = TimerSetup.accelTime[0]; 
@@ -107,8 +107,13 @@ void setup()
 
   
   // MPU 6050 gyro  
-  Wire.begin(); // ?? 
-  mpu_setup(); // in gyro.cpp
+  Wire.begin();
+  mpu_setup(); // initialize MPU (does not auto-calibrate)
+  if (firstRun)
+  {
+    Serial.println(F("First run detected - running MPU calibration"));
+    setUpMPU(); // run calibration on first boot
+  }
 
   getDips(); // need to init this
   //rled.blink(500,500);

@@ -19,6 +19,8 @@ const int sinetbl[37] PROGMEM= {
 
 void speedGyro();
 void mpu_setup();
+// Calibrate MPU offsets (long-running) - run on first boot or via menu
+void setUpMPU(void);
 // Evaluate high pitch and yaw events (refactored from read_giro)
 void evaluateHighPitchYaw(int dx, int dy, int dz);
 

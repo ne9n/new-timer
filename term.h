@@ -10,6 +10,7 @@ void menuValues ();
 void read_giro();
 void plotDebug();
 void term_ctrl();
+void serialMonitor();
 
 
 

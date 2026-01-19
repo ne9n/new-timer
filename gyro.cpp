@@ -115,7 +115,7 @@ void setUpMPU(void)
 
 }
 
-
+ // mpu6050.calcGyroOffsets(true);
 void read_giro()
 {
   // read raw angles
