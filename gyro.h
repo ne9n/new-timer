@@ -1,7 +1,11 @@
 #ifndef GYRO_H
 #define GYRO_H
 //#include <ARDUINO.H>
-#include <MPU6050_tockn.h> 
+#if defined(USE_INTERNAL_IMU)
+#include <Arduino_LSM6DS.h>
+#else
+#include <MPU6050_tockn.h>
+#endif
 #include <Wire.h>
 
 

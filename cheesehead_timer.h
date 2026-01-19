@@ -8,18 +8,36 @@
 #define MAX_SPEED  180 // needs to ptogramabble 
 #define IncThrottle 1
 #define BurpMax 180
+// hardware pin definitions - allow board-specific overrides
+// Define XIAO_NRF52840 (or ARDUINO_ARCH_NRF52840) to enable alternate pinout and internal IMU
+#if defined(XIAO_NRF52840) || defined(ARDUINO_ARCH_NRF52840)
+  // Example XIAO nRF52840 pin mapping - adjust as needed for your board/revision
+  #define SERVO2 2
+  #define SERVO 3
+  #define DS1 4
+  #define DS2 5
+  #define DS3 6
 
-// hardware pin def's blue board white board seems to have same
-#define SERVO2 2  //only on white board
-#define SERVO 3
-#define DS1 4 //only on white define uplled up
-#define DS2 5 //only on white define uplled up
-#define DS3 6 //only on white define uplled up
+  #define LED3 7
+  #define LED4 8
+  #define LED5 9
+  #define BUTTONPIN 10
 
-#define LED3 7  // colors may be wrong
-#define LED4 8
-#define LED5 9 //works
-#define BUTTONPIN 10
+  // Use the board's internal IMU when available
+  #define USE_INTERNAL_IMU
+#else
+  // original/default mapping
+  #define SERVO2 2  //only on white board
+  #define SERVO 3
+  #define DS1 4 //only on white define uplled up
+  #define DS2 5 //only on white define uplled up
+  #define DS3 6 //only on white define uplled up
+
+  #define LED3 7  // colors may be wrong
+  #define LED4 8
+  #define LED5 9 //works
+  #define BUTTONPIN 10
+#endif
 
 extern void terminal();
 extern void speedState();

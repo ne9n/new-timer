@@ -6,7 +6,15 @@
 //#include <Arduino.h>
 #define rLIMIT 150
 extern unsigned long currentMillis;
+// IMU object: either MPU6050 (legacy) or internal IMU via Arduino_LSM6DS (when USE_INTERNAL_IMU)
+#if !defined(USE_INTERNAL_IMU)
 MPU6050 mpu6050(Wire);
+#else
+static bool internalIMUavailable = false;
+// yaw integration state for internal IMU
+static float internalYawAngle = 0.0f;
+static unsigned long internalLastGyroMillis = 0;
+#endif
 
 // Mocking support for tests: when `useMockMPU` is true the getAngle*_read
 // helpers return mocked values instead of reading the real MPU.
@@ -18,9 +26,50 @@ static volatile int mockZ = 0;
 void setMockMPU(bool v) { useMockMPU = v; }
 void setMockAngles(int x, int y, int z) { mockX = x; mockY = y; mockZ = z; }
 
+#if !defined(USE_INTERNAL_IMU)
 int getAngleX_read() { return useMockMPU ? mockX : mpu6050.getAngleX(); }
 int getAngleY_read() { return useMockMPU ? mockY : mpu6050.getAngleY(); }
 int getAngleZ_read() { return useMockMPU ? mockZ : mpu6050.getAngleZ(); }
+#else
+#include <math.h>
+#define RAD_TO_DEG 57.29577951308232f
+int getAngleX_read()
+{
+  if (useMockMPU) return mockX;
+  if (!internalIMUavailable) return 0;
+  float ax=0, ay=0, az=0;
+  if (IMU.accelerationAvailable()) IMU.readAcceleration(ax, ay, az);
+  // pitch: rotation around Y axis (nose up positive)
+  float pitch = atan2(-ax, sqrt(ay*ay + az*az)) * RAD_TO_DEG;
+  return (int)pitch;
+}
+int getAngleY_read()
+{
+  if (useMockMPU) return mockY;
+  if (!internalIMUavailable) return 0;
+  float ax=0, ay=0, az=0;
+  if (IMU.accelerationAvailable()) IMU.readAcceleration(ax, ay, az);
+  // roll: rotation around X axis
+  float roll = atan2(ay, az) * RAD_TO_DEG;
+  return (int)roll;
+}
+int getAngleZ_read()
+{
+  if (useMockMPU) return mockZ;
+  if (!internalIMUavailable) return 0;
+  // integrate gyro Z to approximate yaw (deg)
+  float gx=0, gy=0, gz=0;
+  unsigned long now = currentMillis ? currentMillis : millis();
+  if (internalLastGyroMillis == 0) internalLastGyroMillis = now;
+  unsigned long dt_ms = now - internalLastGyroMillis;
+  if (IMU.gyroscopeAvailable()) IMU.readGyroscope(gx, gy, gz);
+  // gz in rad/s -> convert to deg/sec
+  float gz_dps = gz * RAD_TO_DEG;
+  internalYawAngle += gz_dps * ((float)dt_ms / 1000.0f);
+  internalLastGyroMillis = now;
+  return (int)internalYawAngle;
+}
+#endif
 
 // Simple serial command processor to accept test commands over Serial:
 //  - "TESTMODE ON" / "TESTMODE OFF"
@@ -102,17 +151,29 @@ static const int DEFAULT_YAW_DELTA_RATE_THRESHOLD = 20; // deg/sec
 
 void mpu_setup()
 {
-
- 
- mpu6050.begin();
- mpu6050.calcGyroOffsets(true);
-// mpu6050.calcGyroOffsets(true);
-//  mpu6050.setGyroOffsets(TimerSetup.calX / 100.0, TimerSetup.calY / 100.0, TimerSetup.calZ / 100.0);
+  
+#if !defined(USE_INTERNAL_IMU)
+  mpu6050.begin();
+  mpu6050.calcGyroOffsets(true);
+#else
+  // initialize internal IMU (LSM6DS or compatible via Arduino_LSM6DS)
+  if (IMU.begin())
+  {
+    internalIMUavailable = true;
+  }
+#endif
 }
 void setUpMPU(void)
 {
+#if !defined(USE_INTERNAL_IMU)
   mpu6050.calcGyroOffsets(true);
-
+#else
+  // nothing special to do for internal IMU in this simple implementation
+  if (!internalIMUavailable)
+  {
+    if (IMU.begin()) internalIMUavailable = true;
+  }
+#endif
 }
 
  // mpu6050.calcGyroOffsets(true);
