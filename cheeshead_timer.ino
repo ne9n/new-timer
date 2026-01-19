@@ -105,6 +105,7 @@ void setup()
   //rled.blink(500,500);
   initLED();
   Serial.print(" init complte \n");
+  Serial.println(F("Ready. Press '?' for menu, '!' to toggle telemetry (19200 baud)."));
 
 }
 
