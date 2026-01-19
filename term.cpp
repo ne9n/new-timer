@@ -54,14 +54,18 @@ void term_ctrl()
   }
   else if (keypress == '!')
   {
-    serialMonitor();
+    // toggle telemetry mode (non-blocking)
+    extern bool telemetryMode;
+    telemetryMode = !telemetryMode;
+    if (telemetryMode) Serial.println(F("! Telemetry ON")); else Serial.println(F("! Telemetry OFF"));
   }
 }
-
-// Live serial monitor: start by pressing '!' on the serial console.
-// Press 'q' to exit the monitor and return to normal operation.
-void serialMonitor()
+// Non-blocking telemetry printing; call frequently from main loop
+bool telemetryMode = false;
+void telemetryUpdate()
 {
+  if (!telemetryMode) return;
+
   extern int curThrottle;
   extern int iangleX;
   extern int iangleY;
@@ -69,44 +73,39 @@ void serialMonitor()
   extern int maneuverBoost;
   extern speed_state ispeed_state;
 
-  Serial.println(F("! Starting live telemetry monitor (press 'q' to quit)"));
-  while (true)
+  // allow user to press 'q' to exit telemetry mode
+  if (Serial.available() > 0)
   {
-    // exit if user pressed 'q'
-    if (Serial.available() > 0)
+    char c = Serial.read();
+    if (c == 'q')
     {
-      char c = Serial.read();
-      if (c == 'q')
-      {
-        Serial.println(F("! Exiting telemetry monitor"));
-        break;
-      }
+      telemetryMode = false;
+      Serial.println(F("! Telemetry OFF"));
+      return;
     }
-
-    // Read values and print a single-line status
-    int speed = curThrottle;
-    int pitch = iangleX;
-    int roll = iangleY;
-    int yaw = iangleZ;
-    int boost = maneuverBoost;
-    int led3 = digitalRead(LED3);
-    int led4 = digitalRead(LED4);
-    int led5 = digitalRead(LED5);
-    int btn = !digitalRead(BUTTONPIN); // active low -> pressed = 1
-
-    Serial.print(F("! speed:")); Serial.print(speed);
-    Serial.print(F(" pitch:")); Serial.print(pitch);
-    Serial.print(F(" roll:")); Serial.print(roll);
-    Serial.print(F(" yaw:")); Serial.print(yaw);
-    Serial.print(F(" boost:")); Serial.print(boost);
-    Serial.print(F(" leds:R")); Serial.print(led5);
-    Serial.print(F(" Y")); Serial.print(led4);
-    Serial.print(F(" G")); Serial.print(led3);
-    Serial.print(F(" btn:")); Serial.print(btn);
-    Serial.print(F(" state:")); Serial.println((int)ispeed_state);
-
-    delay(200); // update ~5 times/sec
+    // if other chars are present, ignore them here
   }
+
+  int speed = curThrottle;
+  int pitch = iangleX;
+  int roll = iangleY;
+  int yaw = iangleZ;
+  int boost = maneuverBoost;
+  int led3 = digitalRead(LED3);
+  int led4 = digitalRead(LED4);
+  int led5 = digitalRead(LED5);
+  int btn = !digitalRead(BUTTONPIN); // active low -> pressed = 1
+
+  Serial.print(F("! speed:")); Serial.print(speed);
+  Serial.print(F(" pitch:")); Serial.print(pitch);
+  Serial.print(F(" roll:")); Serial.print(roll);
+  Serial.print(F(" yaw:")); Serial.print(yaw);
+  Serial.print(F(" boost:")); Serial.print(boost);
+  Serial.print(F(" leds:R")); Serial.print(led5);
+  Serial.print(F(" Y")); Serial.print(led4);
+  Serial.print(F(" G")); Serial.print(led3);
+  Serial.print(F(" btn:")); Serial.print(btn);
+  Serial.print(F(" state:")); Serial.println((int)ispeed_state);
 }
 
 

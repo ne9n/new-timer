@@ -18,20 +18,6 @@
 // an MUP is used to trim the throttle based on
 // pitch and roll values of te airplane
 // create servo object to control a servo
-// state constants part of config values
-//
-
-// TODOs addressed: lap-limit shutdown, menu entry, and initialization
-// Add dip swithc support 
-// check LED colors 
-// Add extra fileds to paramater structure 
-// Add servo 2 support (not requred) 
-// excessive movement funcgions 
-
-// to do testsing 
-// new button lib wotks 
-// SS runs 
-
 
 
 
@@ -153,6 +139,7 @@ void loop()
   updateLED();
   getDips();
   updateButton();
+  telemetryUpdate();
   if (run_state)
   {
     check_state();
