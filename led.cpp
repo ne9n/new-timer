@@ -41,9 +41,7 @@ void set_led(int is)
 {
 
   delay(1000);
-  Serial.print(ispeed_state); 
-  Serial.print("  ");
-  Serial.print(" LED state info \n"); 
+  
 
   switch (is)
   {
