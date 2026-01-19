@@ -59,6 +59,15 @@ void term_ctrl()
     telemetryMode = !telemetryMode;
     if (telemetryMode) Serial.println(F("! Telemetry ON")); else Serial.println(F("! Telemetry OFF"));
   }
+  else if (keypress == 'q' || keypress == 'Q')
+  {
+    extern bool telemetryMode;
+    if (telemetryMode)
+    {
+      telemetryMode = false;
+      Serial.println(F("! Telemetry OFF"));
+    }
+  }
 }
 // Non-blocking telemetry printing; call frequently from main loop
 bool telemetryMode = false;
@@ -73,17 +82,17 @@ void telemetryUpdate()
   extern int maneuverBoost;
   extern speed_state ispeed_state;
 
-  // allow user to press 'q' to exit telemetry mode
-  if (Serial.available() > 0)
+  // consume all pending incoming bytes and check for 'q' or 'Q' to exit
+  while (Serial.available() > 0)
   {
-    char c = Serial.read();
-    if (c == 'q')
+    int v = Serial.read();
+    if (v == 'q' || v == 'Q')
     {
       telemetryMode = false;
       Serial.println(F("! Telemetry OFF"));
       return;
     }
-    // if other chars are present, ignore them here
+    // ignore other bytes (including CR/LF)
   }
 
   int speed = curThrottle;
