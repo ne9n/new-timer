@@ -174,6 +174,8 @@ void setUpMPU(void)
 
   int eeAddress = 0;
   EEPROM.put(eeAddress, TimerSetup);
+  // Commit for platforms that require it (ESP32)
+  EEPROM.commit();
 
   Serial.print(F("Calibration complete. Offsets (deg/s): "));
   Serial.print(biasX); Serial.print(F(","));

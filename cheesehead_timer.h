@@ -9,17 +9,35 @@
 #define IncThrottle 1
 #define BurpMax 180
 
-// hardware pin def's blue board white board seems to have same
-#define SERVO2 2  //only on white board
-#define SERVO 3
-#define DS1 4 //only on white define uplled up
-#define DS2 5 //only on white define uplled up
-#define DS3 6 //only on white define uplled up
+// hardware pin definitions
+// Provide ESP32-friendly defaults when building for ESP32, otherwise use
+// the original AVR/Uno pin numbers. You can override these by editing
+// the board-specific configuration if needed.
+#if defined(ESP32) || defined(ARDUINO_ARCH_ESP32)
+  // ESP32 recommended safe GPIOs
+  #define SERVO2 19
+  #define SERVO 18
+  #define DS1 34   // input-only
+  #define DS2 35   // input-only
+  #define DS3 32
 
-#define LED3 7  // colors may be wrong
-#define LED4 8
-#define LED5 9 //works
-#define BUTTONPIN 10
+  #define LED3 25
+  #define LED4 26
+  #define LED5 27
+  #define BUTTONPIN 33
+#else
+  // AVR / Arduino UNO defaults
+  #define SERVO2 2  //only on white board
+  #define SERVO 3
+  #define DS1 4 //only on white define uplled up
+  #define DS2 5 //only on white define uplled up
+  #define DS3 6 //only on white define uplled up
+
+  #define LED3 7  // colors may be wrong
+  #define LED4 8
+  #define LED5 9 //works
+  #define BUTTONPIN 10
+#endif
 
 extern void terminal();
 extern void speedState();

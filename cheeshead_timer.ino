@@ -45,6 +45,8 @@ void setup()
 {
   Serial.begin(19200);
   Serial.print(" init start ");
+  // Initialize EEPROM (required on ESP32 before EEPROM.get/put)
+  EEPROM.begin(sizeof(TimerSetup));
   // SERVO SETUP attaches the servo on pin 9 to the servo object
   esc.attach(SERVO, 1000, 2000);
   esc.write(0);
@@ -71,6 +73,8 @@ void setup()
       TimerSetup.ArmTime[0] = 500;TimerSetup.ArmTime[1]= 500;TimerSetup.ArmTime[2] = 500; // wait time in seconds
       TimerSetup.accelTime[0] = 5000;TimerSetup.accelTime[1] = 5000;TimerSetup.accelTime[2] = 5000; // in mse
       EEPROM.put(eeAddress, TimerSetup);
+      // Commit for platforms that require it (ESP32)
+      EEPROM.commit();
       Serial.print(" set default values \n");
       firstRun = true;
   }
