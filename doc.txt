@@ -181,12 +181,14 @@ Serial terminal
     - `m <value>` — set `LapLimit` in laps (fractional allowed; stored as tenths).
     - `k <value>` — set maneuver gain `rx` (0..180).
     - `s` — save `TimerSetup` to EEPROM.
-    - `G` — run gyro calibration routine.
+    - `G` — run gyro calibration routine and save computed gyro offsets to EEPROM (stored in `TimerSetup.calX/calY/calZ`, units = deg/s * 100).
+    - `u <value>` — set automatic throttle increase percent-per-minute while in `FLY` (0 disables). Example: `u 2` adds 2% of base throttle per minute.
 
   ## Defaults and initialization
 
   - On first run (or invalid EEPROM), defaults are set in `setup()` of `cheesehead_timer.ino` (example defaults for speeds, times, thresholds, and `LapLimit = 0`).
   - The MPU6050 is initialized in `mpu_setup()` and gyro offsets are calculated.
+  - Factory reset now includes a default `autoSpeedPerMin` (2%/min) and calibration offsets are saved into `TimerSetup.calX/calY/calZ` when the `G` command is used.
 
   ## Notes and recommendations
 
@@ -205,6 +207,41 @@ Serial terminal
   ## Contact
 
   - Original project author: Dave Siegler (ne9n) — email present in banner in `term.cpp`.
+
+  ---
+
+  ## Unit tests (on-device with PlatformIO)
+
+  - **Framework:** Unity test runner via PlatformIO.
+  - **Location:** tests live under `test/<name>/` (example: `test/test_utils/test_utils.cpp`).
+  - **Example added:** `src/utils.cpp` and `test/test_utils/test_utils.cpp` implement and verify `clampInt()`.
+  - **Run (CLI):**
+
+    ```powershell
+    pio test -e nano
+    pio test -e nano -v
+    pio test -e nano --upload-port COM6
+    ```
+
+  - **Run (VS Code):** PlatformIO icon → Project Tasks → Test → select `nano`.
+
+  - **Serial monitor for tests:** match `monitor_speed` in `platformio.ini` (project default set to 115200):
+
+    ```powershell
+    pio device monitor -p COM6 -b 115200
+    ```
+
+  - **If `pio` CLI is not available:** install the PlatformIO extension for VS Code (recommended), or install PlatformIO Core:
+
+    ```powershell
+    py -3 -m pip install --user platformio
+    # or with pipx:
+    py -3 -m pip install --user pipx
+    py -3 -m pipx ensurepath
+    pipx install platformio
+    ```
+
+  - **Tips:** close other programs using COM6, verify `board` in `platformio.ini`, and prefer testing pure functions (isolate hardware access) for reliable tests.
 
   ---
 

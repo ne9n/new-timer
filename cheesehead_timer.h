@@ -50,6 +50,8 @@ typedef struct {
   unsigned int FlyTime[3]; // air time in seconds
   unsigned int ArmTime[3]; // wait time in seconds
   unsigned int accelTime[3]; // in mse
+  // Auto increase throttle while in flight: percent per minute (0 disables)
+  byte autoSpeedPerMin; // e.g., 2 = 2% per minute
 } param;
 
 enum speed_state

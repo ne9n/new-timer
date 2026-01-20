@@ -3,6 +3,7 @@
 #include <Servo.h>
 #include "state_machine.h"
 #include <limits.h>
+#include <EEPROM.h>
 //#include <Arduino.h>
 #define rLIMIT 150
 extern unsigned long currentMillis;
@@ -111,8 +112,77 @@ void mpu_setup()
 }
 void setUpMPU(void)
 {
-  mpu6050.calcGyroOffsets(true);
+  // Perform an automatic calibration by sampling angle deltas while
+  // the board is stationary. Compute average gyro bias (deg/sec),
+  // apply to the library, and save into TimerSetup (scaled x100).
+  const int SAMPLES = 200;
+  const unsigned long SAMPLE_MS = 10; // sample interval
 
+  Serial.println(F("Starting MPU auto-calibration: keep board still."));
+  // warm up
+  for (int i = 0; i < 5; ++i) { mpu6050.update(); delay(20); }
+
+  int prevX = mpu6050.getAngleX();
+  int prevY = mpu6050.getAngleY();
+  int prevZ = mpu6050.getAngleZ();
+  double accRateX = 0.0;
+  double accRateY = 0.0;
+  double accRateZ = 0.0;
+
+  for (int i = 0; i < SAMPLES; ++i)
+  {
+    mpu6050.update();
+    int ax = mpu6050.getAngleX();
+    int ay = mpu6050.getAngleY();
+    int az = mpu6050.getAngleZ();
+
+    auto signedDelta = [](int cur, int prev)->int {
+      int d = cur - prev;
+      if (d > 180) d -= 360;
+      else if (d < -180) d += 360;
+      return d;
+    };
+
+    int dx = signedDelta(ax, prevX);
+    int dy = signedDelta(ay, prevY);
+    int dz = signedDelta(az, prevZ);
+
+    double rateX = (double)dx * 1000.0 / (double)SAMPLE_MS; // deg/sec
+    double rateY = (double)dy * 1000.0 / (double)SAMPLE_MS;
+    double rateZ = (double)dz * 1000.0 / (double)SAMPLE_MS;
+
+    accRateX += rateX;
+    accRateY += rateY;
+    accRateZ += rateZ;
+
+    prevX = ax; prevY = ay; prevZ = az;
+    delay(SAMPLE_MS);
+  }
+
+  double biasX = accRateX / (double)SAMPLES;
+  double biasY = accRateY / (double)SAMPLES;
+  double biasZ = accRateZ / (double)SAMPLES;
+
+  // Apply offsets to the MPU library (if available) and persist in EEPROM
+  // Library expects offsets in deg/sec; apply them directly.
+  mpu6050.setGyroOffsets((float)biasX, (float)biasY, (float)biasZ);
+
+  // Store scaled integer with factor 100 to match existing code convention
+  TimerSetup.calX = (int)(biasX * 100.0);
+  TimerSetup.calY = (int)(biasY * 100.0);
+  TimerSetup.calZ = (int)(biasZ * 100.0);
+
+  int eeAddress = 0;
+  EEPROM.put(eeAddress, TimerSetup);
+
+  Serial.print(F("Calibration complete. Offsets (deg/s): "));
+  Serial.print(biasX); Serial.print(F(","));
+  Serial.print(biasY); Serial.print(F(","));
+  Serial.println(biasZ);
+  Serial.print(F("Saved TimerSetup.calX/calY/calZ = "));
+  Serial.print(TimerSetup.calX); Serial.print(F(","));
+  Serial.print(TimerSetup.calY); Serial.print(F(","));
+  Serial.println(TimerSetup.calZ);
 }
 
  // mpu6050.calcGyroOffsets(true);

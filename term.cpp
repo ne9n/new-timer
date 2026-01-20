@@ -280,6 +280,17 @@ void getInput()
           }
           break;
         }
+      case 'u':
+      case 'U':
+        {
+          // set auto speed percent per minute (0 disables)
+          unsigned int v = Serial.parseInt();
+          if (v > 100) v = 100;
+          TimerSetup.autoSpeedPerMin = (byte)v;
+          Serial.print(F("Auto speed percent per minute set to: "));
+          Serial.println(TimerSetup.autoSpeedPerMin);
+          break;
+        }
               case 'x':
               case 'X':
         {
@@ -363,6 +374,7 @@ void getInput()
               TimerSetup.FlyTime[0] = 40000; TimerSetup.FlyTime[1] = 40000; TimerSetup.FlyTime[2] = 40000;
               TimerSetup.ArmTime[0] = 500; TimerSetup.ArmTime[1] = 500; TimerSetup.ArmTime[2] = 500;
               TimerSetup.accelTime[0] = 5000; TimerSetup.accelTime[1] = 5000; TimerSetup.accelTime[2] = 5000;
+              TimerSetup.autoSpeedPerMin = 2;
               EEPROM.put(eeAddress, TimerSetup);
               Serial.println(F("Factory reset complete — defaults written to EEPROM."));
               Serial.println(F("Run 'G' from the menu to recalibrate the MPU if needed."));
@@ -408,6 +420,8 @@ void menuValues()
   Serial.println(TimerSetup.rx);
   Serial.print(F(" B  Maneuver boost "));
   Serial.println(maneuverBoost);
+  Serial.print(F(" U  Auto speed %/min "));
+  Serial.println(TimerSetup.autoSpeedPerMin);
   Serial.print(F(" E  Pitch gain 0- 180 "));
   Serial.println(TimerSetup.px );
   Serial.print(F(" H  Excessive pitch threshold (deg per sample) "));
@@ -417,11 +431,11 @@ void menuValues()
   Serial.print(F(" J  Yaw rate threshold (deg/sec) "));
   Serial.println(TimerSetup.YawRateExThresh );
   Serial.print(F(" X gyro cal X "));
-  Serial.println(TimerSetup.calX );
+  Serial.print(TimerSetup.calX ); Serial.print(F(" (")); Serial.print(((float)TimerSetup.calX) / 100.0f); Serial.println(F(" deg/s)"));
   Serial.print(F(" Y gyro cal Y "));
-  Serial.println(TimerSetup.calY );
+  Serial.print(TimerSetup.calY ); Serial.print(F(" (")); Serial.print(((float)TimerSetup.calY) / 100.0f); Serial.println(F(" deg/s)"));
   Serial.print(F(" Z gyro cal Z "));
-  Serial.println(TimerSetup.calZ );
+  Serial.print(TimerSetup.calZ ); Serial.print(F(" (")); Serial.print(((float)TimerSetup.calZ) / 100.0f); Serial.println(F(" deg/s)"));
  // Serial.print(F(" X gyro value "));
  // Serial.println(iangleX );
  // Serial.print(F(" Y gyro val  "));

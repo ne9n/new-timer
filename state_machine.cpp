@@ -26,6 +26,9 @@ long angle_time = 0;
 int curThrottle;
 bool gyro_flag = false;
 
+// Track when we entered the FLY state for auto-increase
+static unsigned long flyStartMillis = 0;
+
 extern bool PitchEX;
 extern bool YawEX;
 extern bool YawLOW;
@@ -81,6 +84,7 @@ void setSpeedState(speed_state newState)
 {
   ispeed_state = newState;
   previousMillis = millis();
+  if (newState == speed_state::FLY) flyStartMillis = millis();
 }
 
 void speedState()
@@ -144,7 +148,19 @@ void speedState()
     break;
     case speed_state::FLY:
     {
+      // base throttle from profile 0
       curThrottle = TimerSetup.FlySpeed[0];
+      // apply automatic increase: percent per minute (TimerSetup.autoSpeedPerMin)
+      if (TimerSetup.autoSpeedPerMin > 0 && flyStartMillis > 0)
+      {
+        unsigned long now = millis();
+        unsigned long elapsed = (now - flyStartMillis);
+        // compute fractional minutes
+        float minutes = (float)elapsed / 60000.0f;
+        float extraPercent = ((float)TimerSetup.autoSpeedPerMin) * minutes; // percent
+        long extra = (long)((curThrottle * extraPercent) / 100.0f + 0.5f);
+        curThrottle += (int)extra;
+      }
       if (PitchEX or YawEX or YawLOW)
       {
         curThrottle = 0;
