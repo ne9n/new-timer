@@ -1,2 +1,1 @@
-extern "C" void setUp(void) {}
-extern "C" void tearDown(void) {}
+// test_support.cpp disabled - using test_support.c instead
