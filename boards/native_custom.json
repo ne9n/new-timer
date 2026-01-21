@@ -6,7 +6,11 @@
     "ram": 0,
     "flash": 0
   },
+  "id": "native_custom",
   "frameworks": [
+    "native"
+  ],
+  "platforms": [
     "native"
   ],
   "name": "Native (custom)",
