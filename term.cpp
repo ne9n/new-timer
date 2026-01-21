@@ -124,7 +124,9 @@ void saveData()
   int eeAddress = 0;   
   EEPROM.put(eeAddress, TimerSetup );
   // Commit for platforms that require it (ESP32)
+#if defined(ESP32)
   EEPROM.commit();
+#endif
 }
 void getInput()
 {
@@ -379,7 +381,9 @@ void getInput()
               TimerSetup.autoSpeedPerMin = 2;
               EEPROM.put(eeAddress, TimerSetup);
               // Commit for platforms that require it (ESP32)
+#if defined(ESP32)
               EEPROM.commit();
+#endif
               Serial.println(F("Factory reset complete — defaults written to EEPROM."));
               Serial.println(F("Run 'G' from the menu to recalibrate the MPU if needed."));
             }

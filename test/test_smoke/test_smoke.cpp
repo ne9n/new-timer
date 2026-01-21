@@ -1,17 +1,13 @@
-#include <Arduino.h>
 #include <unity.h>
 
-void test_smoke_true()
+void test_smoke()
 {
-    TEST_ASSERT_EQUAL(1, 1);
+	TEST_ASSERT_TRUE(1);
 }
 
-void setup()
+int main()
 {
-    delay(2000); // allow serial monitor to attach if needed
-    UNITY_BEGIN();
-    RUN_TEST(test_smoke_true);
-    UNITY_END();
+	UNITY_BEGIN();
+	RUN_TEST(test_smoke);
+	return UNITY_END();
 }
-
-void loop() {}

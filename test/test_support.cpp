@@ -1,0 +1,2 @@
+extern "C" void setUp(void) {}
+extern "C" void tearDown(void) {}

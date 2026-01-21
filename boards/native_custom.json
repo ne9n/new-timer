@@ -1,0 +1,20 @@
+{
+  "build": {
+    "core": "native",
+    "cpu": "native",
+    "f_cpu": "0L",
+    "ram": 0,
+    "flash": 0
+  },
+  "frameworks": [
+    "native"
+  ],
+  "name": "Native (custom)",
+  "vendor": "custom",
+  "url": "https://example.com/native_custom"
+  ,
+  "upload": {
+    "maximum_size": 1,
+    "maximum_ram_size": 1
+  }
+}
