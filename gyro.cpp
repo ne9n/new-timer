@@ -1,6 +1,10 @@
 #include "gyro.h"
 #include "cheesehead_timer.h"
+#if defined(ESP32)
+#include <ESP32Servo.h>
+#else
 #include <Servo.h>
+#endif
 #include "state_machine.h"
 #include <limits.h>
 #include <EEPROM.h>

@@ -1,6 +1,10 @@
 
 #include <EEPROM.h>
+#if defined(ESP32)
+#include <ESP32Servo.h>
+#else
 #include <Servo.h>
+#endif
 
 
 #include "gyro.h"

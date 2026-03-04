@@ -1,6 +1,10 @@
 // Converted from cheeshead_timer.ino to src/main.cpp for PlatformIO build
 #include <EEPROM.h>
+#if defined(ESP32)
+#include <ESP32Servo.h>
+#else
 #include <Servo.h>
+#endif
 
 #include "gyro.h"
 #include "term.h"
