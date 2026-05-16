@@ -113,3 +113,71 @@ graph TD
     EvalPitchYaw --> UpdateLast[Update last angle & time]
     UpdateLast --> End
 ```
+
+## Gyro Axis Mapping and Usage
+
+This block diagram illustrates how the raw X, Y, and Z inputs from the MPU6050 are dynamically mapped to Pitch, Roll, and Yaw logical axes, and how each axis drives specific features like lap counting, throttle adjustments, and crash detection.
+
+```mermaid
+graph TD
+    %% MPU Input and Mapping
+    MPU[MPU6050 Sensor] -->|Raw X, Y, Z| Config{Axis Mapping Configuration<br>TimerSetup.axisPitch/Roll/Yaw}
+    
+    %% Mapped Axes
+    Config -->|axisPitch| Pitch[Pitch Angle]
+    Config -->|axisRoll| Roll[Roll Angle]
+    Config -->|axisYaw| Yaw[Yaw Angle]
+
+    %% Pitch Usage
+    Pitch --> PitchDelta[Delta Angle Threshold<br>abs dx >= pitchThresh]
+    PitchDelta -->|Exceeds Limit| PitchEX[Crash Detection: PitchEX<br>run_state = false]
+    
+    Pitch --> PosTrim[Positional Trim<br>posTrim]
+    PosTrim -->|Sine wave adjustment| Throttle[Throttle Adjustment]
+    
+    Pitch --> ManeuverBoost[Maneuver Boost<br>maneuverBoost]
+    ManeuverBoost -->|Absolute Magnitude| Throttle
+
+    %% Roll Usage
+    Roll --> Accumulate[Accumulate Delta Degrees]
+    Accumulate -->|Every 36 degrees| Laps[Lap Count += 0.1]
+    Laps -->|Approaching Limit| Burp[Trigger BURP State]
+    Laps -->|Limit Reached| LapShutdown[Lap Limit Exceeded<br>run_state = false]
+
+    %% Yaw Usage
+    Yaw --> YawRate[Calculate Yaw Rate<br>deg/sec]
+    YawRate -->|Exceeds Limit| YawEX[Crash Detection: YawEX<br>run_state = false]
+    
+    Yaw --> YawAbs[Absolute Yaw Angle]
+    YawAbs -->|< Low Threshold| YawLOW[Low Yaw Detection: YawLOW<br>run_state = false]
+
+    %% Subgraphs for Organization
+    subgraph Hardware & Mapping
+        MPU
+        Config
+    end
+
+    subgraph Pitch Logic
+        Pitch
+        PitchDelta
+        PitchEX
+        PosTrim
+        ManeuverBoost
+    end
+
+    subgraph Roll Logic
+        Roll
+        Accumulate
+        Laps
+        Burp
+        LapShutdown
+    end
+
+    subgraph Yaw Logic
+        Yaw
+        YawRate
+        YawEX
+        YawAbs
+        YawLOW
+    end
+```
