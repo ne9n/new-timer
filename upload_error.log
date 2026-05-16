@@ -1,0 +1,33 @@
+Processing nanoatmega328 (platform: atmelavr; board: nanoatmega328; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/atmelavr/nanoatmega328.html
+PLATFORM: Atmel AVR (5.1.0) > Arduino Nano ATmega328
+HARDWARE: ATMEGA328P 16MHz, 2KB RAM, 30KB Flash
+DEBUG: Current (avr-stub) External (avr-stub, simavr)
+PACKAGES: 
+ - framework-arduino-avr @ 5.2.0 
+ - tool-avrdude @ 1.60300.200527 (6.3.0) 
+ - toolchain-atmelavr @ 1.70300.191015 (7.3.0)
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 9 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- Servo @ 1.3.0
+|-- MPU6050_tockn @ 1.5.2
+|-- ezLED @ 1.0.1
+|-- OneButton @ 2.6.1
+|-- EEPROM @ 2.0
+Building in release mode
+Checking size .pio\build\nanoatmega328\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [======    ]  58.3% (used 1195 bytes from 2048 bytes)
+Flash: [========  ]  80.2% (used 24634 bytes from 30720 bytes)
+Configuring upload protocol...
+AVAILABLE: arduino
+CURRENT: upload_protocol = arduino
+Looking for upload port...
+Using manually specified: COM4
+Uploading .pio\build\nanoatmega328\firmware.hex
+
