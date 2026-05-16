@@ -307,6 +307,30 @@ void getInput() {
       Serial.println(TimerSetup.calZ);
       break;
     }
+    case '1': {
+      val = Serial.parseInt();
+      if (val > 2) val = 0;
+      TimerSetup.axisPitch = val;
+      Serial.print(F("Pitch Axis (0=X, 1=Y, 2=Z): "));
+      Serial.println(TimerSetup.axisPitch);
+      break;
+    }
+    case '2': {
+      val = Serial.parseInt();
+      if (val > 2) val = 1;
+      TimerSetup.axisRoll = val;
+      Serial.print(F("Roll Axis (0=X, 1=Y, 2=Z): "));
+      Serial.println(TimerSetup.axisRoll);
+      break;
+    }
+    case '3': {
+      val = Serial.parseInt();
+      if (val > 2) val = 2;
+      TimerSetup.axisYaw = val;
+      Serial.print(F("Yaw Axis (0=X, 1=Y, 2=Z): "));
+      Serial.println(TimerSetup.axisYaw);
+      break;
+    }
 
     case 'o': {
       Serial.print(F("LED off "));
@@ -364,6 +388,9 @@ void getInput() {
         TimerSetup.accelTime[1] = 5000;
         TimerSetup.accelTime[2] = 5000;
         TimerSetup.autoSpeedPerMin = 2;
+        TimerSetup.axisPitch = 0;
+        TimerSetup.axisRoll = 1;
+        TimerSetup.axisYaw = 2;
         EEPROM.put(eeAddress, TimerSetup);
         // Commit for platforms that require it (ESP32)
 #if defined(ESP32)
@@ -427,7 +454,13 @@ void getInput() {
       Serial.print(',');
       Serial.print(TimerSetup.accelTime[2]);
       Serial.print(',');
-      Serial.println(TimerSetup.autoSpeedPerMin);
+      Serial.print(TimerSetup.autoSpeedPerMin);
+      Serial.print(',');
+      Serial.print(TimerSetup.axisPitch);
+      Serial.print(',');
+      Serial.print(TimerSetup.axisRoll);
+      Serial.print(',');
+      Serial.println(TimerSetup.axisYaw);
       break;
     }
     case 'w':
@@ -458,6 +491,9 @@ void getInput() {
       TimerSetup.accelTime[1] = Serial.parseInt();
       TimerSetup.accelTime[2] = Serial.parseInt();
       TimerSetup.autoSpeedPerMin = Serial.parseInt();
+      TimerSetup.axisPitch = Serial.parseInt();
+      TimerSetup.axisRoll = Serial.parseInt();
+      TimerSetup.axisYaw = Serial.parseInt();
 
       saveData();
       Serial.println(F("Configuration uploaded and saved successfully."));
@@ -533,6 +569,12 @@ void menuValues() {
   Serial.print(F(" ("));
   Serial.print(((float)TimerSetup.calZ) / 100.0f);
   Serial.println(F(" deg/s)"));
+  Serial.print(F(" 1  Pitch Axis (0=X,1=Y,2=Z) "));
+  Serial.println(TimerSetup.axisPitch);
+  Serial.print(F(" 2  Roll Axis  (0=X,1=Y,2=Z) "));
+  Serial.println(TimerSetup.axisRoll);
+  Serial.print(F(" 3  Yaw Axis   (0=X,1=Y,2=Z) "));
+  Serial.println(TimerSetup.axisYaw);
   // Serial.print(F(" X gyro value "));
   // Serial.println(iangleX );
   // Serial.print(F(" Y gyro val  "));

@@ -107,12 +107,9 @@ static const int DEFAULT_YAW_DELTA_RATE_THRESHOLD = 20; // deg/sec
 
 void mpu_setup()
 {
-
- 
- mpu6050.begin();
- mpu6050.calcGyroOffsets(true);
-// mpu6050.calcGyroOffsets(true);
-//  mpu6050.setGyroOffsets(TimerSetup.calX / 100.0, TimerSetup.calY / 100.0, TimerSetup.calZ / 100.0);
+  mpu6050.begin();
+  // Instead of recalculating every time, use the saved calibration values
+  mpu6050.setGyroOffsets(TimerSetup.calX / 100.0, TimerSetup.calY / 100.0, TimerSetup.calZ / 100.0);
 }
 void setUpMPU(void)
 {
@@ -197,9 +194,15 @@ void setUpMPU(void)
 void read_giro()
 {
   // read raw angles
-  iangleX = getAngleX_read();
-  iangleY = getAngleY_read();
-  iangleZ = getAngleZ_read();
+  int rawX = getAngleX_read();
+  int rawY = getAngleY_read();
+  int rawZ = getAngleZ_read();
+
+  int axes[3] = {rawX, rawY, rawZ};
+
+  iangleX = axes[TimerSetup.axisPitch];
+  iangleY = axes[TimerSetup.axisRoll];
+  iangleZ = axes[TimerSetup.axisYaw];
 
   // initialize on first call
   if (last_mils == 0)
@@ -368,9 +371,15 @@ void speedGyro()
   mpu6050.update();
 
   // update raw angles
-  iangleX = getAngleX_read();
-  iangleY = getAngleY_read();
-  iangleZ = getAngleZ_read();
+  int rawX = getAngleX_read();
+  int rawY = getAngleY_read();
+  int rawZ = getAngleZ_read();
+
+  int axes[3] = {rawX, rawY, rawZ};
+
+  iangleX = axes[TimerSetup.axisPitch];
+  iangleY = axes[TimerSetup.axisRoll];
+  iangleZ = axes[TimerSetup.axisYaw];
   // compute pitch trim from pitch angle (`iangleX`) using sin-table for smooth curve
   // - Uses `TimerSetup.px` as max magnitude (0..180)
   // - Signed sin table: READ_SIN gives ~0..1000, subtract 500 -> -500..+500

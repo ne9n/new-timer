@@ -76,6 +76,10 @@ void setup()
       TimerSetup.FlyTime[0] = 40000 ;TimerSetup.FlyTime[1]= 40000 ; TimerSetup.FlyTime[2] = 40000; // air time in seconds
       TimerSetup.ArmTime[0] = 500;TimerSetup.ArmTime[1]= 500;TimerSetup.ArmTime[2] = 500; // wait time in seconds
       TimerSetup.accelTime[0] = 5000;TimerSetup.accelTime[1] = 5000;TimerSetup.accelTime[2] = 5000; // in mse
+      TimerSetup.autoSpeedPerMin = 2;
+      TimerSetup.axisPitch = 0; // 0=X
+      TimerSetup.axisRoll = 1;  // 1=Y
+      TimerSetup.axisYaw = 2;   // 2=Z
       EEPROM.put(eeAddress, TimerSetup);
       // Commit for platforms that require it (ESP32)
       EEPROM.commit();
