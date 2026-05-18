@@ -9,6 +9,80 @@ Overview
   - `term.cpp` / `term.h` — serial terminal for diagnostics and configuration.
   - `led.cpp` / `led2.cpp` — LED indicators.
 
+```mermaid
+graph TD
+    %% Styles
+    classDef hardware fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000;
+    classDef software fill:#efebe9,stroke:#4e342e,stroke-width:2px,color:#000;
+    classDef desktop fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px,color:#000;
+    classDef state fill:#fff3e0,stroke:#e65100,stroke-dasharray: 5 5,color:#000;
+
+    %% Hardware Layer Block
+    subgraph Hardware_Layer [Hardware Layer]
+        MCU[Microcontroller Unit<br/>AVR / Uno or ESP32]:::hardware
+        MPU[MPU6050 IMU Sensor<br/>Pitch, Yaw, Gyroscope]:::hardware
+        DIP[3x DIP Switches<br/>DS1, DS2, DS3]:::hardware
+        BTN[1x User Button<br/>BUTTONPIN]:::hardware
+        ESC[ESC / Servo Actuator<br/>SERVO PWM Line]:::hardware
+        LEDS[3x Status Signaling LEDs<br/>LED3, LED4, LED5]:::hardware
+    end
+
+    %% Software Layer Block
+    subgraph Software_Layer [Software Layer / Firmware]
+        TERM[Serial Terminal Module<br/>term.cpp]:::software
+        CORE[Core App Controller<br/>cheesehead_timer.ino]:::software
+        GYRO[Motion Processing Engine<br/>gyro.cpp]:::software
+        FSM[Finite State Machine<br/>state_machine.cpp]:::software
+    end
+
+    %% Desktop Application Block
+    subgraph Desktop_Layer [Desktop Application]
+        APP[Desktop GUI App<br/>desktop_app.py / Tkinter]:::desktop
+    end
+
+    %% State Machine States Subgraph
+    subgraph FSM_States [FSM Sequential Flight Phases]
+        WAIT((WAIT)):::state --> ARMED((ARMED)):::state
+        ARMED --> TR[TAKEOFF_RAMP]:::state
+        TR --> TO[TAKEOFF]:::state
+        TO --> FLY[FLY]:::state
+        FLY --> BURP[BURP]:::state
+        BURP --> RL[RDYLAND]:::state
+        RL --> RD[RAMPDWN]:::state
+    end
+
+    %% Hardware Interconnections
+    MPU <===>|I2C Bus| MCU
+    DIP ---->|GPIO Input| MCU
+    BTN ---->|GPIO Input| MCU
+    MCU ---->|PWM Output| ESC
+    MCU ---->|GPIO Output| LEDS
+
+    %% Hardware to Software Mapping
+    MCU <===>|Runs Firmware Execute Loop| CORE
+
+    %% Internal Software Interconnections & Data Flows
+    CORE <==>|Coordinates| TERM
+    CORE <==>|Feeds Sensor Data| GYRO
+    CORE <==>|Invokes| FSM
+
+    GYRO -->|Calculates posTrim & maneuverBoost| FSM
+    GYRO -->|Increments LapCount| CORE
+    GYRO -->|Triggers Crash Shutdown| CORE
+
+    FSM -->|Drives PWM State Throttle| MCU
+    FSM -.->|Dictates Current State| FSM_States
+
+    %% External Communications
+    TERM <===>|Serial UART Interface<br/>19200 Baud / Telemetry & Commands| APP
+
+    %% Layout adjustments
+    style Hardware_Layer fill:#f1fbfd,stroke:#0288d1,stroke-width:2px;
+    style Software_Layer fill:#f5f2f0,stroke:#5d4037,stroke-width:2px;
+    style Desktop_Layer fill:#f1f8e9,stroke:#33691e,stroke-width:2px;
+    style FSM_States fill:#fffde7,stroke:#f57c00,stroke-width:1px;
+```
+
 Hardware pins
 - `SERVO` (pin defined in `cheesehead_timer.h`) — PWM to ESC/servo.
 - `DS1`, `DS2`, `DS3` — dip switches; `DS3` used to disable some flight-phase checks when LOW.
