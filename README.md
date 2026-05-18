@@ -82,6 +82,7 @@ graph TD
     style Desktop_Layer fill:#f1f8e9,stroke:#33691e,stroke-width:2px;
     style FSM_States fill:#fffde7,stroke:#f57c00,stroke-width:1px;
 ```
+
 Hardware pins
 - `SERVO` (pin defined in `cheesehead_timer.h`) — PWM to ESC/servo.
 - `DS1`, `DS2`, `DS3` — dip switches; `DS3` used to disable some flight-phase checks when LOW.
