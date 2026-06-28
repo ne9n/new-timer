@@ -5,6 +5,9 @@ import threading
 import subprocess
 import time
 import queue
+import os
+import tkinter as tk
+from tkinter import messagebox
 
 # Set the appearance mode and default color theme
 ctk.set_appearance_mode("Dark")
@@ -25,6 +28,7 @@ class SerialMonitorApp(ctk.CTk):
         self.msg_queue = queue.Queue()
 
         self._build_ui()
+        self._create_menu()
         self.update_ports()
         self.after(100, self.process_queue)
 
@@ -79,6 +83,40 @@ class SerialMonitorApp(ctk.CTk):
 
         self.send_btn = ctk.CTkButton(self.bottom_frame, text="Send", width=80, command=self.send_command)
         self.send_btn.pack(side="right")
+
+    def _create_menu(self):
+        self.menu_bar = tk.Menu(self)
+        self.config(menu=self.menu_bar)
+
+        # Help Menu
+        self.help_menu = tk.Menu(self.menu_bar, tearoff=0)
+        self.menu_bar.add_cascade(label="Help", menu=self.help_menu)
+        self.help_menu.add_command(label="Manual", command=self.show_manual)
+        self.help_menu.add_command(label="About", command=self.show_about)
+
+    def show_manual(self):
+        manual_window = ctk.CTkToplevel(self)
+        manual_window.title("Cheesehead Timer Manual")
+        manual_window.geometry("700x800")
+        manual_window.attributes("-topmost", True)  # Ensure it stays on top initially
+
+        textbox = ctk.CTkTextbox(manual_window, font=("Segoe UI", 12))
+        textbox.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # Try to load the manual file
+        manual_path = os.path.join(os.path.dirname(__file__), "manual.md")
+        if os.path.exists(manual_path):
+            with open(manual_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            textbox.insert("0.0", content)
+        else:
+            textbox.insert("0.0", f"Error: manual.md not found at {manual_path}")
+        
+        textbox.configure(state="disabled")
+
+    def show_about(self):
+        about_text = "Cheesehead Timer OSH26\n\nVersion: 1.0.0\nAuthor: Dave Siegler\nProject: Control Line Throttle Sequencer"
+        messagebox.showinfo("About", about_text)
 
     def select_file(self):
         filename = ctk.filedialog.askopenfilename(

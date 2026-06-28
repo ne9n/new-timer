@@ -1,4 +1,4 @@
-# Cheesehead Timer — User Manual & Setup Guide
+# Cheesehead Timer OSH26 — User Manual & Setup Guide
 
 ## Overview
 
@@ -72,6 +72,19 @@ Telemetry fields shown in the menu include:
 - `LapCount` / `LapLimit` (displayed as decimal laps)
 - `P  Pos trim` — current pitch trim applied to throttle
 - `B  Maneuver boost` — current maneuver boost applied
+- `1, 2, 3` — axis mapping configuration (Pitch, Roll, Yaw)
+
+## Axis Mapping (X, Y, Z)
+
+You can customize which physical MPU6050 axis (X=0, Y=1, Z=2) corresponds to Pitch, Roll, and Yaw in the software.
+
+Commands:
+- `1 <value>` — Set **Pitch** axis (0, 1, or 2). Default is 0 (X).
+- `2 <value>` — Set **Roll** axis (0, 1, or 2). Default is 1 (Y).
+- `3 <value>` — Set **Yaw** axis (0, 1, or 2). Default is 2 (Z).
+
+Example: To set Yaw to the X-axis, type `3 0`.
+Remember to send `s` to save your mapping to EEPROM.
 
 ## Lap Counting & Lap Limit
 
