@@ -128,20 +128,23 @@ void speedState()
     break;
     case speed_state::TAKEOFF_RAMP:
     {
-      //
-      delay(25);
+      static unsigned long lastRampMillis = 0;
+      unsigned long rampDuration = TimerSetup.accelTime[sindex];
+      unsigned long elapsed = currentMillis - previousMillis;
+      
+      if (elapsed >= rampDuration) {
+        curThrottle = TimerSetup.FlySpeed[sindex];
+      } else {
+        curThrottle = (int)(((float)elapsed / (float)rampDuration) * (float)TimerSetup.FlySpeed[sindex]);
+      }
+      
       angle_time = currentMillis; //pre load this for crashcheck
       lastZ = iangleZ - 10;
-      curThrottle++;
-      if (curThrottle > MAX_SPEED)
-      {
-        curThrottle = MAX_SPEED;
-      }
     }
     break;
     case speed_state::TAKEOFF:
     {
-      curThrottle = MAX_SPEED;
+      curThrottle = TimerSetup.FlySpeed[sindex];
       // init values for crash_check
       if (PitchEX or YawEX)
       {
@@ -152,8 +155,8 @@ void speedState()
     break;
     case speed_state::FLY:
     {
-      // base throttle from profile 0
-      curThrottle = TimerSetup.FlySpeed[0];
+      // base throttle from current profile
+      curThrottle = TimerSetup.FlySpeed[sindex];
       // apply automatic increase: percent per minute (TimerSetup.autoSpeedPerMin)
       if (TimerSetup.autoSpeedPerMin > 0 && flyStartMillis > 0)
       {
@@ -179,7 +182,7 @@ void speedState()
     break;
     case speed_state::RDYLAND:
     {
-      curThrottle = TimerSetup.FlySpeed[0];
+      curThrottle = TimerSetup.FlySpeed[sindex];
       
     }
     break;
@@ -204,5 +207,8 @@ void speedState()
   long adjusted = (long)curThrottle + (long)posTrim + (long)maneuverBoost;
   if (adjusted < 0) adjusted = 0;
   if (adjusted > MAX_SPEED) adjusted = MAX_SPEED;
+  
+  if (!run_state) adjusted = 0; // Absolute safety cutoff
+  
   esc.write((int)adjusted);
 }

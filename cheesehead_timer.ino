@@ -48,7 +48,8 @@ int incTime = 0;
 void setup()
 {
   Serial.begin(19200);
-  Serial.print(" init start ");
+  getDips();
+  Serial.print(F(" init start "));
   // Initialize EEPROM (required on ESP32 before EEPROM.get/put)
   EEPROM.begin(sizeof(TimerSetup));
   // SERVO SETUP attaches the servo on pin 9 to the servo object
@@ -83,7 +84,7 @@ void setup()
       EEPROM.put(eeAddress, TimerSetup);
       // Commit for platforms that require it (ESP32)
       EEPROM.commit();
-      Serial.print(" set default values \n");
+      Serial.print(F(" set default values \n"));
       firstRun = true;
   }
   state_timer[int (speed_state::FLY)] = TimerSetup.FlyTime[0]; 
@@ -113,10 +114,7 @@ void setup()
     setUpMPU(); // run calibration on first boot
   }
 
-  getDips(); // need to init this
-  //rled.blink(500,500);
-  initLED();
-  Serial.print(" init complte \n");
+  Serial.print(F(" init complte \n"));
   Serial.println(F("Ready. Press '?' for menu, '!' to toggle telemetry (19200 baud)."));
 
 }
@@ -127,17 +125,13 @@ void getDips()
   // allow 3 speed prfiles and on swich for enable disable the gyro
   sindex = (!digitalRead(DS2)<< 1) + (!digitalRead(DS1))  ;
   gyroEn = digitalRead(DS3);
-  // install board cores (commented stray text removed)
   
-/*
-  Serial.print(sindex); 
-  Serial.print(" = speed dips  ");
-  Serial.print(( gyroEn));
-  Serial.print(" =gyro enbable"); 
-  Serial.print(" get dips \n"); 
-
-  delay(1000);
-*/
+  // Update state durations based on selected profile
+  if (sindex >= 0 && sindex < 3) {
+    state_timer[int(speed_state::FLY)] = TimerSetup.FlyTime[sindex];
+    state_timer[int(speed_state::ARMED)] = TimerSetup.ArmTime[sindex];
+    state_timer[int(speed_state::TAKEOFF_RAMP)] = TimerSetup.accelTime[sindex];
+  }
 }
 
 
@@ -145,10 +139,7 @@ void getDips()
 
 void loop()
 {
-  if (gyroEn)
-  {
-    speedGyro();
-  }  
+    updateGyro();
   updateLED();
   getDips();
   updateButton();

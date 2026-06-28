@@ -35,7 +35,7 @@ bool pressAndHoldInProgress = false;
 
 
 void handleTap() {
-  Serial.println("button tap \n");
+  Serial.println(F("button tap \n"));
   if (!pressAndHoldInProgress) { // Only handle taps if not in a press-and-hold
     switch (currentState) {
       case STOPPED:
@@ -52,20 +52,20 @@ void handleTap() {
 }
 
 void handleDoubleClick() {
-   Serial.print("double\n");
+   Serial.print(F("double\n"));
  if (!pressAndHoldInProgress){ // Only handle double clicks if not in a press-and-hold
   
 }}
 
 void handleLongPressStart() {
-  Serial.println("longpress\n");
+  Serial.println(F("longpress\n"));
   pressAndHoldInProgress = true;  // Flag that we're in a press-and-hold
 }
 
 void handleLongPressStop() {
   if (pressAndHoldInProgress && currentState == STOPPED) { // Switch to RUN only from OPERATIONAL
     currentState = RUN;
-    Serial.println("Entering RUN State");
+    Serial.println(F("Entering RUN State"));
   }
   pressAndHoldInProgress = false; // Reset the flag
 }
@@ -84,7 +84,7 @@ void executeOperationalSubstate()
 
 void ButtonSetup()
 {
-  Serial.print("ButtonSetup\n");
+  Serial.print(F("ButtonSetup\n"));
   button.attachClick(handleTap);
   button.attachDoubleClick(handleDoubleClick);
   button.attachLongPressStart(handleLongPressStart); // Start tracking long press

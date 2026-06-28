@@ -191,7 +191,7 @@ void setUpMPU(void)
 }
 
  // mpu6050.calcGyroOffsets(true);
-void read_giro()
+void processGyroSafety()
 {
   // read raw angles
   int rawX = getAngleX_read();
@@ -366,7 +366,7 @@ void evaluateHighPitchYaw(int dx, int dy, int dz)
   }
 }
 
-void speedGyro()
+void updateGyroTrim()
 {
   mpu6050.update();
 
@@ -418,21 +418,8 @@ void speedGyro()
     maneuverBoost = (int)(boostf + 0.5f);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void updateGyro()
+{
+  updateGyroTrim();
+  processGyroSafety();
+}

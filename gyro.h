@@ -17,7 +17,9 @@ const int sinetbl[37] PROGMEM= {
 67,30,8,0,8,30,67,117,
 179,250,329,413,500};
 
-void speedGyro();
+void updateGyroTrim();
+void processGyroSafety();
+void updateGyro();
 void mpu_setup();
 // Calibrate MPU offsets (long-running) - run on first boot or via menu
 void setUpMPU(void);

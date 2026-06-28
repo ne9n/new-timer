@@ -232,7 +232,7 @@ void getInput() {
       break;
     }
     case 'r': {
-      Serial.println("Refresh");
+      Serial.println(F("Refresh"));
       // mpu6050.setGyroOffsets(TimerSetup.calX/100.0, TimerSetup.calY/100.0,
       // TimerSetup.calZ/100.0);
       menuValues();
