@@ -15,7 +15,7 @@ void terminal();
 void banner() {
   Serial.flush();
   Serial.println(F("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"));
-  Serial.println(F(" Cheesehead Timer"));
+  Serial.println(F(" Cheesehead Timer OSH26"));
   Serial.println(F(" A control line time and speed regulator"));
   Serial.println(F(" https://github.com/ne9n"));
   Serial.println(F(" Dave Siegler ne9n.dave@gmail.com"));
