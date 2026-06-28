@@ -9,6 +9,7 @@
 extern void setUpMPU(void);
 extern param TimerSetup;
 extern unsigned long state_timer[];
+extern void processGyroSafety();
 void terminal();
 
 void banner() {
@@ -509,7 +510,7 @@ void getInput() {
 }
 
 void menuValues() {
-  read_giro();
+  processGyroSafety();
   Serial.print(F(" a 1,2,3 Fly Speed 0-180   "));
   Serial.print(TimerSetup.FlySpeed[0]);
   Serial.print("  ");

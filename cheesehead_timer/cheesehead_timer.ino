@@ -51,7 +51,9 @@ void setup()
   getDips();
   Serial.print(F(" init start "));
   // Initialize EEPROM (required on ESP32 before EEPROM.get/put)
+#if defined(ESP32)
   EEPROM.begin(sizeof(TimerSetup));
+#endif
   // SERVO SETUP attaches the servo on pin 9 to the servo object
   esc.attach(SERVO, 1000, 2000);
   esc.write(0);
@@ -83,7 +85,9 @@ void setup()
       TimerSetup.axisYaw = 2;   // 2=Z
       EEPROM.put(eeAddress, TimerSetup);
       // Commit for platforms that require it (ESP32)
+#if defined(ESP32)
       EEPROM.commit();
+#endif
       Serial.print(F(" set default values \n"));
       firstRun = true;
   }

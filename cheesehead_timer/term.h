@@ -7,7 +7,6 @@ void banner();
 void saveData();
 void get1Input();
 void menuValues ();
-void read_giro();
 void plotDebug();
 void term_ctrl();
 // Non-blocking telemetry update; call from main `loop()`
