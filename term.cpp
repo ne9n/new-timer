@@ -150,42 +150,56 @@ void getInput() {
     case 'A': {
       prof = Serial.parseInt();
       val = Serial.parseInt();
-      prof--;
-      Serial.print(F("Set fly speed "));
-      TimerSetup.FlySpeed[prof] = val;
-      if (TimerSetup.FlySpeed[prof] > MAX_SPEED) {
-        TimerSetup.FlySpeed[prof] = MAX_SPEED;
+      if (prof >= 1 && prof <= 3) {
+        prof--;
+        TimerSetup.FlySpeed[prof] = (val > MAX_SPEED) ? MAX_SPEED : val;
+        Serial.print(F("Set fly speed for profile ")); Serial.print(prof + 1);
+        Serial.print(F(" to ")); Serial.println(TimerSetup.FlySpeed[prof]);
+      } else {
+        Serial.println(F("Invalid profile (1-3)"));
       }
-      Serial.println(TimerSetup.FlySpeed[prof]);
       break;
+    }
     case 'b':
     case 'B': {
       prof = Serial.parseInt();
       val = Serial.parseInt();
-      Serial.print(F("Fly Time  secs is "));
-      TimerSetup.FlyTime[prof] = val;
-      state_timer[int(speed_state::FLY)] = TimerSetup.FlyTime[prof];
-      Serial.println(TimerSetup.FlyTime[prof]);
+      if (prof >= 1 && prof <= 3) {
+        prof--;
+        TimerSetup.FlyTime[prof] = val;
+        Serial.print(F("Set fly time for profile ")); Serial.print(prof + 1);
+        Serial.print(F(" to ")); Serial.print(TimerSetup.FlyTime[prof]); Serial.println(F(" ms"));
+      } else {
+        Serial.println(F("Invalid profile (1-3)"));
+      }
       break;
     }
     case 'c':
     case 'C': {
       prof = Serial.parseInt();
       val = Serial.parseInt();
-      Serial.print(F("arm time in seconds is "));
-      TimerSetup.ArmTime[prof] = val;
-      state_timer[int(speed_state::ARMED)] = TimerSetup.ArmTime[prof];
-      Serial.println(TimerSetup.ArmTime[0]);
+      if (prof >= 1 && prof <= 3) {
+        prof--;
+        TimerSetup.ArmTime[prof] = val;
+        Serial.print(F("Set arm time for profile ")); Serial.print(prof + 1);
+        Serial.print(F(" to ")); Serial.print(TimerSetup.ArmTime[prof]); Serial.println(F(" ms"));
+      } else {
+        Serial.println(F("Invalid profile (1-3)"));
+      }
       break;
     }
-    case 'D':
-    case 'd': {
+    case 'd':
+    case 'D': {
       prof = Serial.parseInt();
       val = Serial.parseInt();
-      Serial.print(F("Accel time in mseconds "));
-      TimerSetup.accelTime[prof] = val;
-      state_timer[int(speed_state::TAKEOFF_RAMP)] = TimerSetup.accelTime[0];
-      Serial.println(TimerSetup.accelTime[prof]);
+      if (prof >= 1 && prof <= 3) {
+        prof--;
+        TimerSetup.accelTime[prof] = val;
+        Serial.print(F("Set accel time for profile ")); Serial.print(prof + 1);
+        Serial.print(F(" to ")); Serial.print(TimerSetup.accelTime[prof]); Serial.println(F(" ms"));
+      } else {
+        Serial.println(F("Invalid profile (1-3)"));
+      }
       break;
     }
     case 'E':
@@ -503,8 +517,7 @@ void getInput() {
         Serial.read();
       break;
     }
-    }
-    }
+  }
   }
 }
 
