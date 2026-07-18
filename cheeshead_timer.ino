@@ -1,10 +1,6 @@
 
 #include <EEPROM.h>
-#if defined(ESP32)
-#include <ESP32Servo.h>
-#else
 #include <Servo.h>
-#endif
 
 
 #include "gyro.h"
@@ -49,8 +45,7 @@ void setup()
 {
   Serial.begin(19200);
   Serial.print(" init start ");
-  // Initialize EEPROM (required on ESP32 before EEPROM.get/put)
-  EEPROM.begin(sizeof(TimerSetup));
+  // Initialize EEPROM (only required on ESP32, removed for ATmega328)
   // SERVO SETUP attaches the servo on pin 9 to the servo object
   esc.attach(SERVO, 1000, 2000);
   esc.write(0);
@@ -81,8 +76,6 @@ void setup()
       TimerSetup.axisRoll = 1;  // 1=Y
       TimerSetup.axisYaw = 2;   // 2=Z
       EEPROM.put(eeAddress, TimerSetup);
-      // Commit for platforms that require it (ESP32)
-      EEPROM.commit();
       Serial.print(" set default values \n");
       firstRun = true;
   }
