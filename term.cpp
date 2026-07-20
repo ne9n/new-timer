@@ -7,6 +7,7 @@
 
 
 extern void setUpMPU(void);
+extern void setLevelCalibration(void);
 extern param TimerSetup;
 extern unsigned long state_timer[];
 void terminal();
@@ -73,12 +74,20 @@ void telemetryUpdate() {
   if (!telemetryMode)
     return;
 
+  static unsigned long lastTeleMils = 0;
+  if (millis() - lastTeleMils < 100) return; // 10Hz limit
+  lastTeleMils = millis();
+
   extern int curThrottle;
   extern int iangleX;
   extern int iangleY;
   extern int iangleZ;
   extern int maneuverBoost;
   extern speed_state ispeed_state;
+  extern bool PitchEX;
+  extern bool YawEX;
+  extern int currentPitchDev;
+  extern int currentYawDev;
 
   // consume all pending incoming bytes and check for 'q' or 'Q' to exit
   while (Serial.available() > 0) {
@@ -88,39 +97,62 @@ void telemetryUpdate() {
       Serial.println(F("! Telemetry OFF"));
       return;
     }
-    // ignore other bytes (including CR/LF)
   }
 
-  int speed = curThrottle;
-  int pitch = iangleX;
-  int roll = iangleY;
-  int yaw = iangleZ;
-  int boost = maneuverBoost;
-  int led3 = digitalRead(LED3);
-  int led4 = digitalRead(LED4);
-  int led5 = digitalRead(LED5);
-  int btn = !digitalRead(BUTTONPIN); // active low -> pressed = 1
+  // Fixed-width format for easy reading and copy-pasting
+  // Format: ! THR:xxx PIT:xxxx ROL:xxxx YAW:xxxx BST:xxx LAP:xxx.x ST:xx FLAGS
+  Serial.print(F("! THR:"));
+  if (curThrottle < 100) Serial.print(' ');
+  if (curThrottle < 10) Serial.print(' ');
+  Serial.print(curThrottle);
 
-  Serial.print(F("! speed:"));
-  Serial.print(speed);
-  Serial.print(F(" pitch:"));
-  Serial.print(pitch);
-  Serial.print(F(" roll:"));
-  Serial.print(roll);
-  Serial.print(F(" yaw:"));
-  Serial.print(yaw);
-  Serial.print(F(" boost:"));
-  Serial.print(boost);
-  Serial.print(F(" leds:R"));
-  Serial.print(led5);
-  Serial.print(F(" Y"));
-  Serial.print(led4);
-  Serial.print(F(" G"));
-  Serial.print(led3);
-  Serial.print(F(" btn:"));
-  Serial.print(btn);
-  Serial.print(F(" state:"));
-  Serial.println((int)ispeed_state);
+  Serial.print(F(" PIT:"));
+  if (abs(iangleX) < 100) Serial.print(' ');
+  if (abs(iangleX) < 10) Serial.print(' ');
+  if (iangleX >= 0) Serial.print(' ');
+  Serial.print(iangleX);
+
+  Serial.print(F(" ROL:"));
+  if (abs(iangleY) < 100) Serial.print(' ');
+  if (abs(iangleY) < 10) Serial.print(' ');
+  if (iangleY >= 0) Serial.print(' ');
+  Serial.print(iangleY);
+
+  Serial.print(F(" YAW:"));
+  if (abs(iangleZ) < 100) Serial.print(' ');
+  if (abs(iangleZ) < 10) Serial.print(' ');
+  if (iangleZ >= 0) Serial.print(' ');
+  Serial.print(iangleZ);
+
+  Serial.print(F(" BST:"));
+  if (maneuverBoost < 100) Serial.print(' ');
+  if (maneuverBoost < 10) Serial.print(' ');
+  Serial.print(maneuverBoost);
+
+  Serial.print(F(" LAP:"));
+  float laps = (float)TimerSetup.LapCount / 10.0f;
+  if (laps < 100.0) Serial.print(' ');
+  if (laps < 10.0) Serial.print(' ');
+  Serial.print(laps, 1);
+
+  Serial.print(F(" ST:"));
+  if ((int)ispeed_state < 10) Serial.print(' ');
+  Serial.print((int)ispeed_state);
+
+  Serial.print(F(" PD:"));
+  if (currentPitchDev < 100) Serial.print(' ');
+  if (currentPitchDev < 10) Serial.print(' ');
+  Serial.print(currentPitchDev);
+
+  Serial.print(F(" YD:"));
+  if (currentYawDev < 100) Serial.print(' ');
+  if (currentYawDev < 10) Serial.print(' ');
+  Serial.print(currentYawDev);
+
+  if (PitchEX) Serial.print(F(" PEX")); else Serial.print(F("    "));
+  if (YawEX) Serial.print(F(" YEX")); else Serial.print(F("    "));
+
+  Serial.println();
 }
 
 void saveData() {
@@ -341,6 +373,10 @@ void getInput() {
       Serial.println(TimerSetup.axisYaw);
       break;
     }
+    case '0': {
+      setLevelCalibration();
+      break;
+    }
 
     case 'o': {
       Serial.print(F("LED off "));
@@ -381,7 +417,7 @@ void getInput() {
         TimerSetup.py = 1;
         TimerSetup.rx = 1;
         TimerSetup.ry = 1;
-        TimerSetup.PitchExThresh = 40;
+        TimerSetup.PitchExThresh = 70;
         TimerSetup.YawRateExThresh = 20;
         TimerSetup.LapCount = 0;
         TimerSetup.LapLimit = 0;
@@ -413,60 +449,35 @@ void getInput() {
     }
     case 'p':
     case 'P': {
-      Serial.println(F("CONFIG:"));
-      Serial.print(TimerSetup.calX);
-      Serial.print(',');
-      Serial.print(TimerSetup.calY);
-      Serial.print(',');
-      Serial.print(TimerSetup.calZ);
-      Serial.print(',');
-      Serial.print(TimerSetup.px);
-      Serial.print(',');
-      Serial.print(TimerSetup.py);
-      Serial.print(',');
-      Serial.print(TimerSetup.rx);
-      Serial.print(',');
-      Serial.print(TimerSetup.ry);
-      Serial.print(',');
-      Serial.print(TimerSetup.PitchExThresh);
-      Serial.print(',');
-      Serial.print(TimerSetup.YawRateExThresh);
-      Serial.print(',');
-      Serial.print(TimerSetup.LapCount);
-      Serial.print(',');
-      Serial.print(TimerSetup.LapLimit);
-      Serial.print(',');
-      Serial.print(TimerSetup.FlySpeed[0]);
-      Serial.print(',');
-      Serial.print(TimerSetup.FlySpeed[1]);
-      Serial.print(',');
-      Serial.print(TimerSetup.FlySpeed[2]);
-      Serial.print(',');
-      Serial.print(TimerSetup.FlyTime[0]);
-      Serial.print(',');
-      Serial.print(TimerSetup.FlyTime[1]);
-      Serial.print(',');
-      Serial.print(TimerSetup.FlyTime[2]);
-      Serial.print(',');
-      Serial.print(TimerSetup.ArmTime[0]);
-      Serial.print(',');
-      Serial.print(TimerSetup.ArmTime[1]);
-      Serial.print(',');
-      Serial.print(TimerSetup.ArmTime[2]);
-      Serial.print(',');
-      Serial.print(TimerSetup.accelTime[0]);
-      Serial.print(',');
-      Serial.print(TimerSetup.accelTime[1]);
-      Serial.print(',');
-      Serial.print(TimerSetup.accelTime[2]);
-      Serial.print(',');
-      Serial.print(TimerSetup.autoSpeedPerMin);
-      Serial.print(',');
-      Serial.print(TimerSetup.axisPitch);
-      Serial.print(',');
-      Serial.print(TimerSetup.axisRoll);
-      Serial.print(',');
+      Serial.println(F("--- COPY START ---"));
+      Serial.print(TimerSetup.calX); Serial.print(',');
+      Serial.print(TimerSetup.calY); Serial.print(',');
+      Serial.print(TimerSetup.calZ); Serial.print(',');
+      Serial.print(TimerSetup.px); Serial.print(',');
+      Serial.print(TimerSetup.py); Serial.print(',');
+      Serial.print(TimerSetup.rx); Serial.print(',');
+      Serial.print(TimerSetup.ry); Serial.print(',');
+      Serial.print(TimerSetup.PitchExThresh); Serial.print(',');
+      Serial.print(TimerSetup.YawRateExThresh); Serial.print(',');
+      Serial.print(TimerSetup.LapCount); Serial.print(',');
+      Serial.print(TimerSetup.LapLimit); Serial.print(',');
+      Serial.print(TimerSetup.FlySpeed[0]); Serial.print(',');
+      Serial.print(TimerSetup.FlySpeed[1]); Serial.print(',');
+      Serial.print(TimerSetup.FlySpeed[2]); Serial.print(',');
+      Serial.print(TimerSetup.FlyTime[0]); Serial.print(',');
+      Serial.print(TimerSetup.FlyTime[1]); Serial.print(',');
+      Serial.print(TimerSetup.FlyTime[2]); Serial.print(',');
+      Serial.print(TimerSetup.ArmTime[0]); Serial.print(',');
+      Serial.print(TimerSetup.ArmTime[1]); Serial.print(',');
+      Serial.print(TimerSetup.ArmTime[2]); Serial.print(',');
+      Serial.print(TimerSetup.accelTime[0]); Serial.print(',');
+      Serial.print(TimerSetup.accelTime[1]); Serial.print(',');
+      Serial.print(TimerSetup.accelTime[2]); Serial.print(',');
+      Serial.print(TimerSetup.autoSpeedPerMin); Serial.print(',');
+      Serial.print(TimerSetup.axisPitch); Serial.print(',');
+      Serial.print(TimerSetup.axisRoll); Serial.print(',');
       Serial.println(TimerSetup.axisYaw);
+      Serial.println(F("--- COPY END ---"));
       break;
     }
     case 'w':
@@ -586,6 +597,7 @@ void menuValues() {
   //  Serial.println(iangleY );
 
   Serial.println(F(" **************************"));
+  Serial.println(F(" 0 set current position as LEVEL (for gains)"));
   Serial.println(F(" r refresh"));
   Serial.println(F(" s save"));
   Serial.println(F(" (O)n or (o)ff to test LEDs"));

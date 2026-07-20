@@ -6,12 +6,7 @@ Here are the flowcharts detailing the core logic and state progression of the Ar
 
 This flowchart outlines the main `loop()` function in `cheeshead_timer.ino`, showing the order of operations for reading sensors, updating outputs, and processing the state machine.
 
-```mermaid
-graph TD
-    Start([loop]) --> CheckGyro{"gyroEn?"}
-    CheckGyro -- Yes --> ReadGyro[speedGyro:<br>Read MPU, Calc Trim & Boost]
-    CheckGyro -- No --> UpdateLED
-    ReadGyro --> UpdateLED[updateLED:<br>Update LED states]
+```mermaidadate LED states]
     UpdateLED --> GetDips[getDips:<br>Read DIP switches]
     GetDips --> UpdateBtn[updateButton:<br>Process button inputs]
     UpdateBtn --> Telemetry[telemetryUpdate:<br>Print Serial Telemetry]

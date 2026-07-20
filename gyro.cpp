@@ -68,6 +68,11 @@ int iangleY;
 int iangleZ;
 int posTrim = 0;
 int maneuverBoost = 0;
+// baseline storage for relative safety checks (captured at arming)
+static int baselinePitch = 0;
+static int baselineYaw = 0;
+static int baselineRoll = 0;
+
 // last sample storage - initialize safely
 unsigned long last_mils = 0;
 int last_x = 0;
@@ -76,11 +81,14 @@ int last_z = 0;
 bool PitchEX = false;
 bool YawEX = false;
 bool YawLOW = false;
+int currentPitchDev = 0;
+int currentYawDev = 0;
+static float accumulatedY = 0.0f; // Global static to allow reset in captureBaselines
 
 // Hysteresis counters for pitch excessive detection
 static int pitchSetCounter = 0;
 static int pitchClearCounter = 0;
-static const int PITCH_SET_N = 2;   // require 2 consecutive windows to set
+static const int PITCH_SET_N = 4;   // require 4 consecutive windows (0.4s) to set
 static const int PITCH_CLEAR_M = 5; // require 5 consecutive safe windows to clear
 
 // Slow yaw counting after takeoff
@@ -102,7 +110,7 @@ static const int YAW_LOW_THRESHOLD = 10;             // low yaw absolute
 // Use thresholds from EEPROM-configured `TimerSetup` when available.
 extern param TimerSetup;
 // Fallback defaults if TimerSetup not yet initialized
-static const int DEFAULT_PITCH_DELTA_THRESHOLD = 40;         // degrees change -> excessive
+static const int DEFAULT_PITCH_DELTA_THRESHOLD = 70;         // degrees change -> excessive
 static const int DEFAULT_YAW_DELTA_RATE_THRESHOLD = 20; // deg/sec
 
 void mpu_setup()
@@ -110,6 +118,64 @@ void mpu_setup()
   mpu6050.begin();
   // Instead of recalculating every time, use the saved calibration values
   mpu6050.setGyroOffsets(TimerSetup.calX / 100.0, TimerSetup.calY / 100.0, TimerSetup.calZ / 100.0);
+}
+
+void captureBaselines()
+{
+  long sumP = 0, sumR = 0, sumY = 0;
+  const int SAMPLES = 10;
+  
+  // Helper for normalization
+  auto normalize = [](int angle) -> int {
+    while (angle > 180) angle -= 360;
+    while (angle <= -180) angle += 360;
+    return angle;
+  };
+
+  Serial.println(F("Capturing stable baselines..."));
+  for (int i = 0; i < SAMPLES; i++) {
+    mpu6050.update();
+    int rawX = getAngleX_read();
+    int rawY = getAngleY_read();
+    int rawZ = getAngleZ_read();
+    int axes[3] = {rawX, rawY, rawZ};
+    
+    sumP += -normalize(axes[TimerSetup.axisPitch]);
+    sumR += normalize(axes[TimerSetup.axisRoll]);
+    sumY += normalize(axes[TimerSetup.axisYaw]);
+    delay(20);
+  }
+
+  baselinePitch = (int)(sumP / SAMPLES);
+  baselineRoll = (int)(sumR / SAMPLES);
+  baselineYaw = (int)(sumY / SAMPLES);
+  
+  // Reset error flags for the new run
+  PitchEX = false;
+  YawEX = false;
+  YawLOW = false;
+  TimerSetup.LapCount = 0;
+  accumulatedY = 0;
+  last_mils = 0; 
+  
+  Serial.print(F("Baselines Locked. P:")); Serial.print(baselinePitch);
+  Serial.print(F(" Y:")); Serial.println(baselineYaw);
+}
+
+void setLevelCalibration()
+{
+  Serial.println(F("Setting level calibration offsets..."));
+  mpu6050.update();
+  // We want current position to be 'zero' for gains.
+  // The library uses offsets to shift the gyro readings.
+  // We'll store these in TimerSetup (scaled x100)
+  TimerSetup.calX = (int)(mpu6050.getGyroX() * 100.0);
+  TimerSetup.calY = (int)(mpu6050.getGyroY() * 100.0);
+  TimerSetup.calZ = (int)(mpu6050.getGyroZ() * 100.0);
+  mpu6050.setGyroOffsets(mpu6050.getGyroX(), mpu6050.getGyroY(), mpu6050.getGyroZ());
+  Serial.print(F("Calibration saved. X:")); Serial.print(TimerSetup.calX);
+  Serial.print(F(" Y:")); Serial.print(TimerSetup.calY);
+  Serial.print(F(" Z:")); Serial.println(TimerSetup.calZ);
 }
 void setUpMPU(void)
 {
@@ -193,17 +259,8 @@ void setUpMPU(void)
  // mpu6050.calcGyroOffsets(true);
 void read_giro()
 {
-  // read raw angles
-  int rawX = getAngleX_read();
-  int rawY = getAngleY_read();
-  int rawZ = getAngleZ_read();
-
-  int axes[3] = {rawX, rawY, rawZ};
-
-  iangleX = axes[TimerSetup.axisPitch];
-  iangleY = axes[TimerSetup.axisRoll];
-  iangleZ = axes[TimerSetup.axisYaw];
-
+  currentMillis = millis(); // Refresh global currentMillis
+  
   // initialize on first call
   if (last_mils == 0)
   {
@@ -211,9 +268,7 @@ void read_giro()
     last_x = iangleX;
     last_y = iangleY;
     last_z = iangleZ;
-    PitchEX = false;
-    YawEX = false;
-    YawLOW = false;
+    // Do NOT reset flags here; they should be reset by captureBaselines or manual start
     return;
   }
 
@@ -225,7 +280,6 @@ void read_giro()
   int dz = iangleZ - last_z;
 
   // --- LAP COUNT (tenths) ---
-  static float accumulatedY = 0.0f; // accumulated signed degrees
   auto signedDelta = [](int cur, int prev)->int {
     int d = cur - prev;
     if (d > 180) d -= 360;
@@ -233,8 +287,8 @@ void read_giro()
     return d;
   };
 
-  int signedDeltaY = signedDelta(iangleY, last_y);
-  accumulatedY += (float)signedDeltaY;
+  int signedDeltaZ = signedDelta(iangleZ, last_z);
+  accumulatedY += (float)signedDeltaZ;
 
   auto processLapAccum = [&]() {
     // 36 degrees == 0.1 lap
@@ -250,7 +304,7 @@ void read_giro()
       esc.write(0);
       digitalWrite(LED3, LOW);
       digitalWrite(LED4, LOW);
-      digitalWrite(LED5, LOW);
+      digitalWrite(LED5, LOW); // Solid indicator? No, turning off per existing logic
     }
 
     // trigger BURP one full lap (10 tenths) before limit while flying
@@ -269,9 +323,15 @@ void read_giro()
   };
 
   processLapAccum();
-
+ 
   // --- PITCH / YAW EVALUATION ---
-  evaluateHighPitchYaw(dx, dy, dz);
+  // Only evaluate safety shutdowns once we are out of the WAIT state (ARMED or later)
+  if (ispeed_state >= speed_state::ARMED) {
+    evaluateHighPitchYaw(dx, dy, dz);
+  } else {
+    currentPitchDev = 0;
+    currentYawDev = 0;
+  }
 
   // update last samples and time
   last_x = iangleX;
@@ -283,12 +343,25 @@ void read_giro()
 // Refactored function to evaluate high pitch and yaw events
 void evaluateHighPitchYaw(int dx, int dy, int dz)
 {
-  (void)dy; // dy intentionally unused in current algorithm; silence compiler warning
-  // Simplified, clearer handling split into pitch and yaw sections.
+  (void)dy; 
+  extern int curThrottle; // Needed to check if we are flying
 
-  // --- PITCH (hysteresis) ---
+  // --- PITCH (relative to baseline captured at start) ---
   int pitchThresh = (TimerSetup.PitchExThresh > 0) ? TimerSetup.PitchExThresh : DEFAULT_PITCH_DELTA_THRESHOLD;
-  if (abs(dx) >= pitchThresh)
+  
+  // Use shortest-path delta for deviation
+  int pDelta = iangleX - baselinePitch;
+  while (pDelta > 180) pDelta -= 360;
+  while (pDelta < -180) pDelta += 360;
+  currentPitchDev = abs(pDelta);
+  
+  // Only debug if we are close or above
+  if (currentPitchDev > (pitchThresh / 2)) {
+    Serial.print(F("P-Dev:")); Serial.print(currentPitchDev);
+    Serial.print(F("/")); Serial.println(pitchThresh);
+  }
+
+  if (currentPitchDev >= pitchThresh)
   {
     pitchSetCounter++;
     pitchClearCounter = 0;
@@ -296,11 +369,18 @@ void evaluateHighPitchYaw(int dx, int dy, int dz)
   else
   {
     pitchSetCounter = 0;
-    if (abs(dx) < (pitchThresh / 2)) pitchClearCounter++; else pitchClearCounter = 0;
+    if (currentPitchDev < (pitchThresh / 2)) pitchClearCounter++; else pitchClearCounter = 0;
   }
 
   if (pitchSetCounter >= PITCH_SET_N)
   {
+    if (!PitchEX) {
+      Serial.println(F("EXCESSIVE PITCH SHUTDOWN"));
+      esc.write(0);
+      digitalWrite(LED5, HIGH); // RED solid for pitch?
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED3, LOW);
+    }
     PitchEX = true;
     run_state = false;
   }
@@ -309,13 +389,20 @@ void evaluateHighPitchYaw(int dx, int dy, int dz)
     PitchEX = false;
   }
 
-  // --- YAW (rate and absolute) ---
+  // --- YAW (rate and absolute deviation) ---
   if (ispeed_state == speed_state::TAKEOFF || ispeed_state == speed_state::FLY)
   {
     float yawRate = (float)dz * 1000.0f / (float)GYRO_SAMPLE_MS;
     int yawRateThresh = (TimerSetup.YawRateExThresh > 0) ? TimerSetup.YawRateExThresh : DEFAULT_YAW_DELTA_RATE_THRESHOLD;
+    
+    // Use shortest-path delta for yaw deviation
+    int yDelta = iangleZ - baselineYaw;
+    if (yDelta > 180) yDelta -= 360;
+    else if (yDelta < -180) yDelta += 360;
+    currentYawDev = abs(yDelta);
 
-    if (abs(yawRate) >= yawRateThresh)
+    // Trigger on either excessive rate OR excessive deviation from start
+    if (abs(yawRate) >= yawRateThresh || currentYawDev > 90) // 90 deg deviation is a lot
     {
       yawHighCounter++;
       yawLowCounter = 0;
@@ -338,17 +425,41 @@ void evaluateHighPitchYaw(int dx, int dy, int dz)
 
     bool disableFlightChecks = (ispeed_state == speed_state::FLY && digitalRead(DS3) == LOW);
 
+    // --- Lack of Movement Check (Only if motor is actually running) ---
+    bool isMovingSafely = (curThrottle > 50);
+
     if (yawHighCounter >= YAW_HIGH_N)
     {
-      if (!disableFlightChecks) { YawEX = true; run_state = false; }
+      if (!disableFlightChecks) { 
+        if (!YawEX) {
+          Serial.println(F("EXCESSIVE YAW SHUTDOWN"));
+          esc.write(0);
+        }
+        YawEX = true; 
+        run_state = false; 
+      }
     }
     else if (yawLowCounter >= YAW_LOW_M)
     {
-      if (!disableFlightChecks) { YawLOW = true; run_state = false; }
+      if (!disableFlightChecks && isMovingSafely && ispeed_state == speed_state::FLY) { 
+        if (!YawLOW) {
+          Serial.println(F("YAW LOSS SHUTDOWN"));
+          esc.write(0);
+        }
+        YawLOW = true; 
+        run_state = false; 
+      }
     }
     else if (yawSlowCount >= YAW_SLOW_THRESHOLD)
     {
-      if (!disableFlightChecks) { YawEX = true; run_state = false; }
+      if (!disableFlightChecks && isMovingSafely && ispeed_state == speed_state::FLY) { 
+        if (!YawEX) {
+          Serial.println(F("YAW SLOW SHUTDOWN"));
+          esc.write(0);
+        }
+        YawEX = true; 
+        run_state = false; 
+      }
     }
     else
     {
@@ -380,6 +491,18 @@ void speedGyro()
   iangleX = axes[TimerSetup.axisPitch];
   iangleY = axes[TimerSetup.axisRoll];
   iangleZ = axes[TimerSetup.axisYaw];
+
+  // Normalize angles to -180..180 to keep them readable and avoid large accumulation
+  auto normalizeAngle = [](int angle) -> int {
+    while (angle > 180) angle -= 360;
+    while (angle <= -180) angle += 360;
+    return angle;
+  };
+
+  iangleX = -normalizeAngle(iangleX); // Invert: nose-up now positive
+  iangleY = normalizeAngle(iangleY);
+  iangleZ = normalizeAngle(iangleZ);
+
   // compute pitch trim from pitch angle (`iangleX`) using sin-table for smooth curve
   // - Uses `TimerSetup.px` as max magnitude (0..180)
   // - Signed sin table: READ_SIN gives ~0..1000, subtract 500 -> -500..+500
@@ -395,7 +518,7 @@ void speedGyro()
   int sinVal = READ_SIN(idx); // 0..~1000
   int signedSin = sinVal - 500; // -500..+500
   float trimf = ((float)signedSin / 500.0f) * (float)TimerSetup.px; // -px..+px
-  // invert sign per preference: nose-up (positive pitch) should lower throttle
+  // Nose-up (now positive iangleX) should lower throttle
   int trimmed = -(int)trimf;
   // clamp to +/- px
   int maxTrim = (int)TimerSetup.px;
@@ -417,6 +540,9 @@ void speedGyro()
     if (boostf > (float)TimerSetup.rx) boostf = (float)TimerSetup.rx;
     maneuverBoost = (int)(boostf + 0.5f);
   }
+
+  // Call read_giro to process safety checks and lap counting
+  read_giro();
 }
 
 

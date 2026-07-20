@@ -36,6 +36,7 @@ static unsigned long flyStartMillis = 0;
 extern bool PitchEX;
 extern bool YawEX;
 extern bool YawLOW;
+extern void captureBaselines();
 
 
  /*defaultvalues for states up above */
@@ -72,10 +73,16 @@ bool check_state()
     
     // inc the state and make it wrap 8 states 
 
-   // advance state
-   ispeed_state = static_cast <speed_state>((static_cast<int>((ispeed_state)+1)%8));
+    // advance state
+    ispeed_state = static_cast<speed_state>((static_cast<int>(ispeed_state) + 1) % 8);
     previousMillis = currentMillis;
     
+    // Capture baselines if we just entered the ARMED state
+    if (ispeed_state == speed_state::ARMED) {
+      captureBaselines();
+    }
+    if (ispeed_state == speed_state::FLY) flyStartMillis = millis();
+
     return true;
   
    }
@@ -89,6 +96,7 @@ void setSpeedState(speed_state newState)
   ispeed_state = newState;
   previousMillis = millis();
   if (newState == speed_state::FLY) flyStartMillis = millis();
+  if (newState == speed_state::ARMED) captureBaselines();
 }
 
 void speedState()
@@ -113,10 +121,6 @@ void speedState()
     {
       // once second burst
       curThrottle = 25; /* a quick burp */
-      PitchEX = false;
-      YawEX =false;
-      YawLOW = false;
-
       // Serial.print("wait   ");
     }
     break;
@@ -201,8 +205,15 @@ void speedState()
   // apply pitch trim (`posTrim`) and maneuver boost (`maneuverBoost`) and clamp throttle
   extern int posTrim;
   extern int maneuverBoost;
-  long adjusted = (long)curThrottle + (long)posTrim + (long)maneuverBoost;
-  if (adjusted < 0) adjusted = 0;
-  if (adjusted > MAX_SPEED) adjusted = MAX_SPEED;
+  long adjusted = 0;
+  
+  if (run_state) {
+    adjusted = (long)curThrottle + (long)posTrim + (long)maneuverBoost;
+    if (adjusted < 0) adjusted = 0;
+    if (adjusted > MAX_SPEED) adjusted = MAX_SPEED;
+  } else {
+    adjusted = 0; // Force absolute zero if safety flag is set or state is inactive
+  }
+
   esc.write((int)adjusted);
 }

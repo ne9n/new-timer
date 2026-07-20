@@ -23,6 +23,8 @@ void mpu_setup();
 void setUpMPU(void);
 // Evaluate high pitch and yaw events (refactored from read_giro)
 void evaluateHighPitchYaw(int dx, int dy, int dz);
+void captureBaselines();
+void setLevelCalibration();
 
 // Test/mocking helpers
 void setMockMPU(bool v);
