@@ -1,10 +1,6 @@
 
 #include <EEPROM.h>
-#if defined(ESP32)
-#include <ESP32Servo.h>
-#else
 #include <Servo.h>
-#endif
 
 
 #include "gyro.h"
@@ -48,6 +44,7 @@ int incTime = 0;
 void setup()
 {
   Serial.begin(19200);
+<<<<<<< HEAD:cheesehead_timer/cheesehead_timer.ino
   getDips();
   Serial.print(F(" init start "));
   // Initialize EEPROM (required on ESP32 before EEPROM.get/put)
@@ -71,7 +68,7 @@ void setup()
       TimerSetup.py= 1;
       TimerSetup.rx= 1;
       TimerSetup.ry= 1; 
-      TimerSetup.PitchExThresh = 40; // degrees per sample (legacy behavior)
+      TimerSetup.PitchExThresh = 70; // updated default
       TimerSetup.YawRateExThresh = 20; // deg/sec
       TimerSetup.LapCount = 0;
       TimerSetup.LapLimit = 0; // 0 disables auto-shutdown by laps
