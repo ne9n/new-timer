@@ -1,0 +1,143 @@
+ # Test Plan
+
+ ## Upload & Smoke Tests
+
+ 1. Upload the sketch via USB to the board.
+ 2. Open a serial monitor at 19200 baud and press `?` to display the menu.
+ 3. Verify boot LED sequence and that `o` / `O` toggle LED outputs from the menu.
+ 4. With props removed, perform an arm sequence (switches and button) and verify the ESC receives PWM (use an LED/servo-tester if available).
+
+ ## Lap Counting Tests
+
+ 1. Mount the plane safely on a stand and slowly rotate about the yaw axis; confirm `LapCount` increases. Every 36° should increment one tenth (0.1) lap.
+ 2. Reset lap count with the `l` command and confirm it reads zero.
+ 3. Set a fractional lap limit, e.g.:
+
+ ```text
+ M 0.5
+ ```
+
+    Verify the terminal shows `LapLimit` as `0.5` (stored internally as 5 tenths).
+
+ ## BURP & LapLimit Behavior
+
+ 1. Configure a limit, for example:
+
+ ```text
+ M 2.0
+ ```
+
+ 2. While in `FLY`, observe that the system transitions to `BURP` when `LapCount` reaches `LapLimit - 1.0` (one full lap before the limit).
+ 3. Confirm the system shuts down (ESC to 0, `run_state = false`, LEDs off) when `LapCount >= LapLimit`.
+
+ ## Pitch Trim & Maneuver Boost Tests
+
+ 1. Observe telemetry fields `P  Pos trim` and `B  Maneuver boost` in the terminal while moving the model's nose up/down.
+ 2. Tune pitch gain (`E` menu) and maneuver gain (`K` menu) and verify throttle changes accordingly.
+
+ ## EEPROM Persistence
+
+ 1. Save settings with:
+
+ ```text
+ s
+ ```
+
+ 2. Power-cycle the board and reopen the terminal; confirm saved values persist.
+
+ ## Safety & Crash Detection
+
+ 1. Simulate excessive pitch (above `PitchExThresh`) and confirm the system clears `run_state` and cuts throttle.
+ 2. Simulate high yaw rates (above `YawRateExThresh`) and confirm shutdown behavior.
+
+ ## LEDs & DIP Switch Tests
+
+ 1. Verify `DS3` changes behavior (some flight-phase checks are disabled when `DS3` is LOW).
+ 2. Verify LED indicators represent states (ARMED, FLY, BURP, RDYLAND).
+
+ ---
+
+ End of test plan.
+Cheesehead Timer — Machine-Level Test Plan
+
+Prerequisites
+- Arduino/board connected via USB to host.
+- Arduino IDE or CLI to upload compiled sketch.
+- Serial terminal at 19200 baud (e.g., `screen`, PuTTY, Arduino Serial Monitor).
+- Confirm wiring: ESC on `SERVO` pin, LEDs on LED3/4/5, dips DS1/DS2/DS3 accessible.
+- Ensure `doc.txt` is available for reference.
+
+1) Upload & Basic Boot
+- Action: Compile and upload the sketch to board.
+- Verify: Serial prints initialization messages and "init complte" at 19200 baud.
+- Pass: board boots, MPU init not crashing, `terminal()` available on `?`.
+
+2) Terminal Menu Smoke Test
+- Action: Open serial, press `?` to show menu.
+- Verify: Menu displays FlySpeed, FlyTime, Lap count, Lap limit, Pitch gain (`px`), Maneuver rx (`rx`), Pos trim (`P`), Maneuver boost (`B`).
+- Pass: All listed fields print and are readable.
+
+3) Lap Counting (static rotation simulation)
+- Action: With aircraft static, rotate through ~36° increments (or simulate by moving yaw) and observe `L  Lap count` updates in tenths (0.1 increments).
+- Verify: Each ~36° of cumulative yaw increases displayed lap count by 0.1.
+- Pass: Lap count increments with rotations; no unexpected jumps near ±180 wrap.
+
+4) Lap Limit Shutdown
+- Action: Set a small LapLimit using menu, e.g., `M 0.5` (0.5 lap -> stored as 5). Fly/rotate until LapCount >= LapLimit.
+- Verify: When LapCount >= LapLimit, serial prints "Lap limit exceeded - shutting down", `run_state` cleared, ESC set to 0, LEDs off.
+- Pass: System stops and throttle closes when limit reached.
+
+5) BURP One-Lap Before Limit
+- Action: Set LapLimit >= 1.0 (e.g., `M 2.0`). While in `FLY`, approach within one lap of the limit.
+- Verify: When LapCount >= (LapLimit - 1.0), serial prints "Approaching lap limit - switching to BURP" and state enters `BURP` (short burst). ESC should go to `BurpMax` during `BURP` state.
+- Pass: BURP triggered one lap before shutdown while in FLY.
+
+6) Pitch Trim Behavior
+- Action: With motors idle or at low throttle, tilt nose up and nose down slowly.
+- Verify: `P  Pos trim` updates in serial; nose-up should produce negative trim (reduces throttle), nose-down positive trim (increases throttle) per doc. Magnitude scales with `px`.
+- Test: Change pitch gain `E <value>` and verify `P` magnitude scales.
+- Pass: `posTrim` responds smoothly and respects `TimerSetup.px`.
+
+7) Maneuver Boost Behavior
+- Action: Set maneuver gain `K 60` (example). Tilt nose aggressively and observe `B  Maneuver boost` and throttle output.
+- Verify: `B` increases with pitch magnitude and added positively to commanded throttle; small tilt (<5°) produces zero boost (deadband).
+- Pass: Maneuver boost scales with `rx`, can be tuned, and applied to ESC output.
+
+8) Safety Triggers (Pitch/Yaw Excess)
+- Action: Cause rapid pitch or yaw changes (carefully), or set thresholds low for test (`h 10`, `j 10`).
+- Verify: If thresholds exceeded, serial logs PitchEX/YawEX actions and `run_state` cleared; throttle goes to 0.
+- Pass: Safety conditions reliably stop the run.
+
+9) Persistence
+- Action: Modify config (e.g., `M 1.5`, `E 40`, `K 50`) then send `s` to save.
+- Reboot board.
+- Verify: After reboot, values persist (menu shows saved values).
+- Pass: EEPROM saving/load works.
+
+10) Edge Cases
+- Rapid wrap-around yaw near ±180°: rotate quickly through +/-180 and verify lap count doesn't falsely increment.
+- Very small jitter: verify no false lap or safety triggers when still.
+
+Pass/Fail Criteria
+- Tests marked "Pass" must meet the verify step. Any unexpected throttle output, failure to stop at lap limit, or missed BURP is a failure.
+
+Debugging Tips
+- Use serial prints from `term.cpp` and `gyro.cpp` to observe `posTrim`, `maneuverBoost`, `LapCount`, and safety flags.
+- Reduce `GYRO_SAMPLE_MS` or adjust thresholds temporarily for quicker/manual testing.
+
+Optional automated harness (advanced)
+- Suggestion: Create a desktop test harness that sends menu commands via serial and reads outputs to assert expected strings. Use Python + pySerial for automation.
+
+11) LEDs and DIP switches
+- Action: Verify LED outputs and DIP switch readings across states and via terminal commands.
+- Steps:
+	1. With board powered, observe LEDs at boot — verify LED behavior described in `led.cpp` (blinks/steady per state).
+	2. Use terminal command `O` to turn LEDs on; expect LEDs `LED3/LED4/LED5` HIGH. Use `o` to turn LEDs off; expect LOW.
+	3. While running the state machine, ensure LEDs reflect state transitions (WAIT, ARMED, TAKEOFF_RAMP, TAKEOFF, FLY, BURP, RDYLAND, RAMPDWN) as expected.
+	4. Toggle DIP switches `DS1`/`DS2` to change speed profile (read by `getDips()`): verify profile selection changes throttle settings on next run cycle.
+	5. Toggle `DS3` and verify behavior: when `DS3` is LOW some flight-phase checks are disabled — test by setting `YawRateExThresh` low and verifying yaw checks are skipped during `FLY` when DS3 is LOW.
+	6. Test persistence and hardware state: reboot with various DIP positions and verify the board reads DS positions on startup and LEDs behave accordingly.
+- Verify: LEDs respond to `O`/`o`, indicate states correctly, and DIP switches alter profile selection and DS3 affects safety checks.
+- Pass: LEDs and DIP switches function as expected and reflect state/commands reliably.
+
+End of tests.txt
