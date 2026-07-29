@@ -155,6 +155,17 @@ The Cheesehead Timer uses three onboard LEDs to communicate system initializatio
 * **`O`** (capital 'O'): Turns **ALL 3 LEDs ON** manually (useful for bench testing hardware connections).
 * **`o`** (lowercase 'o'): Turns **ALL 3 LEDs OFF** manually.
 
+## User Button Controls
+
+The primary user push button (connected to `BUTTONPIN`: Pin 10 on AVR Nano / GPIO 33 on ESP32) controls the execution state machine using the `OneButton` debouncing library:
+
+| Gesture / Action | System Condition | Result / Function |
+| :--- | :--- | :--- |
+| **Single Tap (Click)** | Stopped (`run_state = false`) | **Start Flight Sequence**: Sets `run_state = true` and triggers the state machine starting at the `WAIT` state (1-sec initial burp). |
+| **Single Tap (Click)** | Running (`run_state = true`) | **Emergency Stop / Abort**: Instantly stops the run (`run_state = false`), sets ESC throttle to `0`, and returns to `STOPPED` state. |
+| **Press & Hold (Long Press)** | Stopped (`run_state = false`) | **Direct Start**: Holding and releasing the button transitions directly into `RUN` mode (`run_state = true`). |
+| **Double Click** | Any state | Reserved gesture callback (`handleDoubleClick`). |
+
 ## Tests & Tuning (short)
 
 - Run through `tests.txt` for an ordered test plan (lap counting, BURP behavior, EEPROM persistence, LEDs and DIP switches).
