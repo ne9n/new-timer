@@ -28,6 +28,7 @@ unsigned long previousMillis;
 int lastZ = 0;
 long angle_time = 0;
 int curThrottle;
+int motorThrottle = 0; // global current active motor speed (0-180)
 bool gyro_flag = false;
 
 // Track when we entered the FLY state for auto-increase
@@ -210,5 +211,6 @@ void speedState()
   
   if (!run_state) adjusted = 0; // Absolute safety cutoff
   
-  esc.write((int)adjusted);
+  motorThrottle = (int)adjusted;
+  esc.write(motorThrottle);
 }

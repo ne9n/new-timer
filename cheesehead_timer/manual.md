@@ -144,10 +144,10 @@ The Cheesehead Timer uses three onboard LEDs to communicate system initializatio
 | **Boot / Init** | Blinking (500ms) | Initialization pattern | Initialization pattern | Board startup & MPU calibration |
 | **WAIT** | Slow Blink (250ms ON, 1000ms OFF) | OFF | OFF | Idle / Waiting for arming button |
 | **ARMED** | OFF | Slow Blink (250ms ON, 1000ms OFF) | OFF | Armed; countdown to spin-up |
-| **TAKEOFF_RAMP** | OFF | Solid ON | Fast Blink (250ms ON, 100ms OFF) | Throttle ramping up to takeoff |
-| **TAKEOFF** | OFF | OFF | Solid ON | Full power takeoff phase |
-| **FLY** | OFF | Sync Blink (500ms ON, 500ms OFF) | Sync Blink (500ms ON, 500ms OFF) | Cruise flight mode (gyro active) |
-| **BURP** | Solid ON | Solid ON | Solid ON | Pre-shutdown throttle burst |
+| **TAKEOFF_RAMP** | OFF | Solid ON | Proportional Blink (Flash rate scales with motor throttle) | Throttle ramping up to takeoff |
+| **TAKEOFF** | OFF | OFF | Proportional Blink (Flash rate scales with motor throttle) | Full power takeoff phase |
+| **FLY** | OFF | Sync Blink (500ms) | Proportional Blink (500ms @ min speed → 25ms @ max speed) | Cruise flight mode (gyro active) |
+| **BURP** | Solid ON | Solid ON | Rapid Strobe (25ms strobe @ max speed) | Pre-shutdown throttle burst |
 | **RAMPDWN** | Slow Blink (250ms ON, 1000ms OFF) | OFF | OFF | Ramp down / landing phase |
 | **Shutdown / Error** | Solid ON | OFF | OFF | Emergency shutdown or safety trigger |
 

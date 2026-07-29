@@ -51,6 +51,7 @@ extern int posTrim; // pitch trim applied to throttle (can be negative)
 extern int maneuverBoost; // positive boost applied for maneuvering (computed from pitch)
 extern int sindex; // selected profile index
 extern int gyroEn; // gyro enable status
+extern int motorThrottle; // current active motor throttle (0-180)
 
 typedef struct {
  
