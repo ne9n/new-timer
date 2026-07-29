@@ -166,6 +166,36 @@ The primary user push button (connected to `BUTTONPIN`: Pin 10 on AVR Nano / GPI
 | **Press & Hold (Long Press)** | Stopped (`run_state = false`) | **Direct Start**: Holding and releasing the button transitions directly into `RUN` mode (`run_state = true`). |
 | **Double Click** | Any state | Reserved gesture callback (`handleDoubleClick`). |
 
+## Serial Telemetry Stream
+
+The Cheesehead Timer includes a high-speed, non-blocking serial telemetry stream (19200 baud) for live diagnostics, sensor verification, and desktop GUI interface integration (`desktop_app.py`).
+
+### Toggling Telemetry
+* Send **`!`** in the serial terminal to toggle real-time telemetry **ON** or **OFF**.
+* Send **`q`** or **`Q`** at any time to turn telemetry **OFF** and return to menu commands.
+
+### Telemetry Line Format
+When active, the board streams data lines prefixed with `!` at high frequency:
+
+```text
+! speed:120 pitch:2 roll:0 yaw:15 boost:5 leds:R0 Y1 G1 btn:0 state:4
+```
+
+### Telemetry Data Fields
+| Field Name | Example Value | Description / Units |
+| :--- | :--- | :--- |
+| **`speed`** | `speed:120` | Current commanded ESC throttle output (`curThrottle`, range `0`..`180`). |
+| **`pitch`** | `pitch:2` | Current MPU6050 Pitch angle (`iangleX` in degrees). |
+| **`roll`** | `roll:0` | Current MPU6050 Roll angle (`iangleY` in degrees). |
+| **`yaw`** | `yaw:15` | Current MPU6050 Yaw angle (`iangleZ` in degrees). |
+| **`boost`** | `boost:5` | Active maneuver throttle boost (`maneuverBoost` added to ESC). |
+| **`leds`** | `leds:R0 Y1 G1` | Hardware LED states: **R**ed (`LED5`), **Y**ellow (`LED4`), **G**reen (`LED3`) (`0`=OFF, `1`=ON). |
+| **`btn`** | `btn:0` | User push button state (`0`=Released, `1`=Pressed). |
+| **`state`** | `state:4` | Active flight state machine phase ID (`0`=WAIT, `1`=ARMED, `2`=TAKEOFF_RAMP, `3`=TAKEOFF, `4`=FLY, `5`=BURP, `6`=RDYLAND, `7`=RAMPDWN). |
+
+### Desktop App Integration
+The Python GUI (`python desktop_app.py`) parses these exact telemetry lines to update real-time graphs, state badges, LED indicators, and pitch/yaw telemetry displays.
+
 ## Tests & Tuning (short)
 
 - Run through `tests.txt` for an ordered test plan (lap counting, BURP behavior, EEPROM persistence, LEDs and DIP switches).
