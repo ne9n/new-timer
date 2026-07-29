@@ -9,7 +9,7 @@ Files of interest:
 - `gyro.cpp` / `gyro.h` — MPU6050 reads, lap counting, `posTrim`, `maneuverBoost`, safety checks
 - `state_machine.cpp` / `state_machine.h` — state transitions and throttle output
 - `term.cpp` / `term.h` — serial menu for configuration and telemetry
-- `doc.txt`, `manual.md`, `tests.txt` — documentation and test plan
+- `doc.txt`, `manual.md`, `tests.txt`, `bench_integration_test_guide.md` — documentation and test guides
 
 ## Hardware & Wiring (summary)
 
@@ -104,11 +104,56 @@ Remember to send `s` to save your mapping to EEPROM.
 - `maneuverBoost` is a positive throttle boost based on absolute pitch magnitude and the `TimerSetup.rx` gain (set via menu `K`).
 - Small deadband prevents jitter. Used to add temporary throttle during aggressive maneuvering.
 
-## Safety & Crash Detection
+## Error Conditions & Safety Cutoffs
 
-- Hysteresis counters and thresholds (`PitchExThresh`, `YawRateExThresh`) prevent noisy false triggers.
-- On excessive pitch or yaw detection the code sets `run_state = false` and cuts throttle.
-- `DS3` can be used (when LOW) to temporarily disable some flight-phase checks during `FLY`.
+The Cheesehead Timer actively monitors flight dynamics, lap counts, and hardware state to protect the aircraft and power system.
+
+### 🛡️ Motion & Gyro Crash Cutoffs
+| Error Condition | Trigger Criterion | Active States | System Action & Behavior |
+| :--- | :--- | :--- | :--- |
+| **Excessive Pitch (`PitchEX`)** | Pitch delta (`dx`) exceeds `PitchExThresh` (default 40°) for `PITCH_SET_N` consecutive samples. | All active states | • Sets `PitchEX = true`<br>• Clears `run_state = false`<br>• Instantly cuts ESC throttle to `0`<br>• Sets Red LED solid ON |
+| **Excessive Yaw Rate (`YawEX`)** | Yaw rate (`deg/sec`) exceeds `YawRateExThresh` (default 20°/s) for `YAW_HIGH_N` consecutive samples. Indicates spin-out or line break. | `TAKEOFF`, `FLY` | • Sets `YawEX = true`<br>• Clears `run_state = false`<br>• Instantly cuts ESC throttle to `0` |
+| **Abnormally Low Yaw (`YawLOW`)** | Absolute yaw angle drops below `YAW_LOW_THRESHOLD` during flight. Indicates loss of line tension or plane stopping in circle. | `FLY` | • Sets `YawLOW = true`<br>• Clears `run_state = false`<br>• Instantly cuts ESC throttle to `0` |
+| **Stalled Takeoff Yaw (`yawSlowCount`)** | Aircraft fails to gain required yaw rotation speed during takeoff within `YAW_SLOW_THRESHOLD` time. | `TAKEOFF` | • Triggers `YawEX`<br>• Clears `run_state = false`<br>• Cuts ESC throttle to `0` |
+
+> [!NOTE]
+> **Safety Override (`DS3` DIP Switch)**: Setting DIP switch `DS3` to **LOW** temporarily disables flight-phase yaw checks (`YawEX` and `YawLOW`) during `FLY` state. This is useful for bench testing or manual flight override.
+
+### ⏱️ Lap Limit & Timed Flight Termination
+* **Lap Limit Exceeded**: When `LapCount >= LapLimit` (if `LapLimit > 0`), the timer prints `"Lap limit exceeded - shutting down"`, sets `run_state = false`, sets ESC throttle to `0`, and turns off all LEDs.
+* **Flight Duration Expiry**: When the `FlyTime` timer expires, the state machine safely progresses through `RDYLAND` and `RAMPDWN` (ramping throttle to `0`) before disabling `run_state`.
+
+### ⚙️ Hardware & Memory Fault Recovery
+* **Uninitialized / Corrupt EEPROM**: On initial boot or corrupted memory (when `FlySpeed[2] > 500`), the board auto-recovers by writing factory default parameters to EEPROM, running MPU gyro calibration (`setUpMPU()`), and logging `"First run detected - running MPU calibration"`.
+* **I2C / MPU6050 Disconnection**: Loose wiring or sensor disconnection causes MPU read failures, freezing sensor telemetry.
+
+## LED Status Indicators & Signaling
+
+The Cheesehead Timer uses three onboard LEDs to communicate system initialization, real-time flight state machine phases, and diagnostic/error conditions:
+
+### LED Hardware Mapping
+| LED Identifier | Software Object | AVR Pin (Nano/Uno) | ESP32 Pin | Indicator Color |
+| :--- | :--- | :---: | :---: | :--- |
+| **LED3** | `gled` | Pin 7 | GPIO 25 | Green |
+| **LED4** | `yled` | Pin 8 | GPIO 26 | Yellow |
+| **LED5** | `rled` | Pin 9 | GPIO 27 | Red |
+
+### Flight State Machine LED Patterns
+| Flight State | Red LED (`LED5`) | Yellow LED (`LED4`) | Green LED (`LED3`) | Indication / Meaning |
+| :--- | :--- | :--- | :--- | :--- |
+| **Boot / Init** | Blinking (500ms) | Initialization pattern | Initialization pattern | Board startup & MPU calibration |
+| **WAIT** | Slow Blink (250ms ON, 1000ms OFF) | OFF | OFF | Idle / Waiting for arming button |
+| **ARMED** | OFF | Slow Blink (250ms ON, 1000ms OFF) | OFF | Armed; countdown to spin-up |
+| **TAKEOFF_RAMP** | OFF | Solid ON | Fast Blink (250ms ON, 100ms OFF) | Throttle ramping up to takeoff |
+| **TAKEOFF** | OFF | OFF | Solid ON | Full power takeoff phase |
+| **FLY** | OFF | Sync Blink (500ms ON, 500ms OFF) | Sync Blink (500ms ON, 500ms OFF) | Cruise flight mode (gyro active) |
+| **BURP** | Solid ON | Solid ON | Solid ON | Pre-shutdown throttle burst |
+| **RAMPDWN** | Slow Blink (250ms ON, 1000ms OFF) | OFF | OFF | Ramp down / landing phase |
+| **Shutdown / Error** | Solid ON | OFF | OFF | Emergency shutdown or safety trigger |
+
+### Manual Terminal Commands
+* **`O`** (capital 'O'): Turns **ALL 3 LEDs ON** manually (useful for bench testing hardware connections).
+* **`o`** (lowercase 'o'): Turns **ALL 3 LEDs OFF** manually.
 
 ## Tests & Tuning (short)
 
