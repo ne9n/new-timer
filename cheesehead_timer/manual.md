@@ -53,6 +53,32 @@ arduino-cli upload --fqbn arduino:avr:nano -p COM3 -t .
 
 If you use the Arduino IDE, open the folder and select the correct board and port, then Compile / Upload.
 
+## Python Desktop Application Setup
+
+The project includes a Python/CustomTkinter desktop GUI for live telemetry plotting, state gauge monitoring, and automated firmware flashing.
+
+### 1. Requirements
+* **Python**: Python 3.8+ (tested on Python 3.10–3.13)
+* **Dependencies**:
+  * `pyserial` — serial port communication
+  * `customtkinter` — modern dark-themed GUI interface
+
+### 2. Installing Dependencies
+Install required packages using `requirements.txt`:
+```powershell
+pip install -r requirements.txt
+```
+or install directly via `pip`:
+```powershell
+pip install pyserial customtkinter
+```
+
+### 3. Launching the App
+From the project root directory:
+```powershell
+python cheesehead_timer/desktop_app.py
+```
+
 ## Serial Terminal & Menu (19200 baud)
 
 - Open serial at 19200 baud.
