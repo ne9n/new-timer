@@ -17,6 +17,7 @@
   |   • Full-Power Takeoff to Punch Through Helicopter Rotor Wash & Grass   |
   |   • Automatic Throttle Step-Down to a Gentle 90-Second Training Cruise  |
   |   • Millisecond IMU Pitch Cutoff to Prevent Burned Motor Windings       |
+  |   • Open-Source Arduino Architecture Ideal for STEM & Youth Education   |
   |   • Active Gyro Maneuver Boost & Pitch Trim for Sport and Stunt Flying  |
   +-------------------------------------------------------------------------+
 ```
@@ -59,17 +60,6 @@ Over three summers of field testing and refinement at AirVenture, we developed t
 2. **Seven Flights on One Pack:** Powered by an inexpensive, off-the-shelf **3S 2,200 mAh Lithium Polymer (LiPo)** battery and a budget 2212-size brushless motor, the trainer achieves **seven complete 90-second training flights** before needing a battery swap.
 3. **Rapid Turnarounds:** As soon as one student lands, the next student takes the handle, the button is pressed, and the flight begins within seconds. This allows our remaining volunteers to focus entirely on one-on-one student coaching.
 
----
-
-## Two-Stage Throttle: Launch Power vs. Training Speed
-
-The KidVenture flight circle sits near active full-scale helicopter flight corridors. Passing rotor wash, gusty Midwestern summer crosswinds, and thick turf create severe low-level turbulence across the circle.
-
-In electric training, finding the right motor output is a delicate balancing act:
-* If launched at a gentle, beginner-friendly cruise speed, the model struggles to accelerate through thick grass, sags on the lines in crosswinds, and can be flipped by helicopter downwash.
-* If run at full throttle for the entire flight, the airplane flies at 50 to 60 miles per hour—far too fast for a newcomer to control safely.
-* If an instructor tries to hold an auxiliary throttle lever while coaching, their attention is divided right when the student needs close, hands-on guidance.
-
 ```
        +--------------------------------------------------------------+
        |                  TWO-STAGE FLIGHT THROTTLE PROFILE           |
@@ -83,6 +73,17 @@ In electric training, finding the right motor output is a delicate balancing act
        +--------------------------------------------------------------+
          [ RAMP ] [ TAKEOFF ]      [ INSTRUCTIONAL CRUISE ]   [ LAND ]
 ```
+
+---
+
+## Two-Stage Throttle: Launch Power vs. Training Speed
+
+The KidVenture flight circle sits near active full-scale helicopter flight corridors. Passing rotor wash, gusty Midwestern summer crosswinds, and thick turf create severe low-level turbulence across the circle.
+
+In electric training, finding the right motor output is a delicate balancing act:
+* If launched at a gentle, beginner-friendly cruise speed, the model struggles to accelerate through thick grass, sags on the lines in crosswinds, and can be flipped by helicopter downwash.
+* If run at full throttle for the entire flight, the airplane flies at 50 to 60 miles per hour—far too fast for a newcomer to control safely.
+* If an instructor tries to hold an auxiliary throttle lever while coaching, their attention is divided right when the student needs close, hands-on guidance.
 
 The Cheesehead Timer solves this with an automated **two-stage throttle sequencer**:
 
@@ -124,19 +125,9 @@ To eliminate this costly failure mode, we integrated an MPU-6050 six-axis Inerti
 
 ---
 
-## Expanding to Sport and Stunt Operation
+## Accessible Arduino Architecture & STEM Learning
 
-While designed for high-volume training, the Cheesehead Timer is equally valuable for **sport flying** and **Precision Aerobatics (Stunt)**. In traditional glow stunt, pilots relied on the classic "4-2-4" engine break to deliver extra power in climbs and maneuvers. The timer recreates and enhances this behavior electronically using two built-in gyro algorithms in `gyro.cpp`:
-
-* **Maneuver Power Boost (`maneuverBoost`):** When the pilot deflects the elevator for sharp square corners, inside/outside loops, or vertical eights, the MPU-6050 detects the high pitch rate and commands an instantaneous burst of throttle. This delivers extra thrust at the apex of the maneuver to overcome induced drag and maintain line tension. Sensitivity is adjustable via the serial command `K <value>`.
-* **Sinusoidal Pitch Trim (`posTrim`):** The timer reads vertical pitch angle in real time, increasing throttle during vertical climbs to combat gravity, and reducing power on vertical dives to maintain uniform lap speeds across the entire flight profile.
-* **Lap-Based Flight Termination:** In addition to elapsed time, the timer can terminate flights based on exact MPU yaw lap counts (e.g., 5.0 laps), ensuring consistent aerobatic flight profiles regardless of wind speeds.
-
----
-
-## Hardware Architecture & Firmware Design
-
-We designed the hardware around low-cost, off-the-shelf components so any club or individual modeler can easily replicate and customize the system:
+From the start, the Cheesehead Timer was engineered to be straightforward, approachable, and educational. By basing the system on the globally popular **Arduino platform**, the project serves as an ideal hands-on platform for Science, Technology, Engineering, and Math (STEM) classes, youth clubs, and maker programs.
 
 ```
 +--------------------------------------------------------------------------+
@@ -152,14 +143,14 @@ We designed the hardware around low-cost, off-the-shelf components so any club o
 +--------------------------------------------------------------------------+
 ```
 
-### 1. The Microcontroller & Carrier Board
-The firmware runs on an **Arduino Nano V3** (ATmega328P) or **ESP32**. To eliminate fragile point-to-point wiring in high-vibration airframes, we developed a **small custom carrier Printed Circuit Board (PCB)**. The board sockets the Arduino Nano and MPU-6050, breaking out:
-* Polarized headers for three status Light Emitting Diodes (LEDs).
-* A dedicated connector for the fuselage push button.
-* A standard 3-pin male servo header that connects directly to the ESC throttle lead.
+### 1. Simple, Low-Cost Hardware
+Using a standard Arduino Nano or ESP32 keeps hardware costs to just a few dollars. To make assembly easy and eliminate fragile wiring inside vibrating airframes, we designed a **compact carrier Printed Circuit Board (PCB)**. The board cleanly sockets the Arduino and MPU-6050 sensor, while breaking out color-coded pins for the status Light Emitting Diodes (LEDs), push button, and a standard 3-pin ESC connector.
 
-### 2. State Machine Firmware
-The C++ firmware (`state_machine.cpp`) implements a clean Finite State Machine (FSM):
+### 2. Clear, Modular Software
+The code is written in clean, well-commented C++ using standard libraries familiar to every Arduino student:
+* **The `Servo` Library (`#include <Servo.h>`):** Controls the speed controller using standard 50 Hz Pulse Width Modulation (PWM) signals ($1000\,\mu\text{s}$ at zero throttle to $2000\,\mu\text{s}$ at full power), making it universally compatible with budget RC speed controls.
+* **Finite State Machine (FSM):** The flight logic is structured as an easy-to-read state machine (`WAIT` $\to$ `ARMED` $\to$ `TAKEOFF_RAMP` $\to$ `TAKEOFF` $\to$ `FLY` $\to$ `BURP` $\to$ `RDYLAND` $\to$ `RAMPDWN`), giving students an intuitive visual example of how commercial avionics manage mission phases.
+* **$I^2C$ Sensor Integration:** Reads gyroscopic rates and accelerometer angles over the standard two-wire `Wire` bus, demonstrating real-world inertial measurement.
 
 ```mermaid
 graph TD
@@ -170,10 +161,26 @@ graph TD
     E --> F[RDYLAND & RAMPDWN: Smooth Power Ramp-Down]
 ```
 
-### 3. ESC Control via the Arduino Servo Library
-The timer uses the standard **Arduino `Servo` library** (`#include <Servo.h>`) to output standard 50 Hz Pulse Width Modulation (PWM) signals ($1000\,\mu\text{s}$ at idle to $2000\,\mu\text{s}$ at full throttle). This makes the timer universally compatible with standard commercial RC speed controllers.
+### 3. A Multi-Discipline STEM Teaching Tool
+For educators and youth leaders, this setup connects multiple learning concepts in a single flying project:
+* **Physics & Aerodynamics:** Students observe real-time relationships between static thrust, airspeed, induced drag, and centrifugal line tension.
+* **Electronics:** Hands-on experience with microcontroller pinouts, pull-up resistors, $I^2C$ communication, and PWM motor signals.
+* **Computer Science & Data:** Using the Python desktop app (`desktop_app.py`), students can graph live telemetry, calibrate sensor offsets, and explore how software parameters directly alter physical flight characteristics.
 
-### 4. Desktop Workbench GUI
+---
+
+## Expanding to Sport and Stunt Operation
+
+While designed for training, the Cheesehead Timer is equally valuable for **sport flying** and **Precision Aerobatics (Stunt)**. In traditional glow stunt, pilots relied on the classic "4-2-4" engine break to deliver extra power in climbs and maneuvers. The timer recreates and enhances this behavior electronically using two built-in gyro algorithms in `gyro.cpp`:
+
+* **Maneuver Power Boost (`maneuverBoost`):** When the pilot deflects the elevator for sharp square corners, inside/outside loops, or vertical eights, the MPU-6050 detects the high pitch rate and commands an instantaneous burst of throttle. This delivers extra thrust at the apex of the maneuver to overcome induced drag and maintain line tension. Sensitivity is adjustable via the serial command `K <value>`.
+* **Sinusoidal Pitch Trim (`posTrim`):** The timer reads vertical pitch angle in real time, increasing throttle during vertical climbs to combat gravity, and reducing power on vertical dives to maintain uniform lap speeds across the entire flight profile.
+* **Lap-Based Flight Termination:** In addition to elapsed time, the timer can terminate flights based on exact MPU yaw lap counts (e.g., 5.0 laps), ensuring consistent aerobatic flight profiles regardless of wind speeds.
+
+---
+
+## Desktop Workbench GUI
+
 Between flight sessions, instructors connect the timer to a laptop via USB and use the companion Python/CustomTkinter desktop application (`desktop_app.py`).
 
 ```
@@ -217,7 +224,7 @@ Development continues to expand the Cheesehead Timer into a comprehensive flight
 
 The success of the KidVenture training circle is made possible by the dedication of the aeromodeling community. Modelers from across the globe volunteer their time as pilots and ground crew each summer, united by a passion for sharing aviation with the next generation.
 
-By automating launch thrust, reducing student flight speed, protecting motors from crash damage, and supporting advanced stunt, multi-engine, and scale capabilities, the Cheesehead Timer offers a proven, accessible solution for every level of Control Line flying.
+By automating launch thrust, reducing student flight speed, protecting motors from crash damage, and supporting advanced stunt, multi-engine, and scale capabilities, the Cheesehead Timer offers a proven, accessible solution for every level of Control Line flying—from school STEM classrooms to national aerobatics circles.
 
 ---
 
@@ -240,6 +247,9 @@ By automating launch thrust, reducing student flight speed, protecting motors fr
 
 * **Photo 6 (`fig6_stunt_operation.jpg`):**  
   *Caption:* On sport and stunt models, the timer's MPU-6050 gyro delivers dynamic maneuver power boost and active pitch trim through aerobatics. (21 words)
+
+* **Photo 7 (`fig7_stem_workbench.jpg`):**  
+  *Caption:* The approachable Arduino code and Python desktop app make this timer an engaging teaching tool for STEM classrooms and clubs. (21 words)
 
 ---
 
