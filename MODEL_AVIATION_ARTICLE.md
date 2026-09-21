@@ -199,11 +199,13 @@ The GUI provides real-time sensor graphs, calibration tools, and one-click EEPRO
 
 ---
 
-## Future Enhancements
+## Future Enhancements: Multi-Engine & Automated Scale Sequencing
 
-Development continues to make the system even more versatile:
+Development continues to expand the Cheesehead Timer into a comprehensive flight management platform:
 
-* **Automated Gyro Lap Counting & Lap-Time Logging:** Using onboard yaw rate integration ($360^\circ = 1.0\text{ lap}$ count), future updates will add lap-by-lap timing analytics and automatic lap-based flight termination, guaranteeing identical flight experiences regardless of wind conditions.
+* **Twin-Engine & Multi-Motor Control:** Multi-channel PWM support will drive independent ESCs for twin-engine and scale models. This enables synchronized spool-up, individual motor RPM matching, and differential thrust (running the outboard motor slightly faster) to maintain positive line tension on scale twins.
+* **Automated Landing Gear Sequencing:** An auxiliary servo output channel will automate retractable landing gear. The sequencer will automatically retract the gear a few seconds after takeoff climbout and extend it during the pre-landing warning (`BURP` / `RDYLAND`) phase.
+* **Automated Gyro Lap Counting & Lap-Time Logging:** Using onboard yaw rate integration ($360^\circ = 1.0\text{ lap}$ count), updates will add lap-by-lap timing analytics and automatic lap-based flight termination, guaranteeing identical flight experiences regardless of wind conditions.
 * **Wireless Interface for Field Setup:** Integrating Bluetooth or Wi-Fi connectivity (via ESP32) will allow flight leaders to adjust flight times, launch thrust, and cruise speeds directly from a smartphone or tablet in the pit without plugging in cables.
 * **Direct ESC Telemetry & Fault Control:** Direct digital two-way communication with the ESC will enable real-time monitoring of motor current, temperature, and fault codes to catch issues before hardware is damaged.
 * **Active RPM Compensation:** As battery voltage gradually drops across seven flights on a single pack, closed-loop Revolutions Per Minute (RPM) compensation will dynamically adjust throttle to maintain constant propeller speed and identical lap times from the first flight to the last.
@@ -215,7 +217,7 @@ Development continues to make the system even more versatile:
 
 The success of the KidVenture training circle is made possible by the dedication of the aeromodeling community. Modelers from across the globe volunteer their time as pilots and ground crew each summer, united by a passion for sharing aviation with the next generation.
 
-By automating launch thrust, reducing student flight speed, protecting motors from crash damage, and supporting advanced stunt and sport capabilities, the Cheesehead Timer offers a proven, accessible solution for every level of Control Line flying.
+By automating launch thrust, reducing student flight speed, protecting motors from crash damage, and supporting advanced stunt, multi-engine, and scale capabilities, the Cheesehead Timer offers a proven, accessible solution for every level of Control Line flying.
 
 ---
 
