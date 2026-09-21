@@ -24,13 +24,15 @@
 
 ---
 
-## The Spark in the Czech Republic
+## The Spark in the Czech Republic: Micro-Lines & FAI Patterns
 
-In aeromodeling, inspiration often comes from unexpected places. In the winter of 2017, I had the opportunity to attend an international indoor Control Line (CL) stunt contest in the Czech Republic. For those accustomed to flying outdoors on long grass circles, watching high-precision aerobatic models fly inside a gymnasium on thin lines was eye-opening.
+In aeromodeling, inspiration often comes from unexpected places. In the winter of 2017, I had the opportunity to attend an international indoor Control Line (CL) stunt contest in the Czech Republic. For those accustomed to flying outdoors on 60-foot lines over open grass fields, watching high-precision aerobatic models fly inside a gymnasium on **ultra-short 15-foot lines** was nothing short of astonishing.
 
-What stood out most was the cutting-edge electric power management. European innovators were integrating miniature microcontrollers and inertial sensors to actively adjust motor output throughout the flight. The motor delivered extra power at the precise moment the model entered a sharp corner, then automatically stabilized airspeed on level laps.
+Because the flight circle had a radius of just 15 feet, the models flew remarkably slowly on level laps—just fast enough to maintain line tension without dizzying the pilot. But the moment the pilot deflected the elevator and the airplane's nose pitched upward into a maneuver, the onboard controller sensed the pitch rate and the electric motor instantly **spooled up**, delivering a crisp burst of power. 
 
-Watching those models carve clean square corners inside that sports hall sparked an idea: *Could we adapt this intelligent, sensor-driven technology to solve the tough flight-line challenges we face back home—both in precision stunt and on our high-volume youth training circles?*
+This dynamic throttle management allowed the lightweight models to power through vertical climbs, tight square corners, and inverted flight, then immediately settle back to a whisper-quiet, slow cruise on level flight. With this intelligent power boost, pilots were able to complete the entire, demanding **FAI (Fédération Aéronautique Internationale) aerobatics pattern** inside that compact gymnasium.
+
+Watching those flights sparked an immediate realization: *If microcontrollers and inertial sensors can actively modulate power to make indoor aerobatics possible on 15-foot lines, we can adapt this same intelligent technology to solve tough flight-line challenges back home—both for sport stunt and on our high-volume youth training circles at EAA KidVenture.*
 
 ---
 
@@ -148,7 +150,7 @@ Using a standard Arduino Nano or ESP32 keeps hardware costs to just a few dollar
 
 ### 2. Clear, Modular Software
 The code is written in clean, well-commented C++ using standard libraries familiar to every Arduino student:
-* **The `Servo` Library (`#include <Servo.h>`):** Controls the speed controller using standard 50 Hz Pulse Width Modulation (PWM) signals ($1000\,\mu\text{s}$ at zero throttle to $2000\,\mu\text{s}$ at full power), making it universally compatible with budget RC speed controls.
+* **The `Servo` Library (`#include <Servo.h>`)**: Controls the speed controller using standard 50 Hz Pulse Width Modulation (PWM) signals ($1000\,\mu\text{s}$ at zero throttle to $2000\,\mu\text{s}$ at full power), making it universally compatible with budget RC speed controls.
 * **Finite State Machine (FSM):** The flight logic is structured as an easy-to-read state machine (`WAIT` $\to$ `ARMED` $\to$ `TAKEOFF_RAMP` $\to$ `TAKEOFF` $\to$ `FLY` $\to$ `BURP` $\to$ `RDYLAND` $\to$ `RAMPDWN`), giving students an intuitive visual example of how commercial avionics manage mission phases.
 * **$I^2C$ Sensor Integration:** Reads gyroscopic rates and accelerometer angles over the standard two-wire `Wire` bus, demonstrating real-world inertial measurement.
 
@@ -171,7 +173,7 @@ For educators and youth leaders, this setup connects multiple learning concepts 
 
 ## Expanding to Sport and Stunt Operation
 
-While designed for training, the Cheesehead Timer is equally valuable for **sport flying** and **Precision Aerobatics (Stunt)**. In traditional glow stunt, pilots relied on the classic "4-2-4" engine break to deliver extra power in climbs and maneuvers. The timer recreates and enhances this behavior electronically using two built-in gyro algorithms in `gyro.cpp`:
+While designed for training, the Cheesehead Timer is equally valuable for **sport flying** and **Precision Aerobatics (Stunt)**. Just as demonstrated by the Czech indoor pioneers, the timer provides active power boost to recreate and enhance the classic "4-2-4" engine break electronically using two built-in gyro algorithms in `gyro.cpp`:
 
 * **Maneuver Power Boost (`maneuverBoost`):** When the pilot deflects the elevator for sharp square corners, inside/outside loops, or vertical eights, the MPU-6050 detects the high pitch rate and commands an instantaneous burst of throttle. This delivers extra thrust at the apex of the maneuver to overcome induced drag and maintain line tension. Sensitivity is adjustable via the serial command `K <value>`.
 * **Sinusoidal Pitch Trim (`posTrim`):** The timer reads vertical pitch angle in real time, increasing throttle during vertical climbs to combat gravity, and reducing power on vertical dives to maintain uniform lap speeds across the entire flight profile.
