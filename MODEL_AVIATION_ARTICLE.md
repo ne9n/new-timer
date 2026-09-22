@@ -10,11 +10,11 @@
   +-------------------------------------------------------------------------+
   |              EAA KIDVENTURE & CHEESEHEAD TIMER OVERVIEW                 |
   |                                                                         |
-  |   • 30+ Years of Service by the Circle Masters Control Line Club         |
+  |   • 30+ Years of Service by the Circle Masters Control Line Club        |
   |   • 1,500+ First-Time Youth Participants Every Summer at Oshkosh        |
   |   • 1 Pit Person per Circle (Down from 3-Man Glow Starting Crews)       |
-  |   • 6-7 Full Training Flights on a Single 3S 2,200 mAh LiPo Battery       |
-  |   • Full-Power Takeoff to Punch Through Helicopter Rotor Wash & Wind   |
+  |   • 6-7 Full Training Flights on a Single 3S 2,200 mAh LiPo Battery     |
+  |   • Full-Power Takeoff to Punch Through Helicopter Rotor Wash & Wind    |
   |   • Automatic Throttle Step-Down to a Gentle 90-Second Training Cruise  |
   |   • Millisecond IMU Pitch Cutoff to Prevent Burned Motor Windings       |
   |   • Open-Source Arduino Architecture Ideal for STEM & Youth Education   |
@@ -26,11 +26,11 @@
 
 ## The Spark in the Czech Republic: Micro-Lines & FAI Patterns
 
-In aeromodeling, inspiration often comes from unexpected places. In the winter of 2017, I had the opportunity to attend an international indoor Control Line (CL) stunt contest in the Czech Republic. For those accustomed to flying outdoors on 60-foot lines, watching high-precision aerobatic models fly inside a gymnasium on *short 15-foot lines** was nothing short of astonishing.
+In aeromodeling, inspiration often comes from unexpected places. In the winter of 2017, I had the opportunity to attend an international indoor Control Line (CL) stunt contest in the Czech Republic. For those accustomed to flying outdoors on 60-foot lines, watching high-precision aerobatic models fly inside a gymnasium on **short 15-foot lines** was nothing short of astonishing.
 
-Because the flight circle had a radius of just 15 feet (1/2 of a basketball court), the models flew remarkably slowly on level laps—just fast enough to maintain line tension without dizzying the pilot. But the moment the pilot deflected the elevator and the airplane's nose pitched upward into a maneuver, the onboard controller sensed the pitch rate and the electric motor instantly **spooled up**, delivering a crisp burst of power. 
+Because the flight circle had a radius of just 15 feet (1/2 of a basketball court), the models flew remarkably slowly on level laps—just fast enough to maintain line tension without dizzying the pilot. But the moment the pilot deflected the elevator and the airplane's nose pitched upward into a maneuver, the onboard controller sensed the pitch rate and the electric motor instantly **spooled up**, delivering a crisp burst of power.
 
-This dynamic throttle management allowed the lightweight models to power through vertical climbs, tight square corners, and inverted flight, then immediately settle back to a whisper-quiet, slow cruise on level flight. With this intelligent power boost, pilots were able to complete the entire, demanding **FAI (Fédération Aéronautique Internationale) aerobatics pattern** inside that compact gymnasium.
+This dynamic throttle management allowed the lightweight models to power through vertical climbs, tight square corners, and inverted flight, then immediately settle back to a whisper-quiet, slow cruise on level flight. With this intelligent power boost, pilots were able to complete the entire, demanding **FAI (Fédération Aéronautique Internationale)** aerobatics pattern inside that compact gymnasium.
 
 Watching those flights sparked an immediate realization: *If microcontrollers and inertial sensors can actively modulate power to make indoor aerobatics possible on 15-foot lines, we can adapt this same intelligent technology to solve tough flight-line challenges back home—both for sport stunt and on our high-volume youth training circles at EAA KidVenture.*
 
@@ -38,34 +38,34 @@ Watching those flights sparked an immediate realization: *If microcontrollers an
 
 ## Thirty Years of Circles at EAA KidVenture
 
-Back in Wisconsin, the **Circle Masters Control Line Club** has maintained a dedicated presence at the Experimental Aircraft Association (EAA) AirVenture fly-in in Oshkosh for more than three decades. Long before modern brushless motors, lithium batteries, or microcontrollers existed, club members brought trainers to **KidVenture** with a singular mission: to give young people their very first hands-on experience controlling a flying model airplane.
+Back in Wisconsin, the **Circle Masters Control Line Club (and many others)** has maintained a dedicated presence at the Experimental Aircraft Association (EAA) AirVenture fly-in in Oshkosh for more than three decades. Long before modern brushless motors, lithium batteries, or microcontrollers existed, club members brought trainers to **KidVenture** with a singular mission: to give young people their very first hands-on experience controlling a flying model airplane.
 
-Over thirty years of continuous service, the Circlemasters' introductory flight circle has introduced tens of thousands of youngsters to aviation. During a single week at AirVenture, our volunteer crew—joined by experienced modelers from across the United States and around the world who travel to Oshkosh to help—conducts **more than 1,500 introductory flights each week** during AirVenture. The vast majority of these young flyers have *never touched or flown a model airplane before*.
+Over thirty years of continuous service, the Circlemasters' introductory flight circle has introduced tens of thousands of youngsters to aviation. During a single week at AirVenture, our volunteer crew—joined by experienced modelers from across the United States and around the world who travel to Oshkosh to help—conducts **more than 1,500 introductory flights each week during AirVenture**. The vast majority of these young flyers have *never touched or flown a model airplane before*.
 
 Watching a child's face light up when they feel line tension and realize they are commanding an aircraft is unforgettable. However, sustaining 1,500 flights across seven days in the demanding Oshkosh environment requires an exceptionally efficient, reliable, and durable flight-line operation.
 
 ---
 
-## Retiring the Glow Fleet: From 3 Pit Hands Down to 1
+## Retiring the Glow Fleet
 
-For decades, the Circle Masters relied on small **Norvel .061 glow engines** to power our fleet of trainers. While these engines served faithfully, finding replacement engines, fuel, and people who understood them became increasingly difficult.  
+For decades, the Circle Masters relied on small **Norvel .061 glow engines** to power our fleet of trainers. While these engines served faithfully, finding replacement engines, fuel, and people who understood them became increasingly difficult:
 
 * **Three-Person Ground Crews:** Every flight required three volunteer club members per circle: one to prime and fuel, one to hold the starter battery and electric starter, and one to restrain and launch the model.
 * **Flight-Line Bottlenecks:** Managing temperamental needle valves, flooded engines, and refueling after every 90-second flight created constant delays.
 
-We recognized that transitioning to Electric Control Line (ECL) was the right path. However, standard commercial electric timers were too rigid for the unique physical realities of the Oshkosh flight line. We had to improve uptime reliability and reduce pit crew workload.  
+We recognized that transitioning to Electric Control Line (ECL) was the right path. However, standard commercial electric timers were too rigid for the unique physical realities of the Oshkosh flight line. We had to improve uptime reliability and reduce pit crew workload.
 
 Over three summers of field testing and refinement at AirVenture, we developed the **Cheesehead Timer**, an open-source Arduino-based controller (available on [GitHub](https://github.com/ne9n/new-timer)). The transition to smart electric power transformed our flight-line operations:
 
-1. **One-Person Pit Operation:** Instead of three volunteers managing fuel and starters, **only a single pit person is now needed**. The pit person presses a start button and hand-launches the airplane.
-2. **Six or Seven Flights on One Pack:** Powered by an inexpensive, off-the-shelf **3S 2,200 mAh Lithium Polymer (LiPo)** battery and a budget 2807-size brushless motor, the trainer achieves ** 90-second training flights** before needing a battery swap.
+1. **One-Person Pit Operation:** Instead of three volunteers managing fuel and starters, only a single pit person is now needed. The pit person presses a start button and hand-launches the airplane.
+2. **Six or Seven Flights on One Pack:** Powered by an inexpensive, off-the-shelf **3S 2,200 mAh Lithium Polymer (LiPo)** battery and a budget 2807-size brushless motor, the trainer achieves **six to seven 90-second training flights** before needing a battery swap.
 3. **Rapid Turnarounds:** As soon as one student lands, the next student takes the handle, the start button is pressed, and the flight begins within seconds. This allows our remaining volunteers to focus entirely on one-on-one student coaching.
 
 ```
        +--------------------------------------------------------------+
        |                  TWO-STAGE FLIGHT THROTTLE PROFILE           |
        |                                                              |
- 100%  |     /------------\ (Stage 1: Launch )      |
+ 100%  |     /------------\ (Stage 1: Launch)                         |
        |    /              \                                          |
        |   /                \                                         |
   65%  |  /                  \=======================\ (Stage 2: Cru.)|
@@ -77,35 +77,34 @@ Over three summers of field testing and refinement at AirVenture, we developed t
 
 ---
 
-## Two-Stage Throttle: Launch Power vs. Training Speed
+## Launch Power vs. Training Speed
 
-The KidVenture flight circle is at Pioneer Airport adjacent to full-scale helicopter flight operations. Passing rotor wash and gusty Wisconsin summer winds create severe turbulence.
+The KidVenture flight circle is at **Pioneer Airport adjacent to full-scale helicopter flight operations**. Passing rotor wash and gusty Wisconsin summer winds create severe turbulence.
 
 In electric training, finding the right motor output is a delicate balancing act:
-* If launched at a gentle, beginner-friendly cruise speed, the model struggles to accelerate and can be flipped by helicopter downwash.
-* If run at full throttle for the entire flight, the airplane flies at 50 to 60 miles per hour—far too fast for a newcomer to control safely.
+* If launched at a beginner-friendly cruise speed, the model struggles to accelerate and can be flipped by helicopter downwash.
+* If run at full throttle for the entire flight, the airplane flies at 50 to 60 miles per hour—far too fast for a newcomer.
 * If an instructor tries to hold an auxiliary throttle lever while coaching, their attention is divided right when the student needs close, hands-on guidance.
 
 The Cheesehead Timer solves this with an automated **two-stage throttle sequencer**:
 
-1. **Stage 1 (Full-Power Launch):** At startup, the timer commands the Electronic Speed Controller (ESC) to 100% maximum launch power. The propeller delivers immediate static thrust that pulls the airplane cleanly off the turf, punches through rotor wash, and locks in solid line tension.
-2. **Stage 2 (Calm Instructional Cruise):** After two to three seconds—once the model is safely airborne at shoulder height—the timer automatically throttles back to a mild 65% training speed. At this relaxed pace, the beginner has plenty of reaction time to master level flight and gentle climbs.
+1. **Stage 1 (Full-Power Launch):** At startup, the timer commands the Electronic Speed Controller (ESC) to 100% maximum launch power. The propeller delivers immediate static thrust for a hand launch and punches through rotor wash, with solid line tension.
+2. **Stage 2 (Cruise):** After two to three seconds—once the model is safely airborne at shoulder height—the timer automatically throttles back to a mild 65% training speed. At this relaxed pace, the beginner has plenty of reaction time to master level flight and gentle climbs.
 3. **The Warning "Burp":** Exactly one lap before shutdown, the timer delivers a brief throttle surge (the `BURP` state), giving the instructor and student an acoustic cue to level out for landing.
 4. **Landing (`RAMPDWN`):** The motor ramps down smoothly, allowing the airplane to glide in for a gentle touchdown.
+
 ---
 
-## Motor Protection: Preventing High-Stall Burnouts
+## Protecting the Electronics in a Crash
 
-One of the most critical lessons we learned early in our electric transition involved crash dynamics. 
+One of the most critical lessons we learned early in our electric transition involved crash dynamics.
 
-With a glow engine, an accidental ground stops the motor. With a brushless electric power system, behavior is entirely different:  the timer commands full power, and the propeller is locked.  This draws a lot of current into the motor windings 
+With a glow engine, an accidental ground strike stops the motor. With a brushless electric power system, behavior is entirely different: the timer commands full power, and the propeller is locked. This draws a lot of current into the motor windings.
 
-Within three to four seconds of this **high locked-rotor stall current**, the motor overheats, melting insulation, shorting stator windings, and often destroying the ESC.
+Within three to four seconds of this high locked-rotor stall current, the motor overheats, melting insulation, shorting stator windings, and often destroying the ESC.
 
 To eliminate this costly failure mode, we integrated an MPU-6050 six-axis Inertial Measurement Unit (IMU) on the $I^2C$ bus:
 
-
-```
 * **Pitch Delta Cutoff (`PitchEX`):** A sudden pitch angular change ($>40^\circ$) from a ground impact cuts ESC throttle to zero within milliseconds, saving the motor and ESC.
 * **Low-Yaw Cutoff (`YawLOW`):** If the model stops rotating in the circle, it must be on the ground, and the controller power cuts immediately to prevent propeller strikes on the grass.
 * **Line-Break / In-Circle Turn Cutoff (`YawEX`):** If the airplane suffers a line break or turns inward toward the center of the circle, the anomalous yaw/roll rate triggers an immediate motor shutdown to protect participants, spectators, and equipment.
@@ -124,7 +123,7 @@ From the start, the Cheesehead Timer was engineered to be straightforward, appro
 |  Attitude Sensor:    MPU-6050 6-Axis Gyro/Accelerometer Breakout ($I^2C$) |
 |  Carrier Board:      Custom PCB with LED, Button, and Servo headers      |
 |  ESC Interface:      Arduino Servo Library (50Hz PWM Output)             |
-|  Power Package:      Budget 2207 Outrunner + 30A ESC + 3S 2,200 mAh LiPo |
+|  Power Package:      Budget 2807 Outrunner + 30A ESC + 3S 2,200 mAh LiPo |
 |  Status LEDs:        Red (Idle/Error), Yellow (Armed), Green (Running)   |
 |  User Input:         Single Miniature Push Button (Debounced / Pin 10)   |
 +--------------------------------------------------------------------------+
@@ -135,7 +134,7 @@ Using a standard Arduino Nano or ESP32 keeps hardware costs to just a few dollar
 
 ### 2. Clear, Modular Software
 The code is written in clean, well-commented C++ using standard libraries familiar to every Arduino programmer:
-* **The `Servo` Library **: Controls the speed controller using standard 50 Hz Pulse Width Modulation (PWM) signals ($1000\,\mu\text{s}$ at zero throttle to $2000\,\mu\text{s}$ at full power), making it universally compatible with budget RC speed controllers.
+* **The `Servo` Library:** Controls the speed controller using standard 50 Hz Pulse Width Modulation (PWM) signals ($1000\,\mu\text{s}$ at zero throttle to $2000\,\mu\text{s}$ at full power), making it universally compatible with budget RC speed controllers.
 * **Finite State Machine (FSM):** The flight logic is structured as an easy-to-read state machine (`WAIT` $\to$ `ARMED` $\to$ `TAKEOFF_RAMP` $\to$ `TAKEOFF` $\to$ `FLY` $\to$ `BURP` $\to$ `RDYLAND` $\to$ `RAMPDWN`), giving students an intuitive visual example of how commercial avionics manage mission phases.
 * **$I^2C$ Sensor Integration:** Reads gyroscopic rates and accelerometer angles over the standard two-wire `Wire` bus, demonstrating real-world inertial measurement.
 
@@ -156,19 +155,19 @@ For educators and youth leaders, this setup connects multiple learning concepts 
 
 ---
 
-## Expanding to Sport and Stunt Operation
+## Sport and Stunt Operation
 
 While designed for training, the Cheesehead Timer is equally valuable for **sport flying** and **Precision Aerobatics (Stunt)**. Just as demonstrated by the Czech indoor pioneers, the timer provides an active power boost to recreate and enhance the classic "4-2-4" engine break electronically using two built-in gyro algorithms in `gyro.cpp`:
 
-* **Maneuver Power Boost (`maneuverBoost`):** When the pilot deflects the elevator for sharp square corners, inside/outside loops, or vertical eights, the MPU-6050 detects the high pitch rate and commands an instantaneous burst of throttle. This delivers extra thrust at the apex of the maneuver to overcome induced drag and maintain line tension. Sensitivity is adjustable via the serial command `K <value>`.
-* **Sinusoidal Pitch Trim (`posTrim`):** The timer reads vertical pitch angle in real time, increasing throttle during vertical climbs to combat gravity, and reducing power on vertical dives to maintain uniform lap speeds across the entire flight profile.
+* **Maneuver Power Boost:** When the pilot deflects the elevator for sharp square corners, inside/outside loops, or vertical eights, the MPU-6050 detects the high pitch rate and commands an instantaneous burst of throttle. This delivers extra thrust at the apex of the maneuver to overcome induced drag and maintain line tension. Sensitivity is adjustable via the serial command `K <value>`.
+* **Sinusoidal Pitch Trim:** The timer reads vertical pitch angle in real time, increasing throttle during vertical climbs to combat gravity, and reducing power on vertical dives to maintain uniform lap speeds across the entire flight profile.
 * **Lap-Based Flight Termination:** In addition to elapsed time, the timer can terminate flights based on exact MPU yaw lap counts (e.g., 5.0 laps), ensuring consistent aerobatic flight profiles regardless of wind speeds.
 
 ---
 
-## Desktop Workbench GUI
+## Desktop GUI
 
-Between flight sessions, instructors connect the timer to a laptop via USB and use the companion Python/CustomTkinter desktop application .
+Between flight sessions, instructors connect the timer to a laptop via USB and use the companion Python/CustomTkinter desktop application.
 
 ```
 +-------------------------------------------------------------------------+
@@ -193,23 +192,23 @@ The GUI provides real-time sensor graphs, calibration tools, and one-click EEPRO
 
 ---
 
-## Future Enhancements: Multi-Engine & Automated Scale Sequencing
+## Future Enhancements
 
 Development continues to expand the Cheesehead Timer into a comprehensive flight management platform:
 
-* **Twin-Engine & Multi-Motor Control:** Multi-channel PWM support will drive independent ESCs for twin-engine and scale models. This enables synchronized spool-up, individual motor RPM matching, and differential thrust (running the inboard motor slightly faster) to maintain positive line tension on scale twins.
-* **Automated Landing Gear Sequencing:** An auxiliary servo output channel will automate retractable landing gear. The sequencer will automatically retract the gear a few seconds after takeoff climbout and extend it during the pre-landing warning (`BURP` / `RDYLAND`) phase.
-* **Automated Gyro Lap Counting & Lap-Time Logging:** Using onboard yaw rate integration ($360^\circ = 1.0\text{ lap}$ count), updates will add lap-by-lap timing analytics and automatic lap-based flight termination, guaranteeing identical flight experiences regardless of wind conditions.
-* **Wireless Interface for Setup and Telemetry:** Integrating Bluetooth or Wi-Fi connectivity (via ESP32) will allow flight leaders to adjust flight times, launch thrust, and cruise speeds directly from a smartphone or tablet in the pit without plugging in cables.
-* **Direct ESC Telemetry & Fault Control:** Direct digital two-way communication with the ESC will enable real-time monitoring of motor current, temperature, and fault codes to catch issues before hardware is damaged.
-* **Active RPM Compensation:** As battery voltage gradually drops across seven flights on a single pack, closed-loop Revolutions Per Minute (RPM) compensation will dynamically adjust throttle to maintain constant propeller speed and identical lap times from the first flight to the last.
-* **More Compact Hardware:** An integrated, all-in-one surface-mount PCB is in development to combine the microcontroller, IMU, power regulation, and headers into an ultra-compact, featherweight footprint suitable for smaller sport models.
+* **Twin-Engine & Multi-Motor Control:** Multi-channel PWM support to drive independent ESCs for twin-engine models with synchronized start and differential thrust.
+* **Automated Landing Gear Sequencing:** Dedicated auxiliary servo channel to cycle retracts on climbout and landing.
+* **Automated Gyro Lap Counting & Lap-Time Logging:** Precise lap counting and telemetry logging via onboard yaw gyro rate integration.
+* **Wireless Interface for Setup and Telemetry:** Bluetooth / Wi-Fi smartphone pit app for cord-free configuration.
+* **Direct ESC Telemetry & Fault Control:** Real-time ESC motor temperature, current monitoring, and fail-safe diagnostics.
+* **Active RPM Compensation based on battery voltage:** Dynamic voltage sag compensation to maintain constant RPM across all flights.
+* **More Compact Hardware:** Smaller, dedicated all-in-one SMD PCB hardware design.
 
 ---
 
 ## Conclusion: A Global Community Effort
 
-The success of the KidVenture training circle is made possible by the dedication of the aeromodeling community. Modelers from across the globe volunteer their time as pilots and ground crew each summer, united by a passion for sharing aviation with the next generation.  Comer join us we can always use more help.
+Modelers from across the globe volunteer their time as pilots and ground crew each summer, united by a passion for sharing aviation with the next generation. Come join us; we can always use more help.
 
 By automating launch thrust, reducing student flight speed, protecting motors from crash damage, and supporting advanced stunt, multi-engine, and scale capabilities, the Cheesehead Timer offers a proven, accessible solution for every level of Control Line flying—from school STEM classrooms to national aerobatics circles.
 
