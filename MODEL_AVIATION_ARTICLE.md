@@ -32,7 +32,7 @@ Going electric changed everything on our flight line:
 Our circles sit right next to active helicopter flight paths at Pioneer Airport. Passing rotor wash and summer wind gusts make for rough air down low.
 
 We hand-launch every airplane. Here is the problem with training:
-* If you launch at a slow training speed, the airplane struggles the first two laps to pick up airspeed and gets tossed around by wind or rotor wash.
+* If you launch at a slow training speed, the airplane struggles the first two laps to pick up airspeed and get tossed around by wind or rotor wash.
 * If you run full throttle the whole time, the plane flies at 50 to 60 mph. That is way too fast for an 8-year-old beginner.
 * If the instructor tries to hold a throttle lever while helping the student, their attention is divided.
 
@@ -58,7 +58,7 @@ The software is simple and works like a flight checklist. It steps through six b
 
 All speed settings, timing intervals, and IMU sensor configurations are fully programmable by the user. You can easily adjust launch power, cruise speed, countdown delays, flight duration, and sensor sensitivities (such as crash-detection cutoffs and stunt maneuver boost) to match your specific model and flying style.
 
-The code talks to standard speed controllers using the same regular servo signals any RC receiver uses. It is written in simple C++, so anyone who has used an Arduino can open the file, read it, and change values directly.
+The code talks to standard speed controllers using the same regular servo signals any RC receiver uses. It is written in simple C++, so anyone who has used an Arduino can open the file, read it, and change values directly. Behind the scenes, this constant IMU monitoring is what makes our automatic crash protection possible.
 
 ---
 
