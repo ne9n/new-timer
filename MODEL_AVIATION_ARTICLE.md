@@ -100,11 +100,12 @@ We also made a simple computer app. You can plug the timer into a laptop with a 
 
 ## What Comes Next
 
-We are working on a few new features:
-* Retract servo controls to pull landing gear up after takeoff and drop it before landing.
-* Twin-engine setups with motor syncing and outboard thrust boost.
-* Wireless setup from a phone in the pit.
-* Voltage sensing to keep lap times steady as the battery runs down.
+We are working on several new features:
+* **Direct ESC telemetry:** Direct digital connection to the speed controller to monitor motor temperature, battery current, and RPM live in flight.
+* **Smaller dedicated hardware:** A tiny all-in-one circuit board with built-in wireless connections so you can adjust settings from a phone right at the flight line without plugging in cables.
+* **Twin-engine controls:** Multi-motor support with synchronized spool-up and differential thrust to keep lines tight on scale twins.
+* **Retract gear sequencing:** Dedicated servo control to tuck the gear away after climbout and drop it before landing.
+* **Voltage compensation:** Automatic throttle adjustments to keep lap times identical as the battery voltage drops over multiple flights.
 
 KidVenture works because modelers from all over show up to help. If you are coming to Oshkosh this summer, stop by Pioneer Airport. We can always use another set of hands on the flight line.
 
