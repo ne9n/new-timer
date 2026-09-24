@@ -76,16 +76,17 @@ To stop this from happening, I added an inexpensive MPU-6050 gyro sensor to the 
 
 ---
 
-## The Idea from the Czech Republic
+## Sport and Competition Flying
 
-The idea for this timer came from a trip I took in 2017 to an indoor control line contest in the Czech Republic. Pilots were flying full aerobatic stunt patterns inside a gym on short 15-foot lines.
+Although I developed the timer for KidVenture training, it is not just for beginners. By loading alternate settings, the timer works great for weekend sport flying and Precision Aerobatics (Stunt) competition.
 
-Their models flew very slowly on level laps. But the second the nose went up for a loop or a corner, the motor spooled up to give extra pull.
+The inspiration came from a trip I took in 2017 to an indoor control line contest in the Czech Republic. Pilots were flying full aerobatic stunt patterns inside a gym on short 15-foot lines. Their models flew very slowly on level laps, but the second the nose went up for a loop or a corner, the motor spooled up to give extra pull.
 
-I built that same feature into the timer for sport and stunt flyers:
+I built that same capability into the timer for sport and competition models:
 
-* **Corner boost:** When you pull up for a loop or a square corner, the gyro senses the move and adds throttle to keep line tension tight.
-* **Pitch trim:** The timer adds power on vertical climbs and cuts power on dives. It acts just like the classic "4-2-4" engine break on a glow stunt engine.
+* **Corner boost:** When you pull up for a loop, square corner, or vertical eight, the gyro senses the pitch rate and adds throttle to keep line tension solid.
+* **Pitch trim:** The timer boosts power on vertical climbs and reduces throttle on dives. It acts just like the classic "4-2-4" engine break on a glow stunt engine.
+* **Custom flight profiles:** You can dial in higher cruise power, longer flight times, or exact lap counts for official contest flights, turning a tame trainer into a responsive stunt ship in seconds.
 
 ---
 
@@ -136,7 +137,7 @@ Send me an email or check out the project links below to get involved.
   *Caption:* Built-in gyro sensors shut off the motor instantly during crashes to protect the electronics. (14 words)
 
 * **Photo 6 (`fig6_stunt_operation.jpg`):**  
-  *Caption:* The gyro adds power in corners and climbs to help sport and stunt flyers. (14 words)
+  *Caption:* For sport and stunt flying, the gyro adds power in corners and climbs. (14 words)
 
 * **Photo 7 (`fig7_stem_workbench.jpg`):**  
   *Caption:* The low-cost Arduino setup makes this an easy project for school STEM clubs. (13 words)
