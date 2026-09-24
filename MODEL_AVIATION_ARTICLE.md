@@ -8,115 +8,120 @@
 
 ## 1,500 Flights in Seven Days
 
-For more than 30 years, the Circle Masters Control Line Club has introduced youngsters to model aviation at the Experimental Aircraft Association (EAA) AirVenture fly-in in Oshkosh, Wisconsin. Operating at Pioneer Airport during **KidVenture**, our volunteer crew—joined by modelers from around the world who travel to Oshkosh to help—gives **over 1,500 introductory flights** in a single week. For most of these kids, it is the first time they have ever held a control handle.
+Every summer at EAA AirVenture in Oshkosh, Wisconsin, the Circle Masters Control Line Club runs introductory flights for kids at Pioneer Airport. We have been doing this for over 30 years. Modelers from across the country and around the world come to Oshkosh to help out. In just seven days, our crew gives more than 1,500 flights to kids who have never held a control handle before.
 
-For decades, we relied on small **Norvel .061 glow engines**. They flew well, but managing them at high volume was hard work. Every circle needed a three-person pit crew: one to fuel and prime, one on the battery and electric starter, and one to hold and launch the plane. Between finicky needle valves, hot engines, and constant refueling after every 90-second flight, the pits were always backed up.
+For years, we flew small Norvel .061 glow engines. They did the job, but running them all day was hard work. Every flight circle needed three people: one to prime and fuel, one to hold the starter battery and electric starter, and one to hold the plane. Finding parts, fuel, and people who knew how to tune small glow engines was getting harder every year. Refueling after every 90-second flight caused constant lines and delays.
 
-We needed a clean, reliable electric setup that would cut pit workload and keep airplanes flying all day long. The result is the **Cheesehead Timer**, an open-source, low-cost controller that has transformed our flight line.
-
----
-
-## Simple Pits: One Person, Seven Flights per Battery
-
-Switching to smart electric power streamlined our entire operation:
-
-* **One-Person Pit Crew:** Instead of three people juggling fuel and starters, a single pit man presses a button on the fuselage and hand-launches the airplane.
-* **6 to 7 Flights per Charge:** Using an inexpensive 3S 2,200 mAh Lithium Polymer (LiPo) battery and a budget 2807-size brushless motor, each trainer flies **six to seven 90-second instructional flights** before we need to swap batteries.
-* **Instant Turnaround:** As soon as one student lands, the next youngster steps to the handle. The pit man presses the button, launches, and the next flight is in the air in seconds.
+We decided to switch to electric power. But off-the-shelf timers did not fit how we fly at Oshkosh. So over three summers of testing, we built our own setup: the **Cheesehead Timer**.
 
 ---
 
-## Launch Power vs. Training Speed
+## One Pit Man, Seven Flights per Battery
 
-Our flight circles at Pioneer Airport are right next to active full-scale helicopter flight paths. Passing rotor wash and summer wind gusts create turbulent air close to the ground.
+Going electric changed everything on our flight line:
 
-A beginner trainer needs plenty of thrust at takeoff to pull lines tight, overcome grass drag, and punch through helicopter downwash. But once airborne, full power is way too fast for a newcomer's reflexes.
-
-The Cheesehead Timer automates this with an easy two-stage throttle profile:
-
-1. **Full-Power Launch:** The motor starts at 100% power for two to three seconds, giving the plane an authoritative climbout with rock-solid line tension.
-2. **Gentle Cruise:** Once the model reaches flying height, the timer automatically throttles back to an easy 65% training speed. The plane slows down to a comfortable pace where the student can relax and learn elevator control.
-3. **The Warning "Burp":** One lap before flight time is up, the motor gives a brief power surge—an audible cue telling the instructor and student that landing is next.
-4. **Smooth Touchdown:** Power ramps down gently for a smooth landing on the grass.
+* **One-person pits:** We went from three pit crew members down to one. The pit man sets the plane down, pushes a button on the fuselage, and hand-launches it.
+* **Seven flights per pack:** We use a cheap 3S 2,200 mAh LiPo battery and a budget 2807-size brushless motor. That single battery gives us six to seven 90-second flights before we need to swap it out.
+* **Fast turnarounds:** When a flight ends, the next kid takes the handle. The pit man hits the button, launches, and the plane is in the air in seconds.
 
 ---
 
-## Built-In Crash Protection
+## Launch Power and Training Speed
 
-With a glow engine, hitting the ground simply stalls the propeller and stops the engine. Electric motors behave differently. If a trainer hits the turf and the timer keeps running, the stalled motor draws huge current. Within seconds, the heat melts the internal copper windings and destroys the Electronic Speed Controller (ESC).
+Our circles sit right next to active helicopter flight paths at Pioneer Airport. Passing rotor wash and summer wind gusts make for rough air down low.
 
-To protect our equipment, we added an inexpensive gyro sensor (MPU-6050) to the board:
+Here is the problem with training:
+* If you launch at a slow training speed, the plane struggles in tall grass and can get tossed around by wind or rotor wash.
+* If you run full throttle the whole time, the plane flies at 50 to 60 mph. That is way too fast for an 8-year-old beginner.
+* If the instructor tries to hold a throttle lever while helping the student, their attention is divided.
 
-* **Instant Ground Shutoff:** If the nose pitches down into the turf, the sensor detects the sudden shock and shuts the motor off in milliseconds—saving the motor and ESC from burnout.
-* **Low-Yaw Cutoff:** If the airplane stops circling, the controller immediately cuts power.
-* **Line-Break Safety:** If a line snaps or the model turns inward toward the circle, power shuts down instantly.
+The timer fixes this with two throttle stages:
 
----
-
-## From Czech Gymnasium to Oshkosh Flight Line
-
-The inspiration for this design came from an indoor Control Line stunt contest I attended in the Czech Republic in 2017. Pilots flew full aerobatic patterns inside a gymnasium on **short 15-foot lines**. 
-
-Their airplanes flew slowly on level laps, but the moment the nose pitched up into a maneuver, the motor automatically spooled up to provide extra power through loops and corners.
-
-We built that same capability into the Cheesehead Timer for **sport and stunt flyers**:
-
-* **Maneuver Boost:** Senses when you pull up for loops or square corners and automatically adds throttle to maintain line tension and speed.
-* **Pitch Trim:** Boosts power during vertical climbs and reduces power on dives, mimicking the classic "4-2-4" glow stunt run.
+1. **Full-power takeoff:** The motor starts at 100% power for two to three seconds. This pulls the plane out of the grass, beats the wind, and sets solid line tension.
+2. **Slow cruise:** Once the plane gets up to shoulder height, the motor drops to a calm 65% power. The flight slows down so the student can relax and learn to fly level.
+3. **The warning "burp":** One lap before flight time ends, the motor revs up for a quick blip. This tells the instructor and student that the motor is about to shut down.
+4. **Smooth landing:** The motor ramps down slowly so the plane glides in for an easy landing on the grass.
 
 ---
 
-## Simple Hardware & STEM Learning
+## Protecting Motors in a Crash
 
-The timer is built around a standard, low-cost **Arduino** board and an attitude sensor, mounted on a small custom carrier board with simple plug-in connections for the start button, status lights, and ESC lead.
+When a glow engine hits the dirt, the prop stops and the engine stalls. Electric motors do not do that.
 
-Because it is affordable, easy to assemble, and open-source, it makes a fantastic hands-on project for school STEM classes, youth groups, and club build sessions. Students get to explore basic electronics, sensor physics, and flight mechanics on a real flying airplane.
+If an electric plane hits the ground and the timer keeps running, the stalled motor pulls massive current. Within three or four seconds, the heat melts the copper wire windings and destroys the speed control (ESC).
 
-A free companion computer app connects to the timer through a USB cable, letting you change launch power, cruise speed, and flight times with a few clicks.
+To stop this from happening, we added an inexpensive MPU-6050 gyro sensor to the board:
+
+* **Impact shutoff:** If the nose hits the ground, the sensor catches the shock and kills power in milliseconds. We do not burn up motors or ESCs anymore.
+* **Stop shutoff:** If the plane stops spinning around the circle, the timer cuts power right away.
+* **Slack line safety:** If a line breaks or the plane turns inward toward the circle, the motor shuts off immediately.
 
 ---
 
-## Future Features & An Open Invitation
+## The Idea from the Czech Republic
 
-We continue to expand the project with features like automated retractable landing gear sequencing, twin-engine motor controls, wireless smartphone setup, and active propeller speed regulation as battery voltage drops.
+The idea for this timer came from a trip I took in 2017 to an indoor control line contest in the Czech Republic. Pilots were flying full aerobatic stunt patterns inside a gym on short 15-foot lines.
 
-Our success at KidVenture is thanks to the wonderful aeromodeling community. Modelers from across the country and around the world volunteer their time on our flight lines every summer. If you are heading to Oshkosh, come join us—we can always use more hands on the circle!
+Their models flew very slowly on level laps. But the second the nose went up for a loop or a corner, the motor spooled up to give extra pull.
+
+We added that same feature to our timer for sport and stunt flyers:
+
+* **Corner boost:** When you pull up for a loop or a square corner, the gyro senses the move and adds throttle to keep line tension tight.
+* **Pitch trim:** The timer adds power on vertical climbs and cuts power on dives. It acts just like the classic "4-2-4" engine break on a glow stunt engine.
+
+---
+
+## Simple Hardware and STEM Projects
+
+The timer runs on a cheap, standard Arduino Nano board and a gyro module. We designed a small circuit board that everything plugs into, so there are no loose or messy wires.
+
+Because the parts are cheap and the code is open-source, this is a great project for school STEM clubs and youth build sessions. Kids can build the board, plug it in, and see how sensors, software, and motors work on a real model airplane.
+
+We also made a simple computer app. You can plug the timer into a laptop with a USB cable and change speeds, launch power, and flight times in seconds.
+
+---
+
+## What Comes Next
+
+We are working on a few new features:
+* Retract servo controls to pull landing gear up after takeoff and drop it before landing.
+* Twin-engine setups with motor syncing and outboard thrust boost.
+* Wireless setup from a phone in the pit.
+* Voltage sensing to keep lap times steady as the battery runs down.
+
+KidVenture works because modelers from all over show up to help. If you are coming to Oshkosh this summer, stop by Pioneer Airport. We can always use another set of hands on the flight line.
 
 ---
 
 ## Photo Captions
 
 * **Photo 1 (`fig1_kidventure_line.jpg`):**  
-  *Caption:* A volunteer instructor coaches a young first-time pilot on the KidVenture flight line at Oshkosh. (16 words)
+  *Caption:* An instructor coaches a young first-time flyer at EAA KidVenture in Oshkosh. (13 words)
 
 * **Photo 2 (`fig2_launch_sequence.jpg`):**  
-  *Caption:* Full power at launch punches through grass drag and helicopter rotor wash before stepping down to cruise. (18 words)
+  *Caption:* The trainer launches at full power to clear wind and grass before slowing to cruise. (15 words)
 
 * **Photo 3 (`fig3_carrier_board.jpg`):**  
-  *Caption:* The compact carrier board neatly connects the Arduino, gyro sensor, status lights, and speed control. (16 words)
+  *Caption:* The circuit board plugs directly into the Arduino, gyro sensor, and speed control. (13 words)
 
 * **Photo 4 (`fig4_battery_turnaround.jpg`):**  
-  *Caption:* One inexpensive 3S 2,200 mAh LiPo battery powers six to seven flights with quick single-person turnarounds. (17 words)
+  *Caption:* One 3S 2,200 mAh LiPo battery powers six to seven flights with quick pit turnarounds. (15 words)
 
 * **Photo 5 (`fig5_motor_protection.jpg`):**  
-  *Caption:* Built-in gyro sensors cut power in milliseconds during ground strikes, preventing burned brushless motor windings. (16 words)
+  *Caption:* Built-in gyro sensors shut off the motor instantly during crashes to protect the electronics. (14 words)
 
 * **Photo 6 (`fig6_stunt_operation.jpg`):**  
-  *Caption:* For sport and stunt flying, the timer automatically adds power in maneuvers to mimic a classic engine run. (19 words)
+  *Caption:* The gyro adds power in corners and climbs to help sport and stunt flyers. (14 words)
 
 * **Photo 7 (`fig7_stem_workbench.jpg`):**  
-  *Caption:* Simple open-source Arduino hardware makes this timer a great hands-on project for school STEM programs and clubs. (18 words)
+  *Caption:* The low-cost Arduino setup makes this an easy project for school STEM clubs. (13 words)
 
 ---
 
-## Specifications & Resources
+## Resources
 
 * **Club Website:** Circle Masters Control Line Club ([http://www.circlemasters.com](http://www.circlemasters.com))
 * **Author Contact:** David Siegler, AMA NE9N (`dwsiegler@gmail.com`)
 * **Project Files & Code:** [https://github.com/ne9n/new-timer](https://github.com/ne9n/new-timer)
-* **Power Setup:** 2807-size brushless motor, 30A ESC, 3S 2,200 mAh LiPo battery, 8x4 propeller
-* **Electronics:** Arduino Nano V3 (or ESP32), MPU-6050 sensor board, custom carrier PCB
-
----
-
-*This article is formatted according to Model Aviation submission guidelines, using AP and AMA style conventions with acronyms spelled out on first reference.*
+* **Setup:** 2807 brushless motor, 30A ESC, 3S 2,200 mAh LiPo battery, 8x4 prop
+* **Electronics:** Arduino Nano, MPU-6050 gyro board, custom plug-in PCB
