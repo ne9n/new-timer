@@ -44,6 +44,21 @@ The timer fixes this with two throttle stages:
 
 ---
 
+## How the Software Works
+
+The software is simple and works like a flight checklist. It steps through six basic stages:
+
+1. **Wait:** The timer sits disarmed with a flashing light, waiting for the button press.
+2. **Arming delay:** When you press the button, it gives a five-second countdown so the pit man can get set to launch.
+3. **Takeoff ramp:** It ramps the motor to full power for the hand launch and holds it there for two laps.
+4. **Fly:** It throttles back to cruise speed. While flying, the code reads the gyro sensor 50 times every second to watch for crashes or stunt maneuvers.
+5. **Warning blip:** At the end of the flight, it gives a quick throttle "burp" as a landing heads-up.
+6. **Ramp down:** It smoothly cuts the throttle so the plane glides in for a touchdown.
+
+The code talks to standard speed controllers using the same regular servo signals any RC receiver uses. It is written in simple C++, so anyone who has used an Arduino can open the file, read it, and change values like flight times or motor speeds.
+
+---
+
 ## Protecting Motors in a Crash
 
 When a glow engine hits the ground, the prop stops and the engine stalls. Electric motors do not do that.
