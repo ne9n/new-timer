@@ -20,7 +20,7 @@ We decided to switch to electric power. But off-the-shelf timers did not fit how
 
 Going electric changed everything on our flight line:
 
-* **One-person pits:** We went from three pit crew members down to one. The pit man sets the plane down, pushes a button on the fuselage, and hand-launches it.
+* **One-person pits:** We went from three pit crew members down to one. The pit man holds the plane, pushes a button on the fuselage, and hand-launches it.
 * **Seven flights per pack:** We use a cheap 3S 2,200 mAh LiPo battery and a budget 2807-size brushless motor. That single battery gives us six to seven 90-second flights before we need to swap it out.
 * **Fast turnarounds:** When a flight ends, the next kid takes the handle. The pit man hits the button, launches, and the plane is in the air in seconds.
 
@@ -30,23 +30,23 @@ Going electric changed everything on our flight line:
 
 Our circles sit right next to active helicopter flight paths at Pioneer Airport. Passing rotor wash and summer wind gusts make for rough air down low.
 
-Here is the problem with training:
-* If you launch at a slow training speed, the plane struggles in tall grass and can get tossed around by wind or rotor wash.
+We hand-launch every airplane. Here is the problem with training:
+* If you launch at a slow training speed, the airplane struggles the first two laps to pick up airspeed and get tossed around by wind or rotor wash.
 * If you run full throttle the whole time, the plane flies at 50 to 60 mph. That is way too fast for an 8-year-old beginner.
 * If the instructor tries to hold a throttle lever while helping the student, their attention is divided.
 
 The timer fixes this with two throttle stages:
 
-1. **Full-power takeoff:** The motor starts at 100% power for two to three seconds. This pulls the plane out of the grass, beats the wind, and sets solid line tension.
-2. **Slow cruise:** Once the plane gets up to shoulder height, the motor drops to a calm 65% power. The flight slows down so the student can relax and learn to fly level.
+1. **Full-power launch:** The motor starts at 100% power for the first couple laps. This gives the hand-launched plane enough thrust to pick up speed quickly, beat the wind, and lock in solid line tension.
+2. **Slow cruise:** Once the plane is up and moving, the motor drops to a calm 65% power. The flight slows down so the student can relax and learn to fly level.
 3. **The warning "burp":** One lap before flight time ends, the motor revs up for a quick blip. This tells the instructor and student that the motor is about to shut down.
-4. **Smooth landing:** The motor ramps down slowly so the plane glides in for an easy landing on the grass.
+4. **Smooth landing:** The motor ramps down slowly so the plane glides in for an easy touchdown.
 
 ---
 
 ## Protecting Motors in a Crash
 
-When a glow engine hits the dirt, the prop stops and the engine stalls. Electric motors do not do that.
+When a glow engine hits the ground, the prop stops and the engine stalls. Electric motors do not do that.
 
 If an electric plane hits the ground and the timer keeps running, the stalled motor pulls massive current. Within three or four seconds, the heat melts the copper wire windings and destroys the speed control (ESC).
 
@@ -99,7 +99,7 @@ KidVenture works because modelers from all over show up to help. If you are comi
   *Caption:* An instructor coaches a young first-time flyer at EAA KidVenture in Oshkosh. (13 words)
 
 * **Photo 2 (`fig2_launch_sequence.jpg`):**  
-  *Caption:* The trainer launches at full power to clear wind and grass before slowing to cruise. (15 words)
+  *Caption:* Full power at launch helps the hand-launched trainer pick up speed before dropping to cruise. (16 words)
 
 * **Photo 3 (`fig3_carrier_board.jpg`):**  
   *Caption:* The circuit board plugs directly into the Arduino, gyro sensor, and speed control. (13 words)
