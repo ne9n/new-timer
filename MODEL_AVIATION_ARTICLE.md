@@ -8,11 +8,11 @@
 
 ## 1,500 Flights in Seven Days
 
-Every summer at EAA AirVenture in Oshkosh, Wisconsin, the Circle Masters Control Line Club runs introductory flights for kids at Pioneer Airport. We have been doing this for over 30 years. Modelers from across the country and around the world come to Oshkosh to help out. In just seven days, our crew gives more than 1,500 flights to kids who have never held a control handle before.
+Every summer at EAA AirVenture in Oshkosh, Wisconsin, the Circle Masters Control Line Club runs introductory flights for kids at Pioneer Airport. The club has been doing this for over 30 years. Modelers from across the country and around the world come to Oshkosh to help out. In just seven days, our crew gives more than 1,500 flights to kids who have never held a control handle before.
 
-For years, we flew small Norvel .061 glow engines. They did the job, but running them all day was hard work. Every flight circle needed three people: one to prime and fuel, one to hold the starter battery and electric starter, and one to hold the plane. Finding parts, fuel, and people who knew how to tune small glow engines was getting harder every year. Refueling after every 90-second flight caused constant lines and delays.
+For years, the club flew small Norvel .061 glow engines. They did the job, but running them all day was hard work. Every flight circle needed three people: one to prime and fuel, one to hold the starter battery and electric starter, and one to hold the plane. Finding parts, fuel, and people who knew how to tune small glow engines was getting harder every year. Refueling after every 90-second flight caused constant lines and delays.
 
-We decided to switch to electric power. But off-the-shelf timers did not fit how we fly at Oshkosh. So over three summers of testing, we built our own setup: the **Cheesehead Timer**.
+We decided to switch to electric power. But off-the-shelf timers did not fit how we fly at Oshkosh. So over three summers of field testing, I developed my own setup: the **Cheesehead Timer**.
 
 ---
 
@@ -20,8 +20,8 @@ We decided to switch to electric power. But off-the-shelf timers did not fit how
 
 Going electric changed everything on our flight line:
 
-* **One-person pits:** We went from three pit crew members down to one. The pit man holds the plane, pushes a button on the fuselage, and hand-launches it.
-* **Seven flights per pack:** We use a cheap 3S 2,200 mAh LiPo battery and a budget 2807-size brushless motor. That single battery gives us six to seven 90-second flights before we need to swap it out.
+* **One-person pits:** The flight line went from three pit crew members down to one. The pit man holds the plane, pushes a button on the fuselage, and hand-launches it.
+* **Seven flights per pack:** I use a cheap 3S 2,200 mAh LiPo battery and a budget 2807-size brushless motor. That single battery gives six to seven 90-second flights before needing a battery swap.
 * **Fast turnarounds:** When a flight ends, the next kid takes the handle. The pit man hits the button, launches, and the plane is in the air in seconds.
 * **A consistent student experience:** With glow engines, one run was rich and sluggish, the next leaned out too fast, or the engine died after 45 seconds. With the timer, every single student gets the exact same flight: an identical launch, the same steady cruise speed, and a full 90 seconds in the air. Instructors know exactly what the plane will do every flight.
 
@@ -32,7 +32,7 @@ Going electric changed everything on our flight line:
 Our circles sit right next to active helicopter flight paths at Pioneer Airport. Passing rotor wash and summer wind gusts make for rough air down low.
 
 We hand-launch every airplane. Here is the problem with training:
-* If you launch at a slow training speed, the airplane struggles the first two laps to pick up airspeed and get tossed around by wind or rotor wash.
+* If you launch at a slow training speed, the airplane struggles the first two laps to pick up airspeed and gets tossed around by wind or rotor wash.
 * If you run full throttle the whole time, the plane flies at 50 to 60 mph. That is way too fast for an 8-year-old beginner.
 * If the instructor tries to hold a throttle lever while helping the student, their attention is divided.
 
@@ -68,9 +68,9 @@ When a glow engine hits the ground, the prop stops and the engine stalls. Electr
 
 If an electric plane hits the ground and the timer keeps running, the stalled motor pulls massive current. Within three or four seconds, the heat melts the copper wire windings and destroys the speed control (ESC).
 
-To stop this from happening, we added an inexpensive MPU-6050 gyro sensor to the board:
+To stop this from happening, I added an inexpensive MPU-6050 gyro sensor to the board:
 
-* **Impact shutoff:** If the nose hits the ground, the sensor catches the shock and kills power in milliseconds. We do not burn up motors or ESCs anymore.
+* **Impact shutoff:** If the nose hits the ground, the sensor catches the shock and kills power in milliseconds. Motors and ESCs do not burn up anymore.
 * **Stop shutoff:** If the plane stops spinning around the circle, the timer cuts power right away.
 * **Slack line safety:** If a line breaks or the plane turns inward toward the circle, the motor shuts off immediately.
 
@@ -82,7 +82,7 @@ The idea for this timer came from a trip I took in 2017 to an indoor control lin
 
 Their models flew very slowly on level laps. But the second the nose went up for a loop or a corner, the motor spooled up to give extra pull.
 
-We added that same feature to our timer for sport and stunt flyers:
+I built that same feature into the timer for sport and stunt flyers:
 
 * **Corner boost:** When you pull up for a loop or a square corner, the gyro senses the move and adds throttle to keep line tension tight.
 * **Pitch trim:** The timer adds power on vertical climbs and cuts power on dives. It acts just like the classic "4-2-4" engine break on a glow stunt engine.
@@ -91,17 +91,17 @@ We added that same feature to our timer for sport and stunt flyers:
 
 ## Simple Hardware and STEM Projects
 
-The timer runs on a cheap, standard Arduino Nano board and a gyro module. We designed a small circuit board that everything plugs into, so there are no loose or messy wires.
+The timer runs on a cheap, standard Arduino Nano board and a gyro module. I designed a small circuit board that everything plugs into, so there are no loose or messy wires.
 
 Because the parts are cheap and the code is open-source, this is a great project for school STEM clubs and youth build sessions. Kids can build the board, plug it in, and see how sensors, software, and motors work on a real model airplane.
 
-We also made a simple computer app. You can plug the timer into a laptop with a USB cable and change speeds, launch power, and flight times in seconds.
+I also wrote a simple computer app. You can plug the timer into a laptop with a USB cable and change speeds, launch power, and flight times in seconds.
 
 ---
 
 ## What Comes Next & How You Can Help
 
-We are working on several new features:
+I am working on several new features:
 * **Direct ESC telemetry:** Direct digital connection to the speed controller to monitor motor temperature, battery current, and RPM live in flight.
 * **Smaller dedicated hardware:** A tiny all-in-one circuit board with built-in wireless connections so you can adjust settings from a phone right at the flight line without plugging in cables.
 * **Twin-engine controls:** Multi-motor support with synchronized spool-up and differential thrust to keep lines tight on scale twins.
@@ -109,10 +109,10 @@ We are working on several new features:
 * **Voltage compensation:** Automatic throttle adjustments to keep lap times identical as the battery voltage drops over multiple flights.
 
 ### Join Us at KidVenture or on GitHub
-We would love extra help from the aeromodeling community on two fronts:
+I would love extra help from the aeromodeling community on two fronts:
 
 1. **Help on the flight line:** If you are attending EAA AirVenture in Oshkosh, come join our volunteer crew at Pioneer Airport. We can always use extra flight coaches, pit crew, and line tenders. It is one of the most rewarding weeks of flying you will ever experience.
-2. **Help with new features:** If you enjoy coding, building electronics, or testing new ideas, jump into our open-source project on GitHub. Whether you want to help write phone apps, test twin-engine profiles, or build circuit boards, you are welcome to pitch in.
+2. **Help with new features:** If you enjoy coding, building electronics, or testing new ideas, jump into the open-source project on GitHub. Whether you want to help write phone apps, test twin-engine profiles, or build circuit boards, you are welcome to pitch in.
 
 Send me an email or check out the project links below to get involved.
 
