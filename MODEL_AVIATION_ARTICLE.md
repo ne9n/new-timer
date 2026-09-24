@@ -23,6 +23,7 @@ Going electric changed everything on our flight line:
 * **One-person pits:** We went from three pit crew members down to one. The pit man holds the plane, pushes a button on the fuselage, and hand-launches it.
 * **Seven flights per pack:** We use a cheap 3S 2,200 mAh LiPo battery and a budget 2807-size brushless motor. That single battery gives us six to seven 90-second flights before we need to swap it out.
 * **Fast turnarounds:** When a flight ends, the next kid takes the handle. The pit man hits the button, launches, and the plane is in the air in seconds.
+* **A consistent student experience:** With glow engines, one run was rich and sluggish, the next leaned out too fast, or the engine died after 45 seconds. With the timer, every single student gets the exact same flight: an identical launch, the same steady cruise speed, and a full 90 seconds in the air. Instructors know exactly what the plane will do every flight.
 
 ---
 
