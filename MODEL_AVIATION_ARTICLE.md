@@ -55,7 +55,9 @@ The software is simple and works like a flight checklist. It steps through six b
 5. **Warning blip:** At the end of the flight, it gives a quick throttle "burp" as a landing heads-up.
 6. **Ramp down:** It smoothly cuts the throttle so the plane glides in for a touchdown.
 
-The code talks to standard speed controllers using the same regular servo signals any RC receiver uses. It is written in simple C++, so anyone who has used an Arduino can open the file, read it, and change values like flight times or motor speeds.
+All speed settings, timing intervals, and IMU sensor configurations are fully programmable by the user. You can easily adjust launch power, cruise speed, countdown delays, flight duration, and sensor sensitivities (such as crash-detection cutoffs and stunt maneuver boost) to match your specific model and flying style.
+
+The code talks to standard speed controllers using the same regular servo signals any RC receiver uses. It is written in simple C++, so anyone who has used an Arduino can open the file, read it, and change values directly.
 
 ---
 
