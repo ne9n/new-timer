@@ -98,7 +98,7 @@ We also made a simple computer app. You can plug the timer into a laptop with a 
 
 ---
 
-## What Comes Next
+## What Comes Next & How You Can Help
 
 We are working on several new features:
 * **Direct ESC telemetry:** Direct digital connection to the speed controller to monitor motor temperature, battery current, and RPM live in flight.
@@ -107,7 +107,13 @@ We are working on several new features:
 * **Retract gear sequencing:** Dedicated servo control to tuck the gear away after climbout and drop it before landing.
 * **Voltage compensation:** Automatic throttle adjustments to keep lap times identical as the battery voltage drops over multiple flights.
 
-KidVenture works because modelers from all over show up to help. If you are coming to Oshkosh this summer, stop by Pioneer Airport. We can always use another set of hands on the flight line.
+### Join Us at KidVenture or on GitHub
+We would love extra help from the aeromodeling community on two fronts:
+
+1. **Help on the flight line:** If you are attending EAA AirVenture in Oshkosh, come join our volunteer crew at Pioneer Airport. We can always use extra flight coaches, pit crew, and line tenders. It is one of the most rewarding weeks of flying you will ever experience.
+2. **Help with new features:** If you enjoy coding, building electronics, or testing new ideas, jump into our open-source project on GitHub. Whether you want to help write phone apps, test twin-engine profiles, or build circuit boards, you are welcome to pitch in.
+
+Send me an email or check out the project links below to get involved.
 
 ---
 
