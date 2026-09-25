@@ -64,7 +64,7 @@ The code talks to standard speed controllers using the same regular servo signal
 
 ## Protecting Motors in a Crash
 
-When a glow engine hits the ground, the prop stops and the engine stalls. Electric motors do not do that.
+When a glow engine hits the ground, or noses over on take off, the prop stops and the engine stalls. Electric motors do not do that.
 
 If an electric plane hits the ground and the timer keeps running, the stalled motor pulls massive current. Within three or four seconds, the heat melts the copper wire windings and destroys the speed control (ESC).
 
