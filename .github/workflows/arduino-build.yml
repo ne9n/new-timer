@@ -1,7 +1,7 @@
 # ==========================================
 # ARDUINO CLOUD AUTOMATED MATRIX BUILD
 # Targets: Arduino Nano (New & Old Bootloader)
-# Dependencies: Arduino IoT Cloud Library Stack
+# Dependencies: MPU6050_tockn, ezLED, OneButton, Servo, ESP32Servo
 # ==========================================
 
 name: Build and Save Arduino Nano Binaries
@@ -34,6 +34,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Create Build Output Directory
+        run: mkdir -p build-output
+
       # Compile and automatically dump the compiled binaries to a local folder
       - name: Compile Arduino Sketch
         uses: arduino/compile-sketches@v1
@@ -42,15 +45,17 @@ jobs:
           platforms: |
             - name: ${{ matrix.board.platform }}
           
-          # Includes the core Arduino IoT Cloud library suite and dependencies
+          # External libraries used by the firmware. AVR builds use Servo;
+          # ESP32 builds use ESP32Servo.
           libraries: |
-            - name: ArduinoIoTCloud
-            - name: Arduino_ConnectionHandler
-            - name: Arduino_DebugUtils
-            - name: Arduino_BuiltIn
+            - name: MPU6050_tockn
+            - name: ezLED
+            - name: OneButton
+            - name: Servo
+            - name: ESP32Servo
             
           sketch-paths: |
-            - ./MySketchDirectory  # <--- Change this to match your local .ino folder name
+            - ./cheesehead_timer
             
           # This tells the compiler where to place the final binary outputs
           cli-compile-flags: |
