@@ -25,6 +25,12 @@ This document provides a comprehensive, step-by-step **Bench Integration Test Pl
 
 ---
 
+## Automated Host Unit Tests
+
+Run `powershell -ExecutionPolicy Bypass -File cheesehead_timer\tests\run_tests.ps1` from the repository root. The gyro tests simulate three full 360-degree rotations for each possible physical yaw-axis assignment (X, Y, and Z), expecting 30 tenths of a lap each time, and verify excessive-pitch, excessive-yaw, and low-yaw cutoffs. Pitch, roll, and yaw are mapped from physical sensor axes by the menu settings. These tests run against mocked sensor inputs; they do not replace board or hardware testing.
+
+---
+
 ## 📐 Pre-Test Bench Setup
 
 1. Connect the board via USB to your host PC.

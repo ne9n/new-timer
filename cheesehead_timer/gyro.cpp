@@ -220,12 +220,6 @@ void processGyroSafety()
   // only evaluate every GYRO_SAMPLE_MS
   if ((currentMillis - last_mils) < GYRO_SAMPLE_MS) return;
 
-  int dx = iangleX - last_x;
-  int dy = iangleY - last_y;
-  int dz = iangleZ - last_z;
-
-  // --- LAP COUNT (tenths) ---
-  static float accumulatedY = 0.0f; // accumulated signed degrees
   auto signedDelta = [](int cur, int prev)->int {
     int d = cur - prev;
     if (d > 180) d -= 360;
@@ -233,13 +227,18 @@ void processGyroSafety()
     return d;
   };
 
-  int signedDeltaY = signedDelta(iangleY, last_y);
-  accumulatedY += (float)signedDeltaY;
+  int dx = iangleX - last_x;
+  int dy = iangleY - last_y;
+  int yawDelta = signedDelta(iangleZ, last_z);
+
+  // --- LAP COUNT (tenths) ---
+  static float accumulatedYaw = 0.0f;
+  accumulatedYaw += (float)yawDelta;
 
   auto processLapAccum = [&]() {
     // 36 degrees == 0.1 lap
-    if (fabs(accumulatedY) < 36.0f) return;
-    int tenths = (int)(fabs(accumulatedY) / 36.0f);
+    if (fabs(accumulatedYaw) < 36.0f) return;
+    int tenths = (int)(fabs(accumulatedYaw) / 36.0f);
     TimerSetup.LapCount += (unsigned long)tenths; // units = 0.1 lap
 
     // enforce shutdown if limit reached
@@ -265,13 +264,13 @@ void processGyroSafety()
     }
 
     float consumed = 36.0f * (float)tenths;
-    if (accumulatedY > 0) accumulatedY -= consumed; else accumulatedY += consumed;
+    if (accumulatedYaw > 0) accumulatedYaw -= consumed; else accumulatedYaw += consumed;
   };
 
   processLapAccum();
 
   // --- PITCH / YAW EVALUATION ---
-  evaluateHighPitchYaw(dx, dy, dz);
+  evaluateHighPitchYaw(dx, dy, yawDelta);
 
   // update last samples and time
   last_x = iangleX;

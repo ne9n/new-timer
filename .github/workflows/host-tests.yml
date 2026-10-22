@@ -1,0 +1,38 @@
+name: Host Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  state-machine-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Compile Host Tests
+        run: >-
+          g++ -std=c++11 -Wall -Wextra
+          -I cheesehead_timer/tests/fakes
+          -I cheesehead_timer
+          cheesehead_timer/state_machine.cpp
+          cheesehead_timer/tests/state_machine_test.cpp
+          -o state-machine-tests
+
+      - name: Run Host Tests
+        run: ./state-machine-tests
+
+      - name: Compile Gyro Tests
+        run: >-
+          g++ -std=c++11 -Wall -Wextra
+          -I cheesehead_timer/tests/fakes
+          -I cheesehead_timer
+          cheesehead_timer/gyro.cpp
+          cheesehead_timer/tests/gyro_test.cpp
+          -o gyro-tests
+
+      - name: Run Gyro Tests
+        run: ./gyro-tests

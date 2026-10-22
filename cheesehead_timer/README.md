@@ -9,6 +9,14 @@ Overview
   - `term.cpp` / `term.h` — serial terminal for diagnostics and configuration.
   - `led.cpp` / `led2.cpp` — LED indicators.
 
+Host state-machine tests compile the production `state_machine.cpp` against
+small Arduino and Servo fakes. They require a C++ compiler providing `g++` but
+do not require a board or PlatformIO. On Windows, run
+`powershell -ExecutionPolicy Bypass -File cheesehead_timer\tests\run_tests.ps1`
+after installing `g++`. The tests also run in the `Host Tests` GitHub Actions
+workflow; Nano firmware compilation remains covered by the Arduino build
+workflow.
+
 ```mermaid
 graph TD
     %% Styles
